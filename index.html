@@ -15,14 +15,17 @@
         
         .screen { display: none; width: 100%; height: 100%; flex-direction: column; }
         .screen.active { display: flex; }
-        .screen-padded { padding: 24px; }
+        
+        /* УМЕНЬШИЛИ БОКОВЫЕ ОТСТУПЫ, ЧТОБЫ ПОЛЕ БЫЛО ШИРЕ НА ТЕЛЕФОНЕ */
+        .screen-padded { padding: 14px; }
+        @media (min-width: 421px) { .screen-padded { padding: 24px; } }
 
         .btn { background: var(--primary); color: white; border: none; padding: 16px 20px; font-size: 17px; border-radius: 16px; font-weight: 800; cursor: pointer; transition: all 0.15s; text-align: center; display: block; width: 100%; box-shadow: 0 4px 12px rgba(67,105,50,0.35); text-transform: uppercase; letter-spacing: 0.5px; }
         .btn:active { transform: scale(0.97); }
         .btn-secondary { background: rgba(255,255,255,0.95); color: #1a1a1a; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: none; }
         .btn-accent { background: var(--accent); box-shadow: 0 6px 15px rgba(229,142,38,0.4); }
         
-        .nav-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-shrink: 0; }
+        .nav-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-shrink: 0; }
         .nav-back-btn { background: rgba(0,0,0,0.06); border: none; border-radius: 12px; padding: 8px 14px; font-weight: 700; cursor: pointer; font-size: 14px; transition: 0.2s; }
         .nav-back-btn:active { background: rgba(0,0,0,0.1); }
 
@@ -45,8 +48,11 @@
         .checkpoint-label { position: absolute; bottom: -20px; white-space: nowrap; font-size: 12px; font-weight: 800; color: #FF8F00; background: rgba(255,255,255,0.8); padding: 2px 8px; border-radius: 10px; }
 
         .status-card { background: rgba(0,0,0,0.04); padding: 10px 14px; border-radius: 14px; margin-bottom: 12px; display: flex; justify-content: space-around; font-size: 15px; font-weight: 800; align-items: center; border: 1px solid rgba(0,0,0,0.05); }
-        .board { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; background: rgba(67,105,50,0.15); padding: 8px; border-radius: 18px; aspect-ratio: 1; margin-bottom: 12px; }
-        .cell { background: var(--cell-bg); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; transition: 0.15s; aspect-ratio: 1; font-size: 26px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        
+        /* УЛУЧШЕНИЯ ДЛЯ ПОЛЯ: touch-action: none отключает скролл экрана при свайпах, gap меньше */
+        .board { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; background: rgba(67,105,50,0.15); padding: 4px; border-radius: 14px; aspect-ratio: 1; margin-bottom: 12px; touch-action: none; width: 100%; }
+        .cell { background: var(--cell-bg); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; transition: 0.15s; aspect-ratio: 1; font-size: 26px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        
         .cell.selected { background: #d7ecd0; transform: scale(0.92); box-shadow: inset 0 0 0 2.5px var(--primary); }
         .item-img { width: 85%; height: 85%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
         .fallback-icon { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: inherit; }
@@ -72,19 +78,14 @@
         .post-media .item-img { width: 60%; height: 60%; }
         .post-footer { display: flex; gap: 16px; color: #777; font-size: 14px; font-weight: 600; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px; }
         
-        /* НОВЫЙ СТИЛЬ ФЕРМЫ: Единый ландшафт + Drawer */
         .farm-landscape { flex: 1; background: #8BC34A linear-gradient(135deg, #AEDB58 0%, #689F38 100%); position: relative; border-radius: 20px; border: 4px solid rgba(255,255,255,0.5); overflow: hidden; margin-bottom: 10px; box-shadow: inset 0 0 20px rgba(0,0,0,0.1); }
-        /* Имитация тропинок и полянок на фоне */
         .farm-landscape::after { content: ''; position: absolute; top: 20%; bottom: 20%; left: 20%; right: 20%; background: rgba(220, 231, 117, 0.4); border-radius: 40px; filter: blur(15px); z-index: 0; }
-        
         .farm-spot { position: absolute; width: 80px; height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2;}
         .farm-spot-pad { background: rgba(0,0,0,0.15); width: 60px; height: 25px; border-radius: 50%; position: absolute; bottom: 5px; z-index: 1; border: 2px dashed transparent; }
         .farm-spot-icon { z-index: 2; position: relative; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 44px; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.3)); }
         .farm-spot-icon img { width: 100%; height: 100%; object-fit: contain; }
-
         .farm-build-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 85%; z-index: 10; box-shadow: 0 4px 15px rgba(0,0,0,0.3); padding: 14px; font-size: 16px; border-radius: 14px;}
 
-        /* БОКОВОЕ МЕНЮ СТРОЙКИ (Drawer) */
         .drawer-overlay { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; backdrop-filter: blur(2px); border-radius: inherit; }
         .build-drawer { position: absolute; top: 0; right: -320px; bottom: 0; width: 280px; background: #FFF; z-index: 201; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 24px 16px; display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.2); overflow-y: auto; }
         .build-drawer.open { right: 0; }
@@ -150,12 +151,10 @@
         </div>
         
         <div class="farm-landscape" id="farm-landscape">
-            <!-- Места под постройки на ландшафте -->
             <div class="farm-spot" id="spot-strawberry" style="top: 15%; left: 10%;"></div>
             <div class="farm-spot" id="spot-cherry" style="top: 10%; right: 15%;"></div>
             <div class="farm-spot" id="spot-tractor" style="top: 50%; left: 15%;"></div>
             <div class="farm-spot" id="spot-bread" style="top: 45%; right: 10%;"></div>
-            
             <button class="btn btn-accent farm-build-btn" onclick="openBuildMenu()">🔨 СТРОИТЕЛЬСТВО</button>
         </div>
 
@@ -166,9 +165,7 @@
                 <div style="font-size: 18px; font-weight: 900; color: #263326;">Магазин</div>
                 <button style="background: rgba(0,0,0,0.05); border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 14px; font-weight: 800; cursor: pointer; color: #555;" onclick="closeBuildMenu()">✖</button>
             </div>
-            <div id="drawer-items">
-                <!-- Заполняется JS -->
-            </div>
+            <div id="drawer-items"></div>
         </div>
     </div>
 
@@ -196,7 +193,7 @@
         </div>
         <div id="message" class="message">Собери урожай!</div>
         <div id="board" class="board"></div>
-        <button class="btn btn-secondary" style="padding: 12px; font-size: 14px;" onclick="showScreen('screen-levels')">Сдаться и выйти</button>
+        <button class="btn btn-secondary" style="padding: 12px; font-size: 14px; margin-top: 10px;" onclick="showScreen('screen-levels')">Сдаться и выйти</button>
     </div>
 
     <div id="screen-collection" class="screen screen-padded">
@@ -272,6 +269,9 @@
     let currentQuizContext = null; let pendingBuildKey = null;
     let selectedBoosters = { bomb: false, plane: false, moves: false };
     const BOOSTER_COSTS = { bomb: 30, plane: 30, moves: 40 };
+    
+    // ПЕРЕМЕННЫЕ ДЛЯ СВАЙПА
+    let swipeStartX = 0, swipeStartY = 0, swipeR = -1, swipeC = -1;
 
     function showPreLevel(idx) {
         selectedLevelIndex = idx; let lvl = LEVELS_DATA[idx];
@@ -313,16 +313,8 @@
         if (screenId === 'screen-farm') { renderFarm(); farmRenderInterval = setInterval(renderFarm, 1000); }
     }
 
-    // --- НОВЫЙ РЕНДЕР ФЕРМЫ (ЛАНДШАФТ И ШТОРКА) ---
-    function openBuildMenu() {
-        renderFarmDrawer();
-        document.getElementById('drawer-overlay').style.display = 'block';
-        setTimeout(() => document.getElementById('build-drawer').classList.add('open'), 10);
-    }
-    function closeBuildMenu() {
-        document.getElementById('build-drawer').classList.remove('open');
-        setTimeout(() => document.getElementById('drawer-overlay').style.display = 'none', 300);
-    }
+    function openBuildMenu() { renderFarmDrawer(); document.getElementById('drawer-overlay').style.display = 'block'; setTimeout(() => document.getElementById('build-drawer').classList.add('open'), 10); }
+    function closeBuildMenu() { document.getElementById('build-drawer').classList.remove('open'); setTimeout(() => document.getElementById('drawer-overlay').style.display = 'none', 300); }
 
     function renderFarmDrawer() {
         let drawerHtml = '';
@@ -443,7 +435,49 @@
         if (selectedBoosters.plane) board[Math.floor(Math.random() * SIZE)][Math.floor(Math.random() * SIZE)].special = "plane";
     }
 
-    function renderBoard() { const boardEl = document.getElementById("board"); boardEl.innerHTML = ""; for (let r = 0; r < SIZE; r++) { for (let c = 0; c < SIZE; c++) { const cell = document.createElement("div"); cell.className = "cell"; if (selected && selected.r === r && selected.c === c) cell.classList.add("selected"); const item = board[r][c]; if (item) { let imgHtml = getImgTag(item.special ? item.special : item.type); cell.innerHTML = `<div style="width: 85%; height: 85%;">${imgHtml}</div>`; } cell.onclick = () => handleCellClick(r, c); boardEl.appendChild(cell); } } }
+    // --- ВНЕДРЯЕМ СВАЙПЫ ДЛЯ ТЕЛЕФОНА ---
+    function renderBoard() { 
+        const boardEl = document.getElementById("board"); boardEl.innerHTML = ""; 
+        for (let r = 0; r < SIZE; r++) { 
+            for (let c = 0; c < SIZE; c++) { 
+                const cell = document.createElement("div"); cell.className = "cell"; 
+                if (selected && selected.r === r && selected.c === c) cell.classList.add("selected"); 
+                const item = board[r][c]; 
+                if (item) { let imgHtml = getImgTag(item.special ? item.special : item.type); cell.innerHTML = `<div style="width: 85%; height: 85%;">${imgHtml}</div>`; } 
+                
+                // Клик (остается для мышки)
+                cell.onclick = () => handleCellClick(r, c); 
+                
+                // Свайпы (для сенсорных экранов)
+                cell.addEventListener('touchstart', (e) => {
+                    if (busy || finished) return;
+                    swipeStartX = e.touches[0].clientX;
+                    swipeStartY = e.touches[0].clientY;
+                    swipeR = r; swipeC = c;
+                }, {passive: true});
+
+                cell.addEventListener('touchend', (e) => {
+                    if (busy || finished || swipeR === -1) return;
+                    let dx = e.changedTouches[0].clientX - swipeStartX;
+                    let dy = e.changedTouches[0].clientY - swipeStartY;
+                    
+                    if (Math.abs(dx) > 20 || Math.abs(dy) > 20) {
+                        let tr = swipeR, tc = swipeC;
+                        if (Math.abs(dx) > Math.abs(dy)) { dx > 0 ? tc++ : tc--; } 
+                        else { dy > 0 ? tr++ : tr--; }
+                        
+                        if (tr >= 0 && tr < SIZE && tc >= 0 && tc < SIZE) {
+                            executeSwapAndCheck(swipeR, swipeC, tr, tc);
+                        }
+                    }
+                    swipeR = -1; swipeC = -1;
+                });
+
+                boardEl.appendChild(cell); 
+            } 
+        } 
+    }
+
     function updateUI() { let lvl = LEVELS_DATA[selectedLevelIndex]; document.getElementById("target-icon").innerHTML = `<div style="width: 100%; height: 100%;">${getImgTag(lvl.targetItem)}</div>`; document.getElementById("target-count").innerText = `${collectedCount}/${lvl.targetCount}`; document.getElementById("moves-label").innerText = `Ходы: ${moves}`; renderBoard(); }
     function setMessage(text) { document.getElementById("message").innerText = text; }
     function collectItem(item) { let lvl = LEVELS_DATA[selectedLevelIndex]; if (item && item.type === lvl.targetItem) collectedCount++; }
