@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Код земли</title>
+    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+    <style>
+        :root { --primary: #436932; --accent: #E58E26; --card-bg: rgba(255, 255, 255, 0.9); --cell-bg: rgba(255, 255, 255, 0.95); }
+        * { box-sizing: border-box; }
+        body { background-color: #8da680; background-image: linear-gradient(180deg, rgba(50,80,38,0.3) 0%, rgba(30,50,25,0.6) 100%), url('img/bg.jpg'); background-size: cover; background-position: center; background-attachment: fixed; color: #263326; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 0; touch-action: manipulation; }
+        
+        .app-container { background: var(--card-bg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 16px 40px rgba(0,0,0,0.4); max-width: 420px; width: 100%; height: 100vh; max-height: 850px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        @media (min-width: 421px) { .app-container { height: 90vh; border-radius: 24px; border: 1px solid rgba(255,255,255,0.6); } }
+        
+        .screen { display: none; width: 100%; height: 100%; flex-direction: column; }
+        .screen.active { display: flex; }
+        .screen-padded { padding: 24px; }
+
+        .btn { background: var(--primary); color: white; border: none; padding: 16px 20px; font-size: 17px; border-radius: 16px; font-weight: 800; cursor: pointer; transition: all 0.15s; text-align: center; display: block; width: 100%; box-shadow: 0 4px 12px rgba(67,105,50,0.35); text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn:active { transform: scale(0.97); }
+        .btn-secondary { background: rgba(255,255,255,0.95); color: #1a1a1a; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: none; }
+        .btn-accent { background: var(--accent); box-shadow: 0 6px 15px rgba(229,142,38,0.4); }
+        
+        .nav-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-shrink: 0; }
+        .nav-back-btn { background: rgba(0,0,0,0.06); border: none; border-radius: 12px; padding: 8px 14px; font-weight: 700; cursor: pointer; font-size: 14px; transition: 0.2s; }
+        .nav-back-btn:active { background: rgba(0,0,0,0.1); }
+
+        .coin-balance { background: #FFF8E1; border: 2px solid #FFECB3; padding: 6px 12px; border-radius: 14px; font-weight: 800; color: #F57F17; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 15px; }
+        
+        .map-container { flex: 1; overflow-y: auto; position: relative; padding: 40px 0; display: flex; flex-direction: column-reverse; align-items: center; scroll-behavior: smooth; }
+        .map-container::before { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: repeating-linear-gradient(to bottom, rgba(67,105,50,0.3) 0, rgba(67,105,50,0.3) 15px, transparent 15px, transparent 30px); transform: translateX(-50%); z-index: 0; }
+        .level-node-wrap { position: relative; z-index: 1; width: 100%; display: flex; justify-content: center; margin: 20px 0; }
+        .level-node-wrap:nth-child(even) { transform: translateX(40px); }
+        .level-node-wrap:nth-child(odd) { transform: translateX(-40px); }
+        .level-node-wrap.checkpoint { transform: translateX(0); margin: 30px 0; }
+        .level-node { width: 60px; height: 60px; border-radius: 50%; border: 3px solid rgba(67,105,50,0.4); background: #FFF; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: all 0.2s; font-weight: 800; font-size: 20px; color: #263326; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .level-node.completed { background: #E8F5E9; border-color: #81C784; color: #2E7D32; }
+        .level-node.current { border-color: var(--accent); background: #FFF3E0; color: var(--accent); transform: scale(1.15); box-shadow: 0 6px 16px rgba(229,142,38,0.3); }
+        .level-node.locked { background: rgba(0,0,0,0.05); border-color: transparent; color: #9E9E9E; cursor: not-allowed; }
+        .level-node-wrap.checkpoint .level-node { width: 76px; height: 76px; border-color: #FFC107; background: #FFF8E1; color: #FF8F00; box-shadow: 0 0 20px rgba(255,193,7,0.4); border-width: 4px; }
+        .level-node-wrap.checkpoint .level-node.completed { background: #FFE082; }
+        .level-node-wrap.checkpoint .level-node.locked { border-color: #E0E0E0; background: #F5F5F5; color: #BDBDBD; box-shadow: none; }
+        .level-badge { position: absolute; top: -16px; right: -16px; background: #FFF; border-radius: 12px; padding: 2px 6px; font-size: 12px; font-weight: 700; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 2px; }
+        .checkpoint-label { position: absolute; bottom: -20px; white-space: nowrap; font-size: 12px; font-weight: 800; color: #FF8F00; background: rgba(255,255,255,0.8); padding: 2px 8px; border-radius: 10px; }
+
+        .status-card { background: rgba(0,0,0,0.04); padding: 10px 14px; border-radius: 14px; margin-bottom: 12px; display: flex; justify-content: space-around; font-size: 15px; font-weight: 800; align-items: center; border: 1px solid rgba(0,0,0,0.05); }
+        .board { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; background: rgba(67,105,50,0.15); padding: 8px; border-radius: 18px; aspect-ratio: 1; margin-bottom: 12px; }
+        .cell { background: var(--cell-bg); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; transition: 0.15s; aspect-ratio: 1; font-size: 26px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        .cell.selected { background: #d7ecd0; transform: scale(0.92); box-shadow: inset 0 0 0 2.5px var(--primary); }
+        .item-img { width: 85%; height: 85%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
+        .fallback-icon { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: inherit; }
+        .message { font-size: 13px; color: #555; min-height: 18px; margin-bottom: 10px; font-weight: 600; text-align: center; }
+        
+        .collection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 10px 0; flex: 1; overflow-y: auto; }
+        .collection-card { background: #FFF; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 1px solid rgba(0,0,0,0.08); opacity: 0.45; filter: grayscale(100%); transition: all 0.3s; }
+        .collection-card.unlocked { opacity: 1; filter: grayscale(0%); cursor: pointer; border-color: var(--primary); box-shadow: 0 6px 16px rgba(67,105,50,0.15); }
+        .collection-card.unlocked:hover { transform: translateY(-2px); }
+        .collection-icon { font-size: 40px; margin-bottom: 6px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; }
+        .collection-title { font-weight: 800; font-size: 14px; margin-bottom: 4px; }
+        .collection-status { font-size: 11px; font-weight: 700; color: #777; }
+        .collection-card.unlocked .collection-status { color: #2E7D32; }
+
+        .blog-feed { flex: 1; overflow-y: auto; padding-bottom: 20px; display: flex; flex-direction: column; gap: 16px; }
+        .post-card { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.04); text-align: left; }
+        .post-header { display: flex; align-items: center; margin-bottom: 12px; }
+        .post-avatar { width: 44px; height: 44px; border-radius: 50%; background: #E8F5E9; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-right: 12px; border: 1px solid #C8E6C9; }
+        .post-author { font-weight: 800; font-size: 15px; color: #1a1a1a; margin-bottom: 2px; }
+        .post-date { font-size: 12px; color: #888; font-weight: 500; }
+        .post-text { font-size: 14px; line-height: 1.45; color: #333; margin-bottom: 14px; }
+        .post-media { width: 100%; height: 180px; border-radius: 12px; background: rgba(67,105,50,0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; overflow: hidden; }
+        .post-media .item-img { width: 60%; height: 60%; }
+        .post-footer { display: flex; gap: 16px; color: #777; font-size: 14px; font-weight: 600; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px; }
+        
+        /* НОВЫЙ СТИЛЬ ФЕРМЫ: Единый ландшафт + Drawer */
+        .farm-landscape { flex: 1; background: #8BC34A linear-gradient(135deg, #AEDB58 0%, #689F38 100%); position: relative; border-radius: 20px; border: 4px solid rgba(255,255,255,0.5); overflow: hidden; margin-bottom: 10px; box-shadow: inset 0 0 20px rgba(0,0,0,0.1); }
+        /* Имитация тропинок и полянок на фоне */
+        .farm-landscape::after { content: ''; position: absolute; top: 20%; bottom: 20%; left: 20%; right: 20%; background: rgba(220, 231, 117, 0.4); border-radius: 40px; filter: blur(15px); z-index: 0; }
+        
+        .farm-spot { position: absolute; width: 80px; height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2;}
+        .farm-spot-pad { background: rgba(0,0,0,0.15); width: 60px; height: 25px; border-radius: 50%; position: absolute; bottom: 5px; z-index: 1; border: 2px dashed transparent; }
+        .farm-spot-icon { z-index: 2; position: relative; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 44px; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.3)); }
+        .farm-spot-icon img { width: 100%; height: 100%; object-fit: contain; }
+
+        .farm-build-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 85%; z-index: 10; box-shadow: 0 4px 15px rgba(0,0,0,0.3); padding: 14px; font-size: 16px; border-radius: 14px;}
+
+        /* БОКОВОЕ МЕНЮ СТРОЙКИ (Drawer) */
+        .drawer-overlay { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; backdrop-filter: blur(2px); border-radius: inherit; }
+        .build-drawer { position: absolute; top: 0; right: -320px; bottom: 0; width: 280px; background: #FFF; z-index: 201; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 24px 16px; display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.2); overflow-y: auto; }
+        .build-drawer.open { right: 0; }
+        
+        .drawer-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: #F5F5F5; border-radius: 12px; margin-bottom: 12px; border: 1px solid #E0E0E0; }
+        .drawer-item.bought { opacity: 0.5; }
+        .drawer-item-icon { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 30px; background: white; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); flex-shrink: 0; }
+        .drawer-item-info { flex: 1; }
+        .drawer-item-title { font-weight: 800; font-size: 13px; color: #333; margin-bottom: 6px; line-height: 1.2; }
+
+        @keyframes buildBounce { 0%, 100% { transform: translateY(0) scale(1) rotate(0deg); } 25% { transform: translateY(-5px) scale(1.05) rotate(-5deg); } 75% { transform: translateY(-5px) scale(1.05) rotate(5deg); } }
+        .anim-build { animation: buildBounce 0.8s infinite; font-size: 36px; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); justify-content: center; align-items: center; z-index: 300; }
+        .modal-content { background: #FFF; padding: 26px; border-radius: 22px; text-align: center; max-width: 320px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.3); position: relative; }
+        .debug-reset { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.5); color: white; border: none; padding: 4px 8px; font-size: 10px; border-radius: 4px; cursor: pointer; z-index: 999; }
+
+        .booster-grid { display: flex; justify-content: center; gap: 12px; margin: 16px 0; }
+        .booster-card { background: rgba(0,0,0,0.04); border: 2px solid rgba(0,0,0,0.1); border-radius: 14px; padding: 12px 8px; cursor: pointer; transition: 0.2s; position: relative; width: 75px; display: flex; flex-direction: column; align-items: center; }
+        .booster-card.selected { background: #FFF8E1; border-color: #FFC107; box-shadow: 0 4px 12px rgba(255,193,7,0.3); transform: translateY(-3px); }
+        .booster-icon { font-size: 28px; margin-bottom: 6px; }
+        .booster-price { font-size: 12px; font-weight: 800; color: #F57F17; }
+        .booster-check { position: absolute; top: -8px; right: -8px; background: #4CAF50; color: white; border-radius: 50%; width: 22px; height: 22px; font-size: 13px; display: none; align-items: center; justify-content: center; font-weight: bold; border: 2px solid #FFF;}
+        .booster-card.selected .booster-check { display: flex; }
+        .target-wrap { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 26px; font-weight: 900; background: rgba(67,105,50,0.1); border-radius: 16px; padding: 12px; margin-bottom: 20px; }
+        .target-img-wrap { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <button class="debug-reset" onclick="hardReset()">Сбросить всё</button>
+
+    <div id="screen-menu" class="screen active" style="background-image: url('img/cover.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; justify-content: space-between;">
+        <div style="padding: 24px; display: flex; justify-content: flex-end;">
+            <div class="coin-balance">🪙 <span class="coin-val">0</span></div>
+        </div>
+        <div style="background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%); padding: 60px 24px 30px; width: 100%; display: flex; flex-direction: column; gap: 10px;">
+            <button class="btn btn-accent" onclick="showScreen('screen-levels')" style="padding: 18px; margin-bottom: 4px;">ИГРАТЬ</button>
+            <button class="btn btn-secondary" style="background: #e6f2e6; color: #1f3611; font-size: 18px;" onclick="showScreen('screen-farm')">🚜 МОЯ ФЕРМА</button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button class="btn btn-secondary" style="font-size: 14px;" onclick="showScreen('screen-collection')">КОЛЛЕКЦИЯ</button>
+                <button class="btn btn-secondary" style="font-size: 14px;" onclick="showScreen('screen-blog')">БЛОГ ПРОЕКТА</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-levels" class="screen screen-padded" style="padding-bottom: 0;">
+        <div class="nav-header">
+            <button class="nav-back-btn" onclick="showScreen('screen-menu')">← Меню</button>
+            <div style="font-weight: 800; font-size: 18px;">Дорога фермера</div>
+            <div class="coin-balance" style="padding: 4px 10px; font-size: 13px;">🪙 <span class="coin-val">0</span></div>
+        </div>
+        <div class="map-container" id="levels-container"></div>
+    </div>
+
+    <!-- МОЯ ФЕРМА -->
+    <div id="screen-farm" class="screen screen-padded" style="padding-bottom: 0;">
+        <div class="nav-header">
+            <button class="nav-back-btn" onclick="showScreen('screen-menu')">← Меню</button>
+            <div style="font-weight: 800; font-size: 18px;">Моя Ферма</div>
+            <div class="coin-balance" style="padding: 4px 10px; font-size: 13px;">🪙 <span class="coin-val">0</span></div>
+        </div>
+        
+        <div class="farm-landscape" id="farm-landscape">
+            <!-- Места под постройки на ландшафте -->
+            <div class="farm-spot" id="spot-strawberry" style="top: 15%; left: 10%;"></div>
+            <div class="farm-spot" id="spot-cherry" style="top: 10%; right: 15%;"></div>
+            <div class="farm-spot" id="spot-tractor" style="top: 50%; left: 15%;"></div>
+            <div class="farm-spot" id="spot-bread" style="top: 45%; right: 10%;"></div>
+            
+            <button class="btn btn-accent farm-build-btn" onclick="openBuildMenu()">🔨 СТРОИТЕЛЬСТВО</button>
+        </div>
+
+        <!-- ШТОРКА МАГАЗИНА (Drawer) -->
+        <div class="drawer-overlay" id="drawer-overlay" onclick="closeBuildMenu()"></div>
+        <div class="build-drawer" id="build-drawer">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div style="font-size: 18px; font-weight: 900; color: #263326;">Магазин</div>
+                <button style="background: rgba(0,0,0,0.05); border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 14px; font-weight: 800; cursor: pointer; color: #555;" onclick="closeBuildMenu()">✖</button>
+            </div>
+            <div id="drawer-items">
+                <!-- Заполняется JS -->
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-blog" class="screen screen-padded" style="padding-bottom: 0;">
+        <div class="nav-header">
+            <button class="nav-back-btn" onclick="showScreen('screen-menu')">← Меню</button>
+            <div style="font-weight: 800; font-size: 18px;">Блог</div>
+            <div style="width: 60px;"></div>
+        </div>
+        <div class="blog-feed" id="blog-container"></div>
+    </div>
+
+    <div id="screen-game" class="screen screen-padded">
+        <div class="nav-header" style="margin-bottom: 8px;">
+            <button class="nav-back-btn" onclick="showScreen('screen-levels')">← Карта</button>
+            <div id="game-level-indicator" style="font-weight: 800; font-size: 16px;">Уровень 1</div>
+            <div class="coin-balance" style="padding: 4px 10px; font-size: 13px;">🪙 <span class="coin-val">0</span></div>
+        </div>
+        <div class="status-card">
+            <div id="target-label" style="display: flex; align-items: center; gap: 6px;">
+                <div id="target-icon" style="width: 24px; height: 24px; display: flex; align-items: center;"></div>
+                <span id="target-count">0/30</span>
+            </div>
+            <div id="moves-label">Ходы: 20</div>
+        </div>
+        <div id="message" class="message">Собери урожай!</div>
+        <div id="board" class="board"></div>
+        <button class="btn btn-secondary" style="padding: 12px; font-size: 14px;" onclick="showScreen('screen-levels')">Сдаться и выйти</button>
+    </div>
+
+    <div id="screen-collection" class="screen screen-padded">
+        <div class="nav-header">
+            <button class="nav-back-btn" onclick="showScreen('screen-menu')">← Меню</button>
+            <div style="font-weight: 800; font-size: 18px;">Коллекция</div>
+            <div style="width: 60px;"></div>
+        </div>
+        <div class="collection-grid" id="collection-container"></div>
+    </div>
+</div>
+
+<!-- ОКНО ПЕРЕД СТАРТОМ УРОВНЯ -->
+<div id="prelevel-modal" class="modal">
+    <div class="modal-content" style="max-width: 340px;">
+        <h2 id="prelevel-title" style="margin-top: 0; font-size: 26px; color: #263326; margin-bottom: 20px;">Уровень 1</h2>
+        <div class="target-wrap"><div class="target-img-wrap" id="prelevel-icon"></div><span id="prelevel-count" style="color: #436932;"></span><span id="prelevel-moves" style="margin-left: 10px; font-size: 18px; color: #666;"></span></div>
+        <div style="font-size: 14px; font-weight: 700; color: #333;">Нужна помощь? Возьми бустеры:</div>
+        <div class="booster-grid">
+            <div class="booster-card" id="boost-bomb" onclick="toggleBooster('bomb')"><div class="booster-check">✓</div><div class="booster-icon">💣</div><div class="booster-price">30 🪙</div></div>
+            <div class="booster-card" id="boost-plane" onclick="toggleBooster('plane')"><div class="booster-check">✓</div><div class="booster-icon">✈️</div><div class="booster-price">30 🪙</div></div>
+            <div class="booster-card" id="boost-moves" onclick="toggleBooster('moves')"><div class="booster-check">✓</div><div class="booster-icon">👟</div><div class="booster-price">40 🪙</div></div>
+        </div>
+        <button class="btn btn-accent" onclick="startLevelFromModal()" style="margin-top: 10px; font-size: 18px;">ИГРАТЬ</button>
+        <button class="btn btn-secondary" onclick="closePreLevel()" style="margin-top: 10px;">Назад на карту</button>
+    </div>
+</div>
+
+<!-- Модалки -->
+<div id="modal" class="modal"><div class="modal-content"><h2 id="modal-title" style="margin-top: 0; font-size: 22px;">...</h2><p id="modal-text" style="font-size: 14px; color: #555; margin: 10px 0;">...</p><div id="reward-box" style="width: 70px; height: 70px; margin: 15px auto; display: none; align-items: center; justify-content: center; font-size: 44px;"></div><button id="modal-btn" class="btn btn-accent" onclick="closeModal()">...</button><button id="modal-btn-secondary" class="btn btn-secondary" style="display:none; margin-top:10px;" onclick="closeModal()">...</button></div></div>
+<div id="video-modal" class="modal"><div class="modal-content" style="max-width: 95%; width: 400px; padding: 15px; background: #1a1a1a; color: #fff; border: 1px solid #333;"><h3 id="video-title" style="margin-top: 0; font-size: 18px; margin-bottom: 12px;">Ролик</h3><div id="video-container" style="background: #000; height: 420px; border-radius: 8px; margin-bottom: 16px; overflow:hidden;"></div><button class="btn" style="background: #333; color: #FFF; box-shadow: none;" onclick="closeVideo()">Закрыть</button></div></div>
+
+<div id="quiz-modal" class="modal">
+    <div class="modal-content">
+        <h2 id="quiz-modal-title" style="margin-top: 0; font-size: 20px; color: #FF8F00;">Экзамен! 🌱</h2>
+        <p id="quiz-modal-desc" style="font-size: 14px; color: #555; margin-bottom: 15px;">Ответь на вопрос...</p>
+        <div id="quiz-q" style="font-weight: 800; font-size: 16px; margin-bottom: 15px; line-height: 1.3;"></div>
+        <div id="quiz-options" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        <button id="quiz-close-btn" class="btn btn-secondary" style="margin-top: 15px;" onclick="failQuiz()">Отмена</button>
+    </div>
+</div>
+
+<script>
+    try { if (typeof vkBridge !== 'undefined') vkBridge.send('VKWebAppInit'); } catch (e) {}
+
+    const VIDEO_LINKS = { plum: "", cherry: "", strawberry: "https://vk.ru/clip_ext.php?oid=-241022619&id=456239018&autoplay=1", bread: "https://vk.ru/clip_ext.php?oid=-241022619&id=456239020&autoplay=1", tractor: "" };
+    const ROADMAP_VIDEOS = { 10: { title: "Откуда берется мука?", url: "https://vk.ru/clip_ext.php?oid=-241022619&id=456239020&autoplay=1" } };
+    const MOCK_VK_POSTS = [ { text: "🚜 Современные технологии в АПК: как тракторы с GPS экономят топливо?", img: "tractor", date: "Сегодня" }, { text: "🍓 Клубничный сезон! Смотрите наш новый клип про системы капельного полива.", img: "strawberry", date: "Вчера" } ];
+    
+    const QUIZ_LEVEL_FAIL = [ { q: "Как называется профессия человека, выращивающего урожай?", a: ["Агроном", "Ветеринар", "Зоотехник"], correct: 0 }, { q: "Для чего нужен капельный полив?", a: ["Охлаждать растения", "Экономить воду", "Смывать вредителей"], correct: 1 } ];
+    const QUIZ_FARM_BUILD = [ { q: "Из Блога: В чём главная польза тракторов с GPS?", a: ["Они красивые", "Экономят топливо и берегут землю", "Ездят быстрее всех"], correct: 1 }, { q: "Из Блога: Какая технология идеальна для полива клубники?", a: ["Капельный полив", "Затопление поля", "Опрыскивание"], correct: 0 }, { q: "Из Блога: Какой этап проходит зерно перед тем, как стать хлебом?", a: ["Помол в муку", "Жарка", "Заморозка"], correct: 0 } ];
+
+    const SIZE = 8;
+    const TYPES = ["plum", "cherry", "strawberry", "bread", "tractor"];
+    const ICON = { plum: "🍑", cherry: "🍒", strawberry: "🍓", bread: "🍞", tractor: "🚜" };
+    const SPECIAL_ICON = { arrowH: "↔️", arrowV: "↕️", bomb: "💣", plane: "✈️" };
+
+    const LEVELS_DATA = [ { id: 1, targetItem: "plum", targetCount: 15, moves: 15, reward: null }, { id: 2, targetItem: "cherry", targetCount: 20, moves: 18, reward: "plum" }, { id: 3, targetItem: "strawberry", targetCount: 25, moves: 20, reward: "strawberry" }, { id: 4, targetItem: "bread", targetCount: 30, moves: 22, reward: "cherry" }, { id: 5, targetItem: "tractor", targetCount: 35, moves: 25, reward: "tractor" }, { id: 6, targetItem: "bread", targetCount: 35, moves: 24, reward: "bread" }, { id: 7, targetItem: "plum", targetCount: 40, moves: 25, reward: null }, { id: 8, targetItem: "cherry", targetCount: 40, moves: 25, reward: null }, { id: 9, targetItem: "strawberry", targetCount: 45, moves: 26, reward: null }, { id: 10, targetItem: "tractor", targetCount: 50, moves: 28, reward: null, isCheckpoint: true }, { id: 11, targetItem: "bread", targetCount: 50, moves: 28, reward: null }, { id: 12, targetItem: "plum", targetCount: 55, moves: 30, reward: null } ];
+
+    let maxUnlockedLevel = localStorage.getItem('kz_max_level') ? parseInt(localStorage.getItem('kz_max_level')) : 1;
+    let selectedLevelIndex = maxUnlockedLevel - 1; 
+    let unlockedItems = localStorage.getItem('kz_unlocked') ? JSON.parse(localStorage.getItem('kz_unlocked')) : [];
+    let coins = localStorage.getItem('kz_coins') ? parseInt(localStorage.getItem('kz_coins')) : 0;
+    let farmState = JSON.parse(localStorage.getItem('kz_farm')) || { strawberry: false, cherry: false, tractor: false, bread: false };
+
+    function hardReset() { localStorage.clear(); location.reload(); }
+    
+    let board = [], selected = null, busy = false, finished = false;
+    let moves = 0, collectedCount = 0;
+    const FARM_PRICES = { strawberry: 100, cherry: 250, tractor: 500, bread: 1000 };
+    const FARM_NAMES = { strawberry: "Клубничная грядка", cherry: "Вишневый сад", tractor: "Гараж трактора", bread: "Мини-пекарня" };
+    let farmRenderInterval = null;
+    let currentQuizContext = null; let pendingBuildKey = null;
+    let selectedBoosters = { bomb: false, plane: false, moves: false };
+    const BOOSTER_COSTS = { bomb: 30, plane: 30, moves: 40 };
+
+    function showPreLevel(idx) {
+        selectedLevelIndex = idx; let lvl = LEVELS_DATA[idx];
+        document.getElementById("prelevel-title").innerText = `Уровень ${lvl.id}`;
+        document.getElementById("prelevel-icon").innerHTML = `<div style="width:100%;height:100%;">${getImgTag(lvl.targetItem)}</div>`;
+        document.getElementById("prelevel-count").innerText = `${lvl.targetCount} шт.`;
+        document.getElementById("prelevel-moves").innerText = `⏳ ${lvl.moves}`;
+        selectedBoosters = { bomb: false, plane: false, moves: false }; updateBoosterUI();
+        document.getElementById("prelevel-modal").style.display = "flex";
+    }
+    function closePreLevel() { document.getElementById("prelevel-modal").style.display = "none"; }
+    function toggleBooster(type) { selectedBoosters[type] = !selectedBoosters[type]; updateBoosterUI(); }
+    function updateBoosterUI() { ['bomb', 'plane', 'moves'].forEach(type => { let el = document.getElementById(`boost-${type}`); if (selectedBoosters[type]) el.classList.add('selected'); else el.classList.remove('selected'); }); }
+    function startLevelFromModal() {
+        let totalCost = 0;
+        if (selectedBoosters.bomb) totalCost += BOOSTER_COSTS.bomb; if (selectedBoosters.plane) totalCost += BOOSTER_COSTS.plane; if (selectedBoosters.moves) totalCost += BOOSTER_COSTS.moves;
+        if (coins >= totalCost) { addCoins(-totalCost); closePreLevel(); showScreen('screen-game'); initLevel(); } 
+        else { closePreLevel(); showModal("Мало монет 🪙", "Убери часть бустеров или заработай монеты на других уровнях.", "Понятно", () => { document.getElementById("prelevel-modal").style.display="flex"; }); }
+    }
+
+    function addCoins(amount) { coins += amount; localStorage.setItem('kz_coins', coins); updateCoinsUI(); }
+    function updateCoinsUI() { document.querySelectorAll('.coin-val').forEach(el => el.innerText = coins); }
+
+    function checkDailyBonus() {
+        let today = new Date().toDateString();
+        if (localStorage.getItem('kz_last_login') !== today) {
+            localStorage.setItem('kz_last_login', today);
+            setTimeout(() => { addCoins(150); showModal("Ежедневный бонус 🎁", "Держи монеты для старта фермы:\n\n+150 🪙", "Забрать", closeModal); }, 500);
+        }
+    }
+
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+        if (farmRenderInterval) { clearInterval(farmRenderInterval); farmRenderInterval = null; }
+        if (screenId === 'screen-levels') { renderLevelsMap(); setTimeout(() => { const current = document.querySelector('.level-node.current'); if (current) current.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100); }
+        if (screenId === 'screen-collection') renderCollection();
+        if (screenId === 'screen-blog') renderBlog();
+        if (screenId === 'screen-farm') { renderFarm(); farmRenderInterval = setInterval(renderFarm, 1000); }
+    }
+
+    // --- НОВЫЙ РЕНДЕР ФЕРМЫ (ЛАНДШАФТ И ШТОРКА) ---
+    function openBuildMenu() {
+        renderFarmDrawer();
+        document.getElementById('drawer-overlay').style.display = 'block';
+        setTimeout(() => document.getElementById('build-drawer').classList.add('open'), 10);
+    }
+    function closeBuildMenu() {
+        document.getElementById('build-drawer').classList.remove('open');
+        setTimeout(() => document.getElementById('drawer-overlay').style.display = 'none', 300);
+    }
+
+    function renderFarmDrawer() {
+        let drawerHtml = '';
+        ["strawberry", "cherry", "tractor", "bread"].forEach(key => {
+            let state = farmState[key]; let price = FARM_PRICES[key];
+            let isBuilt = state === true; let isBuilding = typeof state === 'number' && state > Date.now();
+            drawerHtml += `
+                <div class="drawer-item ${isBuilt ? 'bought' : ''}">
+                    <div class="drawer-item-icon">${getImgTag(key)}</div>
+                    <div class="drawer-item-info">
+                        <div class="drawer-item-title">${FARM_NAMES[key]}</div>
+                        ${isBuilt ? `<span style="color:#2E7D32; font-weight:800; font-size:12px;">Построено</span>` : 
+                          isBuilding ? `<span style="color:#E65100; font-weight:800; font-size:12px;">Строится...</span>` :
+                          `<button class="btn btn-accent" style="padding:6px 10px; font-size:12px; width:auto; border-radius: 8px;" onclick="requestBuild('${key}')">Купить ${price} 🪙</button>`}
+                    </div>
+                </div>`;
+        });
+        document.getElementById('drawer-items').innerHTML = drawerHtml;
+    }
+
+    function renderFarm() {
+        let now = Date.now();
+        ["strawberry", "cherry", "tractor", "bread"].forEach(key => {
+            let state = farmState[key]; let spot = document.getElementById('spot-' + key);
+            let isBuilt = state === true; let isBuilding = typeof state === 'number' && state > now;
+            
+            if (typeof state === 'number' && state <= now) { 
+                farmState[key] = true; localStorage.setItem('kz_farm', JSON.stringify(farmState)); 
+                isBuilt = true; isBuilding = false; 
+                if(document.getElementById('build-drawer').classList.contains('open')) renderFarmDrawer();
+            }
+            
+            if (isBuilt) {
+                spot.innerHTML = `<div class="farm-spot-pad"></div><div class="farm-spot-icon" style="animation: none; width:70px; height:70px;">${getImgTag(key)}</div>`;
+            } else if (isBuilding) {
+                let timeLeft = Math.ceil((state - now) / 1000);
+                spot.innerHTML = `<div class="farm-spot-pad"></div><div class="farm-spot-icon anim-build">🚧</div><div style="position:absolute; top:-20px; background:rgba(230,81,0,0.9); color:white; font-size:12px; font-weight:800; padding:2px 8px; border-radius:8px; z-index:3;">${timeLeft}с</div>`;
+            } else {
+                spot.innerHTML = `<div class="farm-spot-pad" style="border: 2px dashed rgba(255,255,255,0.6); background: transparent;"></div>`;
+            }
+        });
+    }
+
+    function requestBuild(key) {
+        closeBuildMenu();
+        let price = FARM_PRICES[key];
+        if (coins >= price) {
+            pendingBuildKey = key; currentQuizContext = 'farm_build';
+            const q = QUIZ_FARM_BUILD[Math.floor(Math.random() * QUIZ_FARM_BUILD.length)];
+            document.getElementById("quiz-modal-title").innerText = "Проверка знаний 🧠";
+            document.getElementById("quiz-modal-desc").innerHTML = "Чтобы начать строительство, ответь на вопрос из материалов <b style='color:#436932;'>Блога</b>:";
+            document.getElementById("quiz-close-btn").innerText = "Отмена";
+            document.getElementById("quiz-q").innerText = q.q;
+            const opts = document.getElementById("quiz-options"); opts.innerHTML = "";
+            q.a.forEach((ans, i) => { let b = document.createElement("button"); b.className = "btn"; b.style.marginBottom = "8px"; b.style.backgroundColor = "#F5F5F5"; b.style.color = "#333"; b.style.boxShadow = "none"; b.style.border = "1px solid #CCC"; b.innerText = ans; b.onclick = () => handleQuizAnswer(i === q.correct); opts.appendChild(b); });
+            document.getElementById("quiz-modal").style.display = "flex";
+        } else { showModal("Мало монет 🪙", `Не хватает ${price - coins} 🪙.\nПобеждай в уровнях, чтобы заработать!`, "Понятно", closeModal); }
+    }
+
+    function handleQuizAnswer(isCorrect) {
+        document.getElementById("quiz-modal").style.display = "none";
+        if (currentQuizContext === 'farm_build') {
+            if (isCorrect) { addCoins(-FARM_PRICES[pendingBuildKey]); farmState[pendingBuildKey] = Date.now() + 10000; localStorage.setItem('kz_farm', JSON.stringify(farmState)); renderFarm(); } 
+            else { showModal("Ошибка 😔", "Неправильно! Загляни в БЛОГ, посмотри ролики и возвращайся за стройкой.", "Понятно", closeModal); }
+        } else if (currentQuizContext === 'level_fail') {
+            quizUsed = true;
+            if (isCorrect) { finished = false; busy = false; moves += 3; updateUI(); setMessage("Правильно! +3 хода"); } 
+            else { showModal("Неверно 😔", "Правильный ответ был другой. Ходы закончились.", "Заново", () => { closeModal(); initLevel(); }); }
+        }
+    }
+
+    function showLevelFailQuiz() {
+        currentQuizContext = 'level_fail';
+        const q = QUIZ_LEVEL_FAIL[Math.floor(Math.random() * QUIZ_LEVEL_FAIL.length)];
+        document.getElementById("quiz-modal-title").innerText = "Второй шанс! 🌱";
+        document.getElementById("quiz-modal-desc").innerHTML = "У тебя кончились ходы. Ответь на вопрос про АПК правильно, чтобы получить <b style='color:#436932;'>+3 хода</b> бесплатно!";
+        document.getElementById("quiz-close-btn").innerText = "Сдаться";
+        document.getElementById("quiz-q").innerText = q.q;
+        const opts = document.getElementById("quiz-options"); opts.innerHTML = "";
+        q.a.forEach((ans, i) => { let b = document.createElement("button"); b.className = "btn"; b.style.marginBottom = "8px"; b.style.backgroundColor = "#F5F5F5"; b.style.color = "#333"; b.style.boxShadow = "none"; b.style.border = "1px solid #CCC"; b.innerText = ans; b.onclick = () => handleQuizAnswer(i === q.correct); opts.appendChild(b); });
+        document.getElementById("quiz-modal").style.display = "flex";
+    }
+
+    function failQuiz() { document.getElementById("quiz-modal").style.display = "none"; if (currentQuizContext === 'level_fail') { showModal("Сдался?", "Ходы закончились. Попробуй еще раз!", "Заново", () => { closeModal(); initLevel(); }); } }
+    function renderBlog() { const container = document.getElementById('blog-container'); container.innerHTML = ''; MOCK_VK_POSTS.forEach(post => { container.innerHTML += `<div class="post-card"><div class="post-header"><div class="post-avatar">🌱</div><div><div class="post-author">Код Земли</div><div class="post-date">${post.date}</div></div></div><div class="post-text">${post.text}</div><div class="post-media">${getImgTag(post.img)}</div><div class="post-footer"><div class="post-action">🤍 Лайк</div><div class="post-action">💬 Коммент</div></div></div>`; }); }
+    
+    function renderLevelsMap() {
+        const container = document.getElementById('levels-container'); container.innerHTML = '';
+        LEVELS_DATA.forEach((lvl, idx) => {
+            const wrap = document.createElement('div'); const isCheckpoint = lvl.isCheckpoint || lvl.id % 10 === 0; wrap.className = `level-node-wrap ${isCheckpoint ? 'checkpoint' : ''}`;
+            const isLocked = lvl.id > maxUnlockedLevel, isCompleted = lvl.id < maxUnlockedLevel, isCurrent = lvl.id === maxUnlockedLevel;
+            let iconContent = isLocked ? '🔒' : lvl.id; if (isCheckpoint && !isLocked) iconContent = '▶️';
+            wrap.innerHTML = `<div class="level-node ${isLocked ? 'locked' : ''} ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}"><div>${iconContent}</div>${!isLocked && !isCheckpoint ? `<div class="level-badge">${getImgTag(lvl.targetItem)}${lvl.targetCount}</div>` : ''}</div>${isCheckpoint ? `<div class="checkpoint-label">Сюжетное видео</div>` : ''}`;
+            if (!isLocked) wrap.onclick = () => showPreLevel(idx);
+            container.appendChild(wrap);
+        });
+    }
+
+    function renderCollection() { const container = document.getElementById('collection-container'); container.innerHTML = ''; const metadata = { plum: { title: "Садовая слива", req: "2 ур." }, cherry: { title: "Спелая вишня", req: "4 ур." }, strawberry: { title: "Капельный полив", req: "3 ур." }, bread: { title: "Откуда берутся продукты", req: "6 ур." }, tractor: { title: "Агротехнологии", req: "5 ур." } }; TYPES.forEach(type => { const card = document.createElement('div'), isUnlocked = unlockedItems.includes(type); const info = metadata[type] || { title: type, req: "уровни" }; card.className = `collection-card ${isUnlocked ? 'unlocked' : ''}`; card.innerHTML = `<div class="collection-icon">${getImgTag(type)}</div><div class="collection-title">${info.title}</div><div class="collection-status">${isUnlocked ? '▶ Смотреть ролик' : '🔒 ' + info.req}</div>`; if (isUnlocked) card.onclick = () => openVideo(type, info.title); container.appendChild(card); }); }
+    
+    function openVideo(type, title) { openVideoUrl(title, VIDEO_LINKS[type]); }
+    function openVideoUrl(title, url) { document.getElementById("video-modal").style.display = "flex"; document.getElementById("video-title").innerText = title; const container = document.getElementById("video-container"); if (url && url !== "") { container.innerHTML = `<iframe src="${url}" width="100%" height="100%" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen style="background-color:#000;"></iframe>`; } else { container.innerHTML = `<div style="padding:20px; text-align:center; color:#888;">Видео скоро появится!</div>`; } }
+    function closeVideo() { document.getElementById("video-modal").style.display = "none"; document.getElementById("video-container").innerHTML = ""; }
+    function getImgTag(name) { if (!name) return ""; let fallback = ICON[name] || SPECIAL_ICON[name] || "❓"; return `<img src="img/${name}.png" class="item-img" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span class="fallback-icon" style="display:none; width: 100%; height: 100%; align-items:center; justify-content:center;">${fallback}</span>`; }
+
+    function initLevel() { 
+        let lvl = LEVELS_DATA[selectedLevelIndex]; 
+        document.getElementById("game-level-indicator").innerText = `Уровень ${lvl.id}`; 
+        moves = lvl.moves; 
+        if (selectedBoosters.moves) moves += 5;
+        collectedCount = 0; finished = false; busy = false; selected = null; quizUsed = false; 
+        createBoard(); updateUI(); 
+    }
+
+    function createBoard() { 
+        do { board = []; for (let r = 0; r < SIZE; r++) { let row = []; for (let c = 0; c < SIZE; c++) { let type; do { type = TYPES[Math.floor(Math.random() * TYPES.length)]; } while ((c >= 2 && row[c-1].type === type && row[c-2].type === type) || (r >= 2 && board[r-1][c].type === type && board[r-2][c].type === type)); row.push({ type: type, special: null }); } board.push(row); } } while (findInitialMatches().length > 0); 
+        if (selectedBoosters.bomb) board[Math.floor(Math.random() * SIZE)][Math.floor(Math.random() * SIZE)].special = "bomb";
+        if (selectedBoosters.plane) board[Math.floor(Math.random() * SIZE)][Math.floor(Math.random() * SIZE)].special = "plane";
+    }
+
+    function renderBoard() { const boardEl = document.getElementById("board"); boardEl.innerHTML = ""; for (let r = 0; r < SIZE; r++) { for (let c = 0; c < SIZE; c++) { const cell = document.createElement("div"); cell.className = "cell"; if (selected && selected.r === r && selected.c === c) cell.classList.add("selected"); const item = board[r][c]; if (item) { let imgHtml = getImgTag(item.special ? item.special : item.type); cell.innerHTML = `<div style="width: 85%; height: 85%;">${imgHtml}</div>`; } cell.onclick = () => handleCellClick(r, c); boardEl.appendChild(cell); } } }
+    function updateUI() { let lvl = LEVELS_DATA[selectedLevelIndex]; document.getElementById("target-icon").innerHTML = `<div style="width: 100%; height: 100%;">${getImgTag(lvl.targetItem)}</div>`; document.getElementById("target-count").innerText = `${collectedCount}/${lvl.targetCount}`; document.getElementById("moves-label").innerText = `Ходы: ${moves}`; renderBoard(); }
+    function setMessage(text) { document.getElementById("message").innerText = text; }
+    function collectItem(item) { let lvl = LEVELS_DATA[selectedLevelIndex]; if (item && item.type === lvl.targetItem) collectedCount++; }
+
+    function handleCellClick(r, c) { if (busy || finished) return; if (!selected) { selected = { r, c }; renderBoard(); setMessage(""); return; } if (selected.r === r && selected.c === c) { selected = null; renderBoard(); return; } if ((Math.abs(selected.r - r) + Math.abs(selected.c - c)) === 1) executeSwapAndCheck(selected.r, selected.c, r, c); else { selected = { r, c }; renderBoard(); return; } selected = null; }
+    function executeSwapAndCheck(r1, c1, r2, c2) { busy = true; let temp = board[r1][c1]; board[r1][c1] = board[r2][c2]; board[r2][c2] = temp; const item1 = board[r1][c1], item2 = board[r2][c2]; if (item1.special && item2.special) { moves--; handleSpecialCombination(r1, c1, r2, c2); return; } if (item1.special || item2.special) { moves--; if (item1.special) activateSpecial(r1, c1); else activateSpecial(r2, c2); dropAndFill(false); return; } let matches = findAllMatches(); if (matches.length === 0) { temp = board[r1][c1]; board[r1][c1] = board[r2][c2]; board[r2][c2] = temp; renderBoard(); setMessage("Не создает комбинацию"); busy = false; } else { moves--; setMessage(""); processPlayerMatches(r2, c2, matches); } }
+    function findAllMatches() { let matchedCoords = new Set(); for (let r = 0; r < SIZE; r++) { let count = 1; for (let c = 0; c < SIZE; c++) { let cur = board[r][c]?.type, next = (c + 1 < SIZE) ? board[r][c+1]?.type : null; if (cur && cur === next) count++; else { if (count >= 3) { for (let i = 0; i < count; i++) matchedCoords.add(`${r},${c - i}`); } count = 1; } } } for (let c = 0; c < SIZE; c++) { let count = 1; for (let r = 0; r < SIZE; r++) { let cur = board[r][c]?.type, next = (r + 1 < SIZE) ? board[r+1][c]?.type : null; if (cur && cur === next) count++; else { if (count >= 3) { for (let i = 0; i < count; i++) matchedCoords.add(`${r - i},${c}`); } count = 1; } } } for (let r = 0; r < SIZE - 1; r++) { for (let c = 0; c < SIZE - 1; c++) { let t = board[r][c]?.type; if (t && board[r+1][c]?.type === t && board[r][c+1]?.type === t && board[r+1][c+1]?.type === t) { matchedCoords.add(`${r},${c}`); matchedCoords.add(`${r+1},${c}`); matchedCoords.add(`${r},${c+1}`); matchedCoords.add(`${r+1},${c+1}`); } } } let res = []; matchedCoords.forEach(item => { let p = item.split(","); res.push({ r: parseInt(p[0]), c: parseInt(p[1]) }); }); return res; }
+    function findInitialMatches() { let m = []; for (let r = 0; r < SIZE; r++) { for (let c = 0; c < SIZE - 2; c++) { if (board[r][c].type === board[r][c+1].type && board[r][c].type === board[r][c+2].type) m.push({r, c}); } } for (let c = 0; c < SIZE; c++) { for (let r = 0; r < SIZE - 2; r++) { if (board[r][c].type === board[r+1][c].type && board[r][c].type === board[r+2][c].type) m.push({r, c}); } } return m; }
+    function processPlayerMatches(targetR, targetC, matches) { let createdSpecial = checkAndCreateSpecial(targetR, targetC); matches.forEach(m => { if (createdSpecial && createdSpecial.r === m.r && createdSpecial.c === m.c) return; if (board[m.r][m.c]) collectItem(board[m.r][m.c]); board[m.r][m.c] = null; }); renderBoard(); setTimeout(() => dropAndFill(true), 250); }
+    function checkAndCreateSpecial(r, c) { for (let dr = -1; dr <= 0; dr++) { for (let dc = -1; dc <= 0; dc++) { let r1 = r + dr, c1 = c + dc; if (r1 >= 0 && r1 < SIZE - 1 && c1 >= 0 && c1 < SIZE - 1) { let type = board[r1][c1]?.type; if (type && board[r1+1][c1]?.type === type && board[r1][c1+1]?.type === type && board[r1+1][c1+1]?.type === type) { board[r][c] = { type: type, special: "plane" }; return { r, c }; } } } } let type = board[r][c]?.type; if (!type) return null; let rowCount = 0, colCount = 0; for (let cc = 0; cc < SIZE; cc++) if (board[r][cc]?.type === type) rowCount++; for (let rr = 0; rr < SIZE; rr++) if (board[rr][c]?.type === type) colCount++; if (rowCount >= 5 || colCount >= 5 || (rowCount >= 3 && colCount >= 3)) { board[r][c] = { type: type, special: "bomb" }; return { r, c }; } if (rowCount === 4) { board[r][c] = { type: type, special: "arrowH" }; return { r, c }; } if (colCount === 4) { board[r][c] = { type: type, special: "arrowV" }; return { r, c }; } return null; }
+    function activateSpecial(r, c) { let item = board[r][c]; if (!item || !item.special) return; let spec = item.special; collectItem(item); board[r][c] = null; if (spec === "arrowH") { for (let col = 0; col < SIZE; col++) if (board[r][col]) { collectItem(board[r][col]); board[r][col] = null; } } else if (spec === "arrowV") { for (let row = 0; row < SIZE; row++) if (board[row][c]) { collectItem(board[row][c]); board[row][c] = null; } } else if (spec === "bomb") { for (let dr = -2; dr <= 2; dr++) { for (let dc = -2; dc <= 2; dc++) { let nr = r + dr, nc = c + dc; if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE && board[nr][nc]) { collectItem(board[nr][nc]); board[nr][nc] = null; } } } } else if (spec === "plane") { let tr = Math.floor(Math.random() * SIZE), tc = Math.floor(Math.random() * SIZE); if (board[tr][tc]) { collectItem(board[tr][tc]); board[tr][tc] = null; } } }
+    function handleSpecialCombination(r1, c1, r2, c2) { activateSpecial(r1, c1); activateSpecial(r2, c2); dropAndFill(false); }
+    function dropAndFill(isAfterPlayerMove) { for (let c = 0; c < SIZE; c++) { let remaining = []; for (let r = SIZE - 1; r >= 0; r--) { if (board[r][c] !== null) remaining.push(board[r][c]); } let writeRow = SIZE - 1; for (let i = 0; i < remaining.length; i++) { board[writeRow][c] = remaining[i]; writeRow--; } while (writeRow >= 0) { board[writeRow][c] = { type: TYPES[Math.floor(Math.random() * TYPES.length)], special: null }; writeRow--; } } renderBoard(); let cascadeMatches = findAllMatches(); if (cascadeMatches.length > 0) { setTimeout(() => { cascadeMatches.forEach(m => { if (board[m.r][m.c]) collectItem(board[m.r][m.c]); board[m.r][m.c] = null; }); renderBoard(); setTimeout(() => dropAndFill(false), 250); }, 300); } else { checkGameEnd(); busy = false; } }
+
+    function checkGameEnd() {
+        updateUI(); let lvl = LEVELS_DATA[selectedLevelIndex];
+        if (collectedCount >= lvl.targetCount) {
+            finished = true; addCoins(50);
+            if (selectedLevelIndex + 1 >= maxUnlockedLevel) { maxUnlockedLevel = Math.min(selectedLevelIndex + 2, LEVELS_DATA.length); localStorage.setItem('kz_max_level', maxUnlockedLevel); }
+            let isCheckpoint = lvl.isCheckpoint || lvl.id % 10 === 0; let rewardText = "Заработано: 50 🪙"; let hasCollectionReward = lvl.reward && !unlockedItems.includes(lvl.reward);
+            if (hasCollectionReward) { unlockedItems.push(lvl.reward); localStorage.setItem('kz_unlocked', JSON.stringify(unlockedItems)); rewardText += "\nОткрыта новая карточка коллекции!"; document.getElementById("reward-box").style.display = "flex"; document.getElementById("reward-box").innerHTML = `<div style="width: 100%; height: 100%;">${getImgTag(lvl.reward)}</div>`; } else { document.getElementById("reward-box").style.display = "none"; }
+            if (isCheckpoint) { let videoData = ROADMAP_VIDEOS[lvl.id] || ROADMAP_VIDEOS[10]; showModal("Сюжетный чекпоинт!", "Ты дошел до важного этапа.\n" + rewardText, "Смотреть видео", () => { closeModal(); showScreen('screen-levels'); openVideoUrl(videoData.title, videoData.url); }, "Позже"); } else { showModal("Уровень пройден!", `Отличная работа!\n${rewardText}`, "К уровню", () => { closeModal(); showScreen('screen-levels'); }); }
+        } else if (moves <= 0) {
+            finished = true; document.getElementById("reward-box").style.display = "none";
+            if (!quizUsed) { showLevelFailQuiz(); } else { showModal("Ходы закончились", "Попробуй еще раз!", "Заново", () => { closeModal(); initLevel(); }); }
+        }
+    }
+
+    function showModal(title, text, btnText, callback, secondaryBtnText = null) { document.getElementById("modal-title").innerText = title; document.getElementById("modal-text").innerText = text; let btn1 = document.getElementById("modal-btn"); btn1.innerText = btnText; btn1.onclick = callback; let btn2 = document.getElementById("modal-btn-secondary"); if (secondaryBtnText) { btn2.style.display = "block"; btn2.innerText = secondaryBtnText; btn2.onclick = () => { closeModal(); showScreen('screen-levels'); }; } else { btn2.style.display = "none"; } document.getElementById("modal").style.display = "flex"; }
+    function closeModal() { document.getElementById("modal").style.display = "none"; }
+    function restartLevel() { initLevel(); }
+
+    updateCoinsUI(); checkDailyBonus();
+</script>
+</body>
+</html>
