@@ -15,17 +15,14 @@
         
         .screen { display: none; width: 100%; height: 100%; flex-direction: column; }
         .screen.active { display: flex; }
-        
-        /* УМЕНЬШИЛИ БОКОВЫЕ ОТСТУПЫ, ЧТОБЫ ПОЛЕ БЫЛО ШИРЕ НА ТЕЛЕФОНЕ */
-        .screen-padded { padding: 14px; }
-        @media (min-width: 421px) { .screen-padded { padding: 24px; } }
+        .screen-padded { padding: 24px; }
 
         .btn { background: var(--primary); color: white; border: none; padding: 16px 20px; font-size: 17px; border-radius: 16px; font-weight: 800; cursor: pointer; transition: all 0.15s; text-align: center; display: block; width: 100%; box-shadow: 0 4px 12px rgba(67,105,50,0.35); text-transform: uppercase; letter-spacing: 0.5px; }
         .btn:active { transform: scale(0.97); }
         .btn-secondary { background: rgba(255,255,255,0.95); color: #1a1a1a; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: none; }
         .btn-accent { background: var(--accent); box-shadow: 0 6px 15px rgba(229,142,38,0.4); }
         
-        .nav-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-shrink: 0; }
+        .nav-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-shrink: 0; }
         .nav-back-btn { background: rgba(0,0,0,0.06); border: none; border-radius: 12px; padding: 8px 14px; font-weight: 700; cursor: pointer; font-size: 14px; transition: 0.2s; }
         .nav-back-btn:active { background: rgba(0,0,0,0.1); }
 
@@ -49,15 +46,17 @@
 
         .status-card { background: rgba(0,0,0,0.04); padding: 10px 14px; border-radius: 14px; margin-bottom: 12px; display: flex; justify-content: space-around; font-size: 15px; font-weight: 800; align-items: center; border: 1px solid rgba(0,0,0,0.05); }
         
-        /* УЛУЧШЕНИЯ ДЛЯ ПОЛЯ: touch-action: none отключает скролл экрана при свайпах, gap меньше */
-        .board { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; background: rgba(67,105,50,0.15); padding: 4px; border-radius: 14px; aspect-ratio: 1; margin-bottom: 12px; touch-action: none; width: 100%; }
-        .cell { background: var(--cell-bg); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; transition: 0.15s; aspect-ratio: 1; font-size: 26px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        /* --- ИЗМЕНЕНО: Поле 6x6 для крупных ягод --- */
+        .board { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; background: rgba(67,105,50,0.15); padding: 8px; border-radius: 18px; aspect-ratio: 1; margin-bottom: 12px; touch-action: none; user-select: none; -webkit-user-select: none; }
+        .cell { background: var(--cell-bg); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; transition: 0.15s; aspect-ratio: 1; font-size: 32px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        .cell.selected { background: #d7ecd0; transform: scale(0.92); box-shadow: inset 0 0 0 3px var(--primary); }
         
-        .cell.selected { background: #d7ecd0; transform: scale(0.92); box-shadow: inset 0 0 0 2.5px var(--primary); }
-        .item-img { width: 85%; height: 85%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
+        /* --- ИЗМЕНЕНО: Отключаем возможность браузера тянуть картинку --- */
+        .item-img { width: 80%; height: 80%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.2)); user-select: none; -webkit-user-select: none; -webkit-user-drag: none; }
         .fallback-icon { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: inherit; }
         .message { font-size: 13px; color: #555; min-height: 18px; margin-bottom: 10px; font-weight: 600; text-align: center; }
         
+        /* ФЕРМА И БЛОГ (Стили оставлены без изменений) */
         .collection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 10px 0; flex: 1; overflow-y: auto; }
         .collection-card { background: #FFF; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 1px solid rgba(0,0,0,0.08); opacity: 0.45; filter: grayscale(100%); transition: all 0.3s; }
         .collection-card.unlocked { opacity: 1; filter: grayscale(0%); cursor: pointer; border-color: var(--primary); box-shadow: 0 6px 16px rgba(67,105,50,0.15); }
@@ -89,7 +88,6 @@
         .drawer-overlay { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; backdrop-filter: blur(2px); border-radius: inherit; }
         .build-drawer { position: absolute; top: 0; right: -320px; bottom: 0; width: 280px; background: #FFF; z-index: 201; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 24px 16px; display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.2); overflow-y: auto; }
         .build-drawer.open { right: 0; }
-        
         .drawer-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: #F5F5F5; border-radius: 12px; margin-bottom: 12px; border: 1px solid #E0E0E0; }
         .drawer-item.bought { opacity: 0.5; }
         .drawer-item-icon { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 30px; background: white; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); flex-shrink: 0; }
@@ -142,7 +140,6 @@
         <div class="map-container" id="levels-container"></div>
     </div>
 
-    <!-- МОЯ ФЕРМА -->
     <div id="screen-farm" class="screen screen-padded" style="padding-bottom: 0;">
         <div class="nav-header">
             <button class="nav-back-btn" onclick="showScreen('screen-menu')">← Меню</button>
@@ -158,7 +155,6 @@
             <button class="btn btn-accent farm-build-btn" onclick="openBuildMenu()">🔨 СТРОИТЕЛЬСТВО</button>
         </div>
 
-        <!-- ШТОРКА МАГАЗИНА (Drawer) -->
         <div class="drawer-overlay" id="drawer-overlay" onclick="closeBuildMenu()"></div>
         <div class="build-drawer" id="build-drawer">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -206,7 +202,7 @@
     </div>
 </div>
 
-<!-- ОКНО ПЕРЕД СТАРТОМ УРОВНЯ -->
+<!-- Модалки (Старт уровня, Победа, видео, викторина) -->
 <div id="prelevel-modal" class="modal">
     <div class="modal-content" style="max-width: 340px;">
         <h2 id="prelevel-title" style="margin-top: 0; font-size: 26px; color: #263326; margin-bottom: 20px;">Уровень 1</h2>
@@ -222,10 +218,8 @@
     </div>
 </div>
 
-<!-- Модалки -->
 <div id="modal" class="modal"><div class="modal-content"><h2 id="modal-title" style="margin-top: 0; font-size: 22px;">...</h2><p id="modal-text" style="font-size: 14px; color: #555; margin: 10px 0;">...</p><div id="reward-box" style="width: 70px; height: 70px; margin: 15px auto; display: none; align-items: center; justify-content: center; font-size: 44px;"></div><button id="modal-btn" class="btn btn-accent" onclick="closeModal()">...</button><button id="modal-btn-secondary" class="btn btn-secondary" style="display:none; margin-top:10px;" onclick="closeModal()">...</button></div></div>
 <div id="video-modal" class="modal"><div class="modal-content" style="max-width: 95%; width: 400px; padding: 15px; background: #1a1a1a; color: #fff; border: 1px solid #333;"><h3 id="video-title" style="margin-top: 0; font-size: 18px; margin-bottom: 12px;">Ролик</h3><div id="video-container" style="background: #000; height: 420px; border-radius: 8px; margin-bottom: 16px; overflow:hidden;"></div><button class="btn" style="background: #333; color: #FFF; box-shadow: none;" onclick="closeVideo()">Закрыть</button></div></div>
-
 <div id="quiz-modal" class="modal">
     <div class="modal-content">
         <h2 id="quiz-modal-title" style="margin-top: 0; font-size: 20px; color: #FF8F00;">Экзамен! 🌱</h2>
@@ -246,12 +240,27 @@
     const QUIZ_LEVEL_FAIL = [ { q: "Как называется профессия человека, выращивающего урожай?", a: ["Агроном", "Ветеринар", "Зоотехник"], correct: 0 }, { q: "Для чего нужен капельный полив?", a: ["Охлаждать растения", "Экономить воду", "Смывать вредителей"], correct: 1 } ];
     const QUIZ_FARM_BUILD = [ { q: "Из Блога: В чём главная польза тракторов с GPS?", a: ["Они красивые", "Экономят топливо и берегут землю", "Ездят быстрее всех"], correct: 1 }, { q: "Из Блога: Какая технология идеальна для полива клубники?", a: ["Капельный полив", "Затопление поля", "Опрыскивание"], correct: 0 }, { q: "Из Блога: Какой этап проходит зерно перед тем, как стать хлебом?", a: ["Помол в муку", "Жарка", "Заморозка"], correct: 0 } ];
 
-    const SIZE = 8;
+    // --- ИЗМЕНЕНО: Поле теперь 6х6 (крупнее фрукты) ---
+    const SIZE = 6;
     const TYPES = ["plum", "cherry", "strawberry", "bread", "tractor"];
     const ICON = { plum: "🍑", cherry: "🍒", strawberry: "🍓", bread: "🍞", tractor: "🚜" };
     const SPECIAL_ICON = { arrowH: "↔️", arrowV: "↕️", bomb: "💣", plane: "✈️" };
 
-    const LEVELS_DATA = [ { id: 1, targetItem: "plum", targetCount: 15, moves: 15, reward: null }, { id: 2, targetItem: "cherry", targetCount: 20, moves: 18, reward: "plum" }, { id: 3, targetItem: "strawberry", targetCount: 25, moves: 20, reward: "strawberry" }, { id: 4, targetItem: "bread", targetCount: 30, moves: 22, reward: "cherry" }, { id: 5, targetItem: "tractor", targetCount: 35, moves: 25, reward: "tractor" }, { id: 6, targetItem: "bread", targetCount: 35, moves: 24, reward: "bread" }, { id: 7, targetItem: "plum", targetCount: 40, moves: 25, reward: null }, { id: 8, targetItem: "cherry", targetCount: 40, moves: 25, reward: null }, { id: 9, targetItem: "strawberry", targetCount: 45, moves: 26, reward: null }, { id: 10, targetItem: "tractor", targetCount: 50, moves: 28, reward: null, isCheckpoint: true }, { id: 11, targetItem: "bread", targetCount: 50, moves: 28, reward: null }, { id: 12, targetItem: "plum", targetCount: 55, moves: 30, reward: null } ];
+    // --- ИЗМЕНЕНО: Цели уменьшены, т.к. поле стало 6х6 ---
+    const LEVELS_DATA = [ 
+        { id: 1, targetItem: "plum", targetCount: 10, moves: 15, reward: null }, 
+        { id: 2, targetItem: "cherry", targetCount: 15, moves: 18, reward: "plum" }, 
+        { id: 3, targetItem: "strawberry", targetCount: 18, moves: 20, reward: "strawberry" }, 
+        { id: 4, targetItem: "bread", targetCount: 20, moves: 22, reward: "cherry" }, 
+        { id: 5, targetItem: "tractor", targetCount: 25, moves: 25, reward: "tractor" }, 
+        { id: 6, targetItem: "bread", targetCount: 25, moves: 24, reward: "bread" }, 
+        { id: 7, targetItem: "plum", targetCount: 30, moves: 25, reward: null }, 
+        { id: 8, targetItem: "cherry", targetCount: 30, moves: 25, reward: null }, 
+        { id: 9, targetItem: "strawberry", targetCount: 35, moves: 26, reward: null }, 
+        { id: 10, targetItem: "tractor", targetCount: 35, moves: 28, reward: null, isCheckpoint: true }, 
+        { id: 11, targetItem: "bread", targetCount: 40, moves: 28, reward: null }, 
+        { id: 12, targetItem: "plum", targetCount: 45, moves: 30, reward: null } 
+    ];
 
     let maxUnlockedLevel = localStorage.getItem('kz_max_level') ? parseInt(localStorage.getItem('kz_max_level')) : 1;
     let selectedLevelIndex = maxUnlockedLevel - 1; 
@@ -269,9 +278,9 @@
     let currentQuizContext = null; let pendingBuildKey = null;
     let selectedBoosters = { bomb: false, plane: false, moves: false };
     const BOOSTER_COSTS = { bomb: 30, plane: 30, moves: 40 };
-    
-    // ПЕРЕМЕННЫЕ ДЛЯ СВАЙПА
-    let swipeStartX = 0, swipeStartY = 0, swipeR = -1, swipeC = -1;
+
+    // Флаг для блокировки двойных нажатий
+    let isSwiping = false; 
 
     function showPreLevel(idx) {
         selectedLevelIndex = idx; let lvl = LEVELS_DATA[idx];
@@ -418,7 +427,7 @@
     function openVideo(type, title) { openVideoUrl(title, VIDEO_LINKS[type]); }
     function openVideoUrl(title, url) { document.getElementById("video-modal").style.display = "flex"; document.getElementById("video-title").innerText = title; const container = document.getElementById("video-container"); if (url && url !== "") { container.innerHTML = `<iframe src="${url}" width="100%" height="100%" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen style="background-color:#000;"></iframe>`; } else { container.innerHTML = `<div style="padding:20px; text-align:center; color:#888;">Видео скоро появится!</div>`; } }
     function closeVideo() { document.getElementById("video-modal").style.display = "none"; document.getElementById("video-container").innerHTML = ""; }
-    function getImgTag(name) { if (!name) return ""; let fallback = ICON[name] || SPECIAL_ICON[name] || "❓"; return `<img src="img/${name}.png" class="item-img" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span class="fallback-icon" style="display:none; width: 100%; height: 100%; align-items:center; justify-content:center;">${fallback}</span>`; }
+    function getImgTag(name) { if (!name) return ""; let fallback = ICON[name] || SPECIAL_ICON[name] || "❓"; return `<img src="img/${name}.png" class="item-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span class="fallback-icon" style="display:none; width: 100%; height: 100%; align-items:center; justify-content:center;">${fallback}</span>`; }
 
     function initLevel() { 
         let lvl = LEVELS_DATA[selectedLevelIndex]; 
@@ -435,7 +444,9 @@
         if (selectedBoosters.plane) board[Math.floor(Math.random() * SIZE)][Math.floor(Math.random() * SIZE)].special = "plane";
     }
 
-    // --- ВНЕДРЯЕМ СВАЙПЫ ДЛЯ ТЕЛЕФОНА ---
+    // --- ОБНОВЛЕННЫЙ РЕНДЕР С БЛОКИРОВКОЙ КОНФЛИКТА СВАЙП-КЛИК ---
+    let swipeStartX = 0, swipeStartY = 0, swipeR = -1, swipeC = -1;
+
     function renderBoard() { 
         const boardEl = document.getElementById("board"); boardEl.innerHTML = ""; 
         for (let r = 0; r < SIZE; r++) { 
@@ -443,17 +454,18 @@
                 const cell = document.createElement("div"); cell.className = "cell"; 
                 if (selected && selected.r === r && selected.c === c) cell.classList.add("selected"); 
                 const item = board[r][c]; 
-                if (item) { let imgHtml = getImgTag(item.special ? item.special : item.type); cell.innerHTML = `<div style="width: 85%; height: 85%;">${imgHtml}</div>`; } 
+                if (item) { let imgHtml = getImgTag(item.special ? item.special : item.type); cell.innerHTML = `<div style="width: 85%; height: 85%; pointer-events: none;">${imgHtml}</div>`; } 
                 
-                // Клик (остается для мышки)
-                cell.onclick = () => handleCellClick(r, c); 
-                
-                // Свайпы (для сенсорных экранов)
+                // Обработка свайпов
                 cell.addEventListener('touchstart', (e) => {
                     if (busy || finished) return;
-                    swipeStartX = e.touches[0].clientX;
-                    swipeStartY = e.touches[0].clientY;
+                    swipeStartX = e.touches[0].clientX; swipeStartY = e.touches[0].clientY;
                     swipeR = r; swipeC = c;
+                    isSwiping = false; // сбрасываем флаг при новом касании
+                }, {passive: true});
+
+                cell.addEventListener('touchmove', (e) => {
+                    isSwiping = true; // Если палец поехал — это свайп, а не клик
                 }, {passive: true});
 
                 cell.addEventListener('touchend', (e) => {
@@ -461,17 +473,26 @@
                     let dx = e.changedTouches[0].clientX - swipeStartX;
                     let dy = e.changedTouches[0].clientY - swipeStartY;
                     
-                    if (Math.abs(dx) > 20 || Math.abs(dy) > 20) {
+                    // Если свайпнули хотя бы на 15 пикселей
+                    if (Math.abs(dx) > 15 || Math.abs(dy) > 15) {
+                        isSwiping = true;
                         let tr = swipeR, tc = swipeC;
-                        if (Math.abs(dx) > Math.abs(dy)) { dx > 0 ? tc++ : tc--; } 
-                        else { dy > 0 ? tr++ : tr--; }
+                        if (Math.abs(dx) > Math.abs(dy)) { dx > 0 ? tc++ : tc--; } else { dy > 0 ? tr++ : tr--; }
                         
                         if (tr >= 0 && tr < SIZE && tc >= 0 && tc < SIZE) {
+                            selected = null; // Сбрасываем визуальное выделение
+                            renderBoard();
                             executeSwapAndCheck(swipeR, swipeC, tr, tc);
                         }
                     }
                     swipeR = -1; swipeC = -1;
                 });
+
+                // Обработка обычного клика (с защитой)
+                cell.onclick = (e) => {
+                    if (isSwiping) return; // Если был свайп - блокируем клик!
+                    handleCellClick(r, c);
+                };
 
                 boardEl.appendChild(cell); 
             } 
