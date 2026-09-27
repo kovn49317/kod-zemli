@@ -47,7 +47,6 @@
 
         .status-card { background: rgba(0,0,0,0.04); padding: 10px 14px; border-radius: 14px; margin-bottom: 12px; display: flex; justify-content: space-around; font-size: 15px; font-weight: 800; align-items: center; border: 1px solid rgba(0,0,0,0.05); }
         
-        /* --- ИГРОВОЕ ПОЛЕ И ПЛАВНЫЕ АНИМАЦИИ --- */
         .board { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; background: rgba(67,105,50,0.15); padding: 8px; border-radius: 18px; aspect-ratio: 1; margin-bottom: 12px; touch-action: none; user-select: none; -webkit-user-select: none; position: relative; }
         .cell { background: var(--cell-bg); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; transition: 0.15s; aspect-ratio: 1; font-size: 32px; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.05); position: relative; overflow: visible; }
         .cell.selected { background: #d7ecd0; transform: scale(0.92); box-shadow: inset 0 0 0 3px var(--primary); }
@@ -82,9 +81,6 @@
         .post-author { font-weight: 800; font-size: 15px; color: #1a1a1a; margin-bottom: 2px; }
         .post-date { font-size: 12px; color: #888; font-weight: 500; }
         .post-text { font-size: 14px; line-height: 1.45; color: #333; margin-bottom: 14px; }
-        .post-media { width: 100%; height: 180px; border-radius: 12px; background: rgba(67,105,50,0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; overflow: hidden; }
-        .post-media .item-img { width: 60%; height: 60%; }
-        .post-footer { display: flex; gap: 16px; color: #777; font-size: 14px; font-weight: 600; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px; }
         
         .farm-landscape { flex: 1; background: #8BC34A linear-gradient(135deg, #AEDB58 0%, #689F38 100%); position: relative; border-radius: 20px; border: 4px solid rgba(255,255,255,0.5); overflow: hidden; margin-bottom: 10px; box-shadow: inset 0 0 20px rgba(0,0,0,0.1); }
         .farm-landscape::after { content: ''; position: absolute; top: 20%; bottom: 20%; left: 20%; right: 20%; background: rgba(220, 231, 117, 0.4); border-radius: 40px; filter: blur(15px); z-index: 0; }
@@ -121,11 +117,9 @@
 
 <div class="app-container">
     
+    <!-- СТАРТОВОЕ МЕНЮ (Без сливы, только монетки) -->
     <div id="screen-menu" class="screen active" style="background-image: url('img/cover.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; justify-content: space-between;">
-        <div style="padding: 24px; display: flex; justify-content: space-between; align-items: center;">
-            <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.9); border-radius: 16px; padding: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center;">
-                <img src="img/plum.png" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.style.display='none'">
-            </div>
+        <div style="padding: 24px; display: flex; justify-content: flex-end; align-items: center;">
             <div class="coin-balance">🪙 <span class="coin-val">0</span></div>
         </div>
         <div style="background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%); padding: 60px 24px 30px; width: 100%; display: flex; flex-direction: column; gap: 10px;">
@@ -225,7 +219,7 @@
     </div>
 </div>
 
-<div id="modal" class="modal"><div class="modal-content"><h2 id="modal-title" style="margin-top: 0; font-size: 22px;">...</h2><p id="modal-text" style="font-size: 14px; color: #555; margin: 10px 0;">...</p><div id="reward-box" style="width: 70px; height: 70px; margin: 15px auto; display: none; align-items: center; justify-content: center; font-size: 44px;"></div><button id="modal-btn" class="btn btn-accent" onclick="closeModal()">...</button><button id="modal-btn-secondary" class="btn btn-secondary" style="display:none; margin-top:10px;" onclick="closeModal()">...</button></div></div>
+<div id="modal" class="modal"><div class="modal-content"><h2 id="modal-title" style="margin-top: 0; font-size: 22px;">...</h2><p id="modal-text" style="font-size: 14px; color: #555; margin: 10px 0;">...</p><div id="reward-box" style="width: 70px; height: 70px; margin: 15px auto; display: none; align-items: center; justify-content: center; font-size: 44px;"></div><button id="modal-btn" class="btn btn-accent" onclick="closeModal()">...</button><button id="modal-btn-secondary" class="btn btn-secondary" style="display:none; margin-top:10px;">...</button></div></div>
 <div id="video-modal" class="modal"><div class="modal-content" style="max-width: 95%; width: 400px; padding: 15px; background: #1a1a1a; color: #fff; border: 1px solid #333;"><h3 id="video-title" style="margin-top: 0; font-size: 18px; margin-bottom: 12px;">Ролик</h3><div id="video-container" style="background: #000; height: 420px; border-radius: 8px; margin-bottom: 16px; overflow:hidden;"></div><button class="btn" style="background: #333; color: #FFF; box-shadow: none;" onclick="closeVideo()">Закрыть</button></div></div>
 
 <div id="quiz-modal" class="modal">
@@ -243,10 +237,41 @@
 
     const VIDEO_LINKS = { plum: "", cherry: "", strawberry: "https://vk.ru/clip_ext.php?oid=-241022619&id=456239018&autoplay=1", bread: "https://vk.ru/clip_ext.php?oid=-241022619&id=456239020&autoplay=1", tractor: "" };
     const ROADMAP_VIDEOS = { 10: { title: "Откуда берется мука?", url: "https://vk.ru/clip_ext.php?oid=-241022619&id=456239020&autoplay=1" } };
-    const MOCK_VK_POSTS = [ { text: "🚜 Современные технологии в АПК: как тракторы с GPS экономят топливо?", img: "tractor", date: "Сегодня" }, { text: "🍓 Клубничный сезон! Смотрите наш новый клип про системы капельного полива.", img: "strawberry", date: "Вчера" } ];
+    
+    // --- НОВАЯ БАЗА СТАТЕЙ В БЛОГ ---
+    const MOCK_VK_POSTS = [ 
+        { text: "🛰️ <b>Точное земледелие:</b> Сегодня тракторы ездят сами благодаря GPS и ГЛОНАСС! Они не перекрывают ряды при посеве, экономят топливо и берегут почву от лишнего уплотнения.", date: "Сегодня" }, 
+        { text: "💧 <b>Системы полива:</b> Почему капельный полив лучше распылителей? Он доставляет воду и удобрения прямо к корням растения, снижая расход воды на 50% и не давая расти сорнякам между рядами.", date: "Вчера" },
+        { text: "🧬 <b>Селекция растений:</b> Многие боятся ГМО, но современная селекция позволяет создавать сорта пшеницы, устойчивые к засухе, без опасности для человека. Это спасает урожай в жару!", date: "3 дня назад" },
+        { text: "🌱 <b>Вертикальные фермы:</b> Представьте себе ферму прямо в городе, в небоскребе! Гидропоника позволяет выращивать клубнику без почвы круглый год, используя LED-лампы.", date: "Неделю назад" },
+        { text: "🚁 <b>Агродроны в деле:</b> Беспилотники с мультиспектральными камерами сканируют поля и вычисляют индекс NDVI. Они точно знают, какому ростку не хватает азота!", date: "Две недели назад" }
+    ];
     
     const QUIZ_LEVEL_FAIL = [ { q: "Как называется профессия человека, выращивающего урожай?", a: ["Агроном", "Ветеринар", "Зоотехник"], correct: 0 }, { q: "Для чего нужен капельный полив?", a: ["Охлаждать растения", "Экономить воду", "Смывать вредителей"], correct: 1 } ];
-    const QUIZ_FARM_BUILD = [ { q: "Из Блога: В чём главная польза тракторов с GPS?", a: ["Они красивые", "Экономят топливо и берегут землю", "Ездят быстрее всех"], correct: 1 }, { q: "Из Блога: Какая технология идеальна для полива клубники?", a: ["Капельный полив", "Затопление поля", "Опрыскивание"], correct: 0 }, { q: "Из Блога: Какой этап проходит зерно перед тем, как стать хлебом?", a: ["Помол в муку", "Жарка", "Заморозка"], correct: 0 } ];
+    
+    // --- ОГРОМНАЯ БАЗА СЛОЖНЫХ ВОПРОСОВ (12-15 ЛЕТ) ---
+    const QUIZ_FARM_BUILD = [ 
+        { q: "Как называется система выращивания растений без почвы, на питательных растворах?", a: ["Гидропоника", "Аэродинамика", "Терраформирование"], correct: 0 },
+        { q: "Какой индекс вычисляют агродроны для оценки здоровья растений (содержания хлорофилла)?", a: ["NDVI", "IQ-индекс", "УФ-индекс"], correct: 0 },
+        { q: "В чём главное преимущество капельного полива перед обычным дождеванием?", a: ["Вода попадает прямо к корням", "Охлаждает листья", "Отпугивает птиц"], correct: 0 },
+        { q: "Как называется процесс создания новых, улучшенных сортов сельскохозяйственных культур?", a: ["Селекция", "Клонирование", "Пастеризация"], correct: 0 },
+        { q: "Почему в вертикальных городских фермах чаще всего используют фиолетовое свечение LED-ламп?", a: ["Растения поглощают красный и синий спектр", "Для красоты", "Отпугивает насекомых"], correct: 0 },
+        { q: "Какая система позволяет современным тракторам ездить по полю на автопилоте с точностью до сантиметра?", a: ["GPS/ГЛОНАСС", "Эхолокация", "Магнитный компас"], correct: 0 },
+        { q: "Какое вещество в клетках растений отвечает за фотосинтез и делает листья зелеными?", a: ["Хлорофилл", "Меланин", "Каротин"], correct: 0 },
+        { q: "Что такое 'Точное земледелие' (Precision farming)?", a: ["Управление полем на основе данных со спутников и датчиков", "Посадка семян по линейке", "Выращивание урожая в теплицах"], correct: 0 },
+        { q: "Зачем агрономы иногда специально высаживают бобовые культуры (горох, клевер) между сезонами?", a: ["Они обогащают почву азотом", "Они вытягивают лишнюю соль", "Для корма диким животным"], correct: 0 },
+        { q: "Что делают беспилотные комбайны, когда их бункер заполняется зерном?", a: ["Подают сигнал грузовику и выгружают на ходу", "Останавливаются и ждут агронома", "Сбрасывают зерно на землю"], correct: 0 },
+        { q: "Как называется метод защиты урожая, при котором вместо химикатов на поле выпускают полезных насекомых (энтомофагов)?", a: ["Биологический метод", "Химический метод", "Генетический метод"], correct: 0 },
+        { q: "Какая технология позволяет растениям пережить долгую засуху?", a: ["Глубокая корневая система (селекция)", "Частое рыхление", "Посадка в тени"], correct: 0 },
+        { q: "Что из этого НЕ относится к современным агротехнологиям?", a: ["Астрология посевов", "Мультиспектральная съемка", "Датчики влажности почвы"], correct: 0 },
+        { q: "Какая техника используется для рыхления верхнего слоя почвы и уничтожения мелких сорняков?", a: ["Культиватор", "Экскаватор", "Бульдозер"], correct: 0 },
+        { q: "Какой газ растения поглощают из атмосферы в процессе фотосинтеза?", a: ["Углекислый газ", "Кислород", "Азот"], correct: 0 },
+        { q: "Что означает аббревиатура ГМО в сельском хозяйстве?", a: ["Генетически модифицированный организм", "Глобальная машинная обработка", "Городское молочное объединение"], correct: 0 },
+        { q: "В какое время суток лучше всего осуществлять обычный полив (дождевание) в жаркий сезон?", a: ["Ранним утром или вечером", "В самый полдень", "Только ночью в полной темноте"], correct: 0 },
+        { q: "Для чего фермеры используют агродроны с тепловизорами?", a: ["Для поиска зон засухи на поле", "Для распугивания ворон", "Для сушки урожая"], correct: 0 },
+        { q: "Какая сельскохозяйственная культура является главной для производства макаронных изделий?", a: ["Твердая пшеница", "Овес", "Кукуруза"], correct: 0 },
+        { q: "Как называется процесс срезания колосьев и отделения зерна от стеблей машинным способом?", a: ["Обмолот", "Пастеризация", "Ферментация"], correct: 0 }
+    ];
 
     const SIZE = 6;
     const TYPES = ["plum", "cherry", "strawberry", "bread", "tractor"];
@@ -370,21 +395,48 @@
         closeBuildMenu(); let price = FARM_PRICES[key];
         if (coins >= price) {
             pendingBuildKey = key; currentQuizContext = 'farm_build';
-            const q = QUIZ_FARM_BUILD[Math.floor(Math.random() * QUIZ_FARM_BUILD.length)];
+            
+            // Рандомный выбор из большой базы
+            let qIndex = Math.floor(Math.random() * QUIZ_FARM_BUILD.length);
+            const q = QUIZ_FARM_BUILD[qIndex];
+            
             document.getElementById("quiz-modal-title").innerText = "Проверка знаний 🧠";
-            document.getElementById("quiz-modal-desc").innerHTML = "Чтобы начать строительство, ответь на вопрос из материалов <b style='color:#436932;'>Блога</b>:";
-            document.getElementById("quiz-close-btn").innerText = "Отмена"; document.getElementById("quiz-q").innerText = q.q;
+            document.getElementById("quiz-modal-desc").innerHTML = "Для стройки нужно подтвердить знания агротехнологий:";
+            document.getElementById("quiz-close-btn").innerText = "Отмена"; 
+            document.getElementById("quiz-q").innerText = q.q;
+            
             const opts = document.getElementById("quiz-options"); opts.innerHTML = "";
-            q.a.forEach((ans, i) => { let b = document.createElement("button"); b.className = "btn"; b.style.marginBottom = "8px"; b.style.backgroundColor = "#F5F5F5"; b.style.color = "#333"; b.style.boxShadow = "none"; b.style.border = "1px solid #CCC"; b.innerText = ans; b.onclick = () => handleQuizAnswer(i === q.correct); opts.appendChild(b); });
+            
+            // Чтобы правильный ответ не всегда был первым, перемешаем их
+            let answers = q.a.map((ans, i) => ({ text: ans, isCorrect: i === q.correct }));
+            answers.sort(() => Math.random() - 0.5);
+            
+            answers.forEach(ansObj => { 
+                let b = document.createElement("button"); b.className = "btn"; b.style.marginBottom = "8px"; b.style.backgroundColor = "#F5F5F5"; b.style.color = "#333"; b.style.boxShadow = "none"; b.style.border = "1px solid #CCC"; b.style.lineHeight = "1.3"; b.style.padding = "12px"; b.style.fontSize = "15px"; b.innerText = ansObj.text; 
+                b.onclick = () => handleQuizAnswer(ansObj.isCorrect); 
+                opts.appendChild(b); 
+            });
             document.getElementById("quiz-modal").style.display = "flex";
         } else { showModal("Мало монет 🪙", `Не хватает ${price - coins} 🪙.\nПобеждай в уровнях, чтобы заработать!`, "Понятно", closeModal); }
     }
 
+    // --- УМНАЯ СИСТЕМА ОШИБОК С ПЕРЕБРОСОМ В БЛОГ ---
     function handleQuizAnswer(isCorrect) {
         document.getElementById("quiz-modal").style.display = "none";
         if (currentQuizContext === 'farm_build') {
-            if (isCorrect) { addCoins(-FARM_PRICES[pendingBuildKey]); farmState[pendingBuildKey] = Date.now() + 10000; localStorage.setItem('kz_farm', JSON.stringify(farmState)); renderFarm(); } 
-            else { showModal("Ошибка 😔", "Неправильно! Загляни в БЛОГ, посмотри ролики и возвращайся за стройкой.", "Понятно", closeModal); }
+            if (isCorrect) { 
+                addCoins(-FARM_PRICES[pendingBuildKey]); farmState[pendingBuildKey] = Date.now() + 10000; localStorage.setItem('kz_farm', JSON.stringify(farmState)); renderFarm(); 
+            } else { 
+                // Если ответил неверно -> Отправляем в Блог!
+                showModal(
+                    "Ошибка 😔", 
+                    "Ответ неверный. Агроному важно постоянно учиться! Изучите статьи в нашем Блоге и возвращайтесь для стройки.", 
+                    "Читать Блог", 
+                    () => { closeModal(); showScreen('screen-blog'); }, 
+                    "Отмена",
+                    () => { closeModal(); }
+                ); 
+            }
         } else if (currentQuizContext === 'level_fail') {
             quizUsed = true;
             if (isCorrect) { finished = false; busy = false; moves += 3; updateUI(); setMessage("Правильно! +3 хода"); } 
@@ -403,7 +455,7 @@
     }
     function failQuiz() { document.getElementById("quiz-modal").style.display = "none"; if (currentQuizContext === 'level_fail') { showModal("Сдался?", "Ходы закончились. Попробуй еще раз!", "Заново", () => { closeModal(); initLevel(); }); } }
     
-    function renderBlog() { const container = document.getElementById('blog-container'); container.innerHTML = ''; MOCK_VK_POSTS.forEach(post => { container.innerHTML += `<div class="post-card"><div class="post-header"><div class="post-avatar"><img src="img/plum.png" style="width:80%; height:80%; object-fit:contain;" onerror="this.style.display='none'"></div><div><div class="post-author">Код Земли</div><div class="post-date">${post.date}</div></div></div><div class="post-text">${post.text}</div><div class="post-media">${getImgTag(post.img)}</div><div class="post-footer"><div class="post-action">🤍 Лайк</div><div class="post-action">💬 Коммент</div></div></div>`; }); }
+    function renderBlog() { const container = document.getElementById('blog-container'); container.innerHTML = ''; MOCK_VK_POSTS.forEach(post => { container.innerHTML += `<div class="post-card"><div class="post-header"><div class="post-avatar"><span style="font-size: 24px;">🌱</span></div><div><div class="post-author">Код Земли</div><div class="post-date">${post.date}</div></div></div><div class="post-text">${post.text}</div><div class="post-footer"><div class="post-action">🤍 Лайк</div><div class="post-action">💬 Коммент</div></div></div>`; }); }
     
     function renderLevelsMap() {
         const container = document.getElementById('levels-container'); container.innerHTML = '';
@@ -422,7 +474,6 @@
     function openVideoUrl(title, url) { document.getElementById("video-modal").style.display = "flex"; document.getElementById("video-title").innerText = title; const container = document.getElementById("video-container"); if (url && url !== "") { container.innerHTML = `<iframe src="${url}" width="100%" height="100%" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen style="background-color:#000;"></iframe>`; } else { container.innerHTML = `<div style="padding:20px; text-align:center; color:#888;">Видео скоро появится!</div>`; } }
     function closeVideo() { document.getElementById("video-modal").style.display = "none"; document.getElementById("video-container").innerHTML = ""; }
     
-    // --- УМНЫЙ РЕНДЕР КАРТИНОК БУСТЕРОВ ---
     function getImgTag(name, special = null) { 
         if (!name) return ""; 
         let fallback = ICON[name] || SPECIAL_ICON[name] || "❓"; 
@@ -434,7 +485,6 @@
         return html; 
     }
 
-    // --- ТОЧНАЯ МАТЕМАТИКА ИГРЫ ТРИ-В-РЯД ---
     function initLevel() { 
         let lvl = LEVELS_DATA[selectedLevelIndex]; document.getElementById("game-level-indicator").innerText = `Уровень ${lvl.id}`; 
         moves = lvl.moves; if (selectedBoosters.moves) moves += 5;
@@ -550,7 +600,6 @@
             let item1 = board[r1][c1], item2 = board[r2][c2];
             let matches = findAllMatches();
             
-            // Активация бустеров от любого свайпа
             if ((item1 && item1.special) || (item2 && item2.special)) {
                 moves--; let toDestroy = new Set();
                 if (item1 && item1.special && item2 && item2.special) {
@@ -562,7 +611,7 @@
                     toDestroy.add(`${r2},${c2}`); activateSpecial(r2, c2, toDestroy);
                 }
                 
-                explodeCells(toDestroy, null); // Цепная реакция!
+                explodeCells(toDestroy, null);
                 
                 toDestroy.forEach(coord => { let parts = coord.split(','); let el = document.getElementById(`inner-${parts[0]}-${parts[1]}`); if (el) el.classList.add('pop'); });
                 setTimeout(() => {
@@ -589,7 +638,6 @@
         }, 250);
     }
 
-    // --- УМНАЯ СИСТЕМА ЦЕПНЫХ РЕАКЦИЙ ---
     function explodeCells(coordsSet, safeCoordStr) {
         let newlyAdded = true;
         let processedSpecials = new Set();
@@ -628,7 +676,6 @@
             toDestroy.add(coordStr);
         });
 
-        // Триггер всех бустеров, попавших в ряд
         explodeCells(toDestroy, safeCoordStr);
 
         toDestroy.forEach(coord => {
@@ -667,7 +714,6 @@
         }, 350);
     }
 
-    // --- УМНОЕ ОПРЕДЕЛЕНИЕ ФОРМЫ СОВПАДЕНИЯ ---
     function getCluster(r, c, matches) {
         let type = board[r][c]?.type; if (!type) return [];
         let cluster = []; let queue = [{r,c}]; let visited = new Set(); visited.add(`${r},${c}`);
@@ -682,10 +728,8 @@
     function checkAndCreateSpecial(r, c, matches) {
         if (r === null || c === null || matches.length < 4) return null;
         let type = board[r][c]?.type; if (!type) return null;
-        
         let inMatch = matches.some(m => m.r === r && m.c === c);
         if (!inMatch) return null;
-        
         let cluster = getCluster(r, c, matches);
         if (cluster.length < 4) return null;
         
@@ -695,13 +739,11 @@
         if (rowCount >= 5 || colCount >= 5 || (rowCount >= 3 && colCount >= 3)) { 
             board[r][c] = { type: type, special: "bomb", counted: false }; return { r, c }; 
         }
-        
         let minR = Math.min(...cluster.map(m=>m.r)), maxR = Math.max(...cluster.map(m=>m.r));
         let minC = Math.min(...cluster.map(m=>m.c)), maxC = Math.max(...cluster.map(m=>m.c));
         if (maxR - minR === 1 && maxC - minC === 1 && cluster.length === 4) {
             board[r][c] = { type: type, special: "plane", counted: false }; return { r, c };
         }
-        
         if (rowCount >= 4) { board[r][c] = { type: type, special: "arrowV", counted: false }; return { r, c }; }
         if (colCount >= 4) { board[r][c] = { type: type, special: "arrowH", counted: false }; return { r, c }; }
         return null;
@@ -746,7 +788,19 @@
         }
     }
 
-    function showModal(title, text, btnText, callback, secondaryBtnText = null) { document.getElementById("modal-title").innerText = title; document.getElementById("modal-text").innerText = text; let btn1 = document.getElementById("modal-btn"); btn1.innerText = btnText; btn1.onclick = callback; let btn2 = document.getElementById("modal-btn-secondary"); if (secondaryBtnText) { btn2.style.display = "block"; btn2.innerText = secondaryBtnText; btn2.onclick = () => { closeModal(); showScreen('screen-levels'); }; } else { btn2.style.display = "none"; } document.getElementById("modal").style.display = "flex"; }
+    function showModal(title, text, btnText, callback, secondaryBtnText = null, secondaryCallback = null) { 
+        document.getElementById("modal-title").innerText = title; 
+        document.getElementById("modal-text").innerText = text; 
+        let btn1 = document.getElementById("modal-btn"); 
+        btn1.innerText = btnText; btn1.onclick = callback; 
+        let btn2 = document.getElementById("modal-btn-secondary"); 
+        if (secondaryBtnText) { 
+            btn2.style.display = "block"; btn2.innerText = secondaryBtnText; 
+            btn2.onclick = secondaryCallback ? secondaryCallback : () => { closeModal(); }; 
+        } else { btn2.style.display = "none"; } 
+        document.getElementById("modal").style.display = "flex"; 
+    }
+    
     function closeModal() { document.getElementById("modal").style.display = "none"; }
     function restartLevel() { initLevel(); }
 
