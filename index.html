@@ -29,26 +29,26 @@
 
         .coin-balance { background: #FFF8E1; border: 2px solid #FFECB3; padding: 6px 12px; border-radius: 14px; font-weight: 800; color: #F57F17; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 15px; }
         
-        /* ФЕРМА И КАМЕРА */
+        /* --- ФЕРМА --- */
         .farm-viewport { flex: 1; overflow: hidden; position: relative; border-radius: 20px; border: 4px solid rgba(255,255,255,0.5); box-shadow: inset 0 0 20px rgba(0,0,0,0.2); background: #7CB342; touch-action: none; user-select: none; -webkit-user-select: none; margin-bottom: 10px; }
         .farm-world { position: absolute; top: 0; left: 0; width: 2000px; height: 2000px; background-color: #8BC34A; background-image: linear-gradient(rgba(255,255,255,0.15) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.15) 2px, transparent 2px), url('img/bg_farm.jpg'); background-size: 80px 80px, 80px 80px, 400px 400px; transform-origin: 0 0; will-change: transform; transition: transform 0.05s linear; }
         
         .farm-build-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 85%; z-index: 200; box-shadow: 0 4px 15px rgba(0,0,0,0.3); padding: 14px; font-size: 16px; border-radius: 14px;}
         .storage-badge { background: #E8F5E9; border: 2px solid #81C784; color: #2E7D32; font-weight: 800; padding: 6px 12px; border-radius: 14px; font-size: 14px; display: flex; align-items: center; gap: 4px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
-        /* --- ОБНОВЛЕННЫЙ АМБАР СО ШКАЛОЙ --- */
         .main-barn { position: absolute; left: 880px; top: 880px; width: 240px; height: 240px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; z-index: 50; }
         .barn-shadow { background: rgba(0,0,0,0.25); width: 180px; height: 50px; border-radius: 50%; position: absolute; bottom: 10px; z-index: 1; filter: blur(4px); }
-        .barn-img { width: 100%; height: 100%; object-fit: contain; z-index: 2; position: relative; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.3)); }
-        
+        .barn-img { width: 100%; height: 100%; object-fit: contain; z-index: 2; position: relative; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.3)); pointer-events: none;}
         .storage-bar-wrap { position: absolute; top: 0px; width: 140px; height: 22px; background: rgba(0,0,0,0.6); border: 2px solid #FFF; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .storage-bar-fill { position: absolute; top: 0; left: 0; bottom: 0; width: 0%; background: linear-gradient(90deg, #81C784, #4CAF50); transition: width 0.4s ease-out; z-index: 1; }
         .storage-bar-text { position: relative; z-index: 2; color: #FFF; font-size: 12px; font-weight: 800; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
 
-        /* ОБЛАКА */
         .cloud-layer { position: absolute; pointer-events: none; z-index: 150; opacity: 0.85; animation: floatCloud linear infinite; }
         @keyframes floatCloud { 0% { transform: translateX(-400px); } 100% { transform: translateX(2400px); } }
+        @keyframes sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+        .sway { animation: sway 3s ease-in-out infinite; transform-origin: bottom center; }
 
+        /* --- СТАРЫЕ СТИЛИ --- */
         .map-container { flex: 1; overflow-y: auto; position: relative; padding: 40px 0; display: flex; flex-direction: column-reverse; align-items: center; scroll-behavior: smooth; }
         .map-container::before { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: repeating-linear-gradient(to bottom, rgba(67,105,50,0.3) 0, rgba(67,105,50,0.3) 15px, transparent 15px, transparent 30px); transform: translateX(-50%); z-index: 0; }
         .level-node-wrap { position: relative; z-index: 1; width: 100%; display: flex; justify-content: center; margin: 20px 0; }
@@ -100,7 +100,11 @@
         .drawer-overlay { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; backdrop-filter: blur(2px); border-radius: inherit; }
         .build-drawer { position: absolute; top: 0; right: -320px; bottom: 0; width: 280px; background: #FFF; z-index: 201; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 24px 16px; display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.2); overflow-y: auto; }
         .build-drawer.open { right: 0; }
-        
+        .drawer-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: #F5F5F5; border-radius: 12px; margin-bottom: 12px; border: 1px solid #E0E0E0; }
+        .drawer-item-icon { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 30px; background: white; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); flex-shrink: 0; }
+        .drawer-item-info { flex: 1; }
+        .drawer-item-title { font-weight: 800; font-size: 13px; color: #333; margin-bottom: 6px; line-height: 1.2; }
+
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); justify-content: center; align-items: center; z-index: 300; }
         .modal-content { background: #FFF; padding: 26px; border-radius: 22px; text-align: center; max-width: 320px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.3); position: relative; }
         
@@ -146,10 +150,15 @@
     <div id="screen-farm" class="screen screen-padded" style="padding-bottom: 0;">
         <div class="nav-header">
             <button class="nav-back-btn" onclick="showScreen('screen-menu')">← Меню</button>
-            <div class="storage-badge" onclick="showModal('Склад (Амбар)', 'Здесь будет храниться твой урожай, молоко и хлеб. Пока тут пусто!', 'Понятно', closeModal)">📦 <span id="storage-count">0/50</span></div>
+            <div class="storage-badge" onclick="openBarn()">📦 <span id="storage-count">0/50</span></div>
             <div class="coin-balance" style="padding: 4px 10px; font-size: 13px;">🪙 <span class="coin-val">0</span></div>
         </div>
         
+        <div id="placement-banner" style="display:none; position:absolute; top:80px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.85); color:white; padding:12px 24px; border-radius:24px; z-index:300; font-weight:800; white-space:nowrap; align-items:center; gap:12px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);">
+            Укажи место на поле! 🌱
+            <button onclick="cancelPlacement()" style="background:#E53935; border:none; color:white; border-radius:50%; width:28px; height:28px; font-weight:bold; cursor:pointer;">✖</button>
+        </div>
+
         <div id="farm-viewport" class="farm-viewport">
             <div id="farm-world" class="farm-world">
                 
@@ -161,12 +170,9 @@
                     <img src="img/cloud2.png" style="width: 400px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     <span style="display:none; font-size: 120px; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));">☁️</span>
                 </div>
-                <div class="cloud-layer" style="top: 1400px; animation-duration: 90s; animation-delay: -60s;">
-                    <img src="img/cloud1.png" style="width: 250px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                    <span style="display:none; font-size: 70px; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));">☁️</span>
-                </div>
+                
+                <div id="farm-items-container" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none;"></div>
 
-                <!-- Амбар со Шкалой -->
                 <div class="main-barn">
                     <div class="storage-bar-wrap">
                         <div class="storage-bar-fill" id="barn-storage-fill"></div>
@@ -178,18 +184,16 @@
                 </div>
             </div>
             
-            <button class="btn btn-accent farm-build-btn" onclick="openBuildMenu()">🔨 МАГАЗИН ФЕРМЕРА</button>
+            <button class="btn btn-accent farm-build-btn" onclick="openBuildMenu()">🛒 МАГАЗИН</button>
         </div>
 
         <div class="drawer-overlay" id="drawer-overlay" onclick="closeBuildMenu()"></div>
         <div class="build-drawer" id="build-drawer">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <div style="font-size: 18px; font-weight: 900; color: #263326;">Магазин</div>
+                <div style="font-size: 18px; font-weight: 900; color: #263326;">Магазин фермера</div>
                 <button style="background: rgba(0,0,0,0.05); border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 14px; font-weight: 800; cursor: pointer; color: #555;" onclick="closeBuildMenu()">✖</button>
             </div>
-            <div style="text-align: center; color: #777; font-size: 14px; margin-top: 20px; line-height: 1.5;">
-                Магазин закрыт на реконструкцию.<br><br>В следующем этапе здесь появятся грядки и загоны, которые можно будет ставить прямо на сетку карты!
-            </div>
+            <div id="drawer-items"></div>
         </div>
     </div>
 
@@ -261,6 +265,12 @@
 <script>
     try { if (typeof vkBridge !== 'undefined') vkBridge.send('VKWebAppInit'); } catch (e) {}
 
+    const MOCK_VK_POSTS = [ 
+        { text: "🛰️ <b>Точное земледелие:</b> Сегодня тракторы ездят сами благодаря GPS и ГЛОНАСС! Они не перекрывают ряды при посеве, экономят топливо и берегут почву от лишнего уплотнения.", date: "Сегодня" }, 
+        { text: "💧 <b>Системы полива:</b> Почему капельный полив лучше распылителей? Он доставляет воду и удобрения прямо к корням растения, снижая расход воды на 50% и не давая расти сорнякам между рядами.", date: "Вчера" }
+    ];
+    const QUIZ_LEVEL_FAIL = [ { q: "Как называется профессия человека, выращивающего урожай?", a: ["Агроном", "Ветеринар", "Зоотехник"], correct: 0 } ];
+
     const SIZE = 6;
     const TYPES = ["plum", "cherry", "strawberry", "bread", "tractor"];
     const ICON = { plum: "🍑", cherry: "🍒", strawberry: "🍓", bread: "🍞", tractor: "🚜" };
@@ -274,10 +284,16 @@
     let maxUnlockedLevel = localStorage.getItem('kz_max_level') ? parseInt(localStorage.getItem('kz_max_level')) : 1;
     let selectedLevelIndex = maxUnlockedLevel - 1; 
     let unlockedItems = localStorage.getItem('kz_unlocked') ? JSON.parse(localStorage.getItem('kz_unlocked')) : [];
-    let coins = localStorage.getItem('kz_coins') ? parseInt(localStorage.getItem('kz_coins')) : 0;
+    let coins = localStorage.getItem('kz_coins') ? parseInt(localStorage.getItem('kz_coins')) : 100;
+    let storage = JSON.parse(localStorage.getItem('kz_storage')) || { cherry: 0, capacity: 50 };
     
-    // --- ХРАНИЛИЩЕ ---
-    let storage = JSON.parse(localStorage.getItem('kz_storage')) || { wheat: 0, milk: 0, capacity: 50 };
+    let farmItems = JSON.parse(localStorage.getItem('kz_farm_items')) || [];
+
+    // Миграция старых данных: добавляем кол-во урожаев (harvestsLeft) и статус (state)
+    farmItems.forEach(item => {
+        if (item.harvestsLeft === undefined) item.harvestsLeft = 5;
+        if (!item.state) item.state = 'growing';
+    });
 
     let board = [], selected = null, busy = false, finished = false;
     let moves = 0, collectedCount = 0, quizUsed = false;
@@ -285,262 +301,301 @@
     const BOOSTER_COSTS = { bomb: 30, plane: 30, moves: 40 };
 
     function updateStorageUI() {
-        let total = storage.wheat + storage.milk;
+        let total = storage.cherry || 0;
         let percent = Math.min(100, (total / storage.capacity) * 100);
-        
-        // Бейдж наверху
-        let elTop = document.getElementById('storage-count');
-        if (elTop) elTop.innerText = `${total}/${storage.capacity}`;
-        
-        // Шкала над амбаром
-        let elFill = document.getElementById('barn-storage-fill');
-        let elText = document.getElementById('barn-storage-text');
-        if (elFill) elFill.style.width = percent + "%";
-        if (elText) elText.innerText = `${total} / ${storage.capacity}`;
+        let elTop = document.getElementById('storage-count'); if (elTop) elTop.innerText = `${total}/${storage.capacity}`;
+        let elFill = document.getElementById('barn-storage-fill'); let elText = document.getElementById('barn-storage-text');
+        if (elFill) elFill.style.width = percent + "%"; if (elText) elText.innerText = `${total} / ${storage.capacity}`;
     }
 
-    // --- УМНАЯ КАМЕРА (ФОКУСНЫЙ ЗУМ + АНИМАЦИЯ) ---
+    function openBarn() {
+        let content = `<div style="text-align:left;">`;
+        if ((storage.cherry || 0) > 0) {
+            content += `
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px; background:#F5F5F5; padding:12px; border-radius:12px;">
+                    <div style="width:44px; height:44px;"><img src="img/cherry.png" style="width:100%; height:100%; object-fit:contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span style="display:none; font-size:30px;">🍒</span></div>
+                    <div style="flex:1;">
+                        <b style="color:#263326; font-size:16px;">Черешня</b><br>
+                        <span style="color:#666; font-size:12px; font-weight:700;">В наличии: ${storage.cherry}</span>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                        <button class="btn btn-accent" style="padding:6px 10px; font-size:12px;" onclick="sellItem('cherry', 1)">Продать (1 🪙)</button>
+                        <button class="btn btn-secondary" style="padding:6px 10px; font-size:12px; border:1px solid #CCC;" onclick="processJam()">На завод</button>
+                    </div>
+                </div>`;
+        } else {
+            content += `<div style="color:#777; text-align:center; padding: 20px 0;">Амбар пуст. Посади деревья и собери урожай!</div>`;
+        }
+        content += `</div>`;
+        showModal("📦 Амбар", "", "Закрыть", closeModal);
+        document.getElementById('modal-text').innerHTML = content;
+    }
+
+    function sellItem(type, price) {
+        if (storage[type] > 0) {
+            storage[type]--; addCoins(price);
+            localStorage.setItem('kz_storage', JSON.stringify(storage));
+            updateStorageUI(); openBarn(); 
+        }
+    }
+
+    function processJam() { showModal("Завод варенья 🏭", "Завод варенья пока не построен! Накопи ресурсы, он станет доступен в следующих обновлениях.", "Понятно", openBarn); }
+
+    // --- УМНАЯ КАМЕРА ---
     const fViewport = document.getElementById('farm-viewport');
     const fWorld = document.getElementById('farm-world');
     let fScale = 1;
     let fPanX = window.innerWidth < 400 ? -800 : -850; 
     let fPanY = -750;
-    
     let fIsDragging = false, fStartX, fStartY, fStartPanX, fStartPanY;
     let fInitialPinchDist = 0, fInitialScale = 1;
     let fReqAnim = null;
+    let harvestedThisSwipe = false; 
 
     if (fViewport) {
         fViewport.addEventListener('touchstart', e => {
+            harvestedThisSwipe = false;
             if (e.touches.length === 1) {
-                fIsDragging = true;
-                fStartX = e.touches[0].clientX; fStartY = e.touches[0].clientY;
+                fIsDragging = true; fStartX = e.touches[0].clientX; fStartY = e.touches[0].clientY;
                 fStartPanX = fPanX; fStartPanY = fPanY;
             } else if (e.touches.length === 2) {
                 fIsDragging = false;
                 fInitialPinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-                fInitialScale = fScale;
-                fStartPanX = fPanX; fStartPanY = fPanY;
+                fInitialScale = fScale; fStartPanX = fPanX; fStartPanY = fPanY;
             }
         }, {passive: false});
 
         fViewport.addEventListener('touchmove', e => {
             e.preventDefault();
             if (e.touches.length === 1 && fIsDragging) {
-                fPanX = fStartPanX + (e.touches[0].clientX - fStartX); 
-                fPanY = fStartPanY + (e.touches[0].clientY - fStartY);
-                requestCameraUpdate();
+                let touch = e.touches[0];
+                let rect = fViewport.getBoundingClientRect();
+                
+                let worldX = ((touch.clientX - rect.left) - fPanX) / fScale;
+                let worldY = ((touch.clientY - rect.top) - fPanY) / fScale;
+                let c = Math.floor(worldX / 80); let r = Math.floor(worldY / 80);
+                
+                let item = farmItems.find(i => i.c === c && i.r === r);
+                if (item && item.state !== 'dry' && !buildModeItem) {
+                    let age = Date.now() - item.plantedAt;
+                    if (age >= 120000) { // 2 минуты
+                        harvestItem(item, touch.clientX, touch.clientY);
+                        harvestedThisSwipe = true;
+                    }
+                }
+
+                if (!harvestedThisSwipe) {
+                    fPanX = fStartPanX + (touch.clientX - fStartX); 
+                    fPanY = fStartPanY + (touch.clientY - fStartY);
+                    requestCameraUpdate();
+                }
             } else if (e.touches.length === 2) {
                 let dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
                 let newScale = Math.min(Math.max(0.4, fInitialScale * (dist / fInitialPinchDist)), 2.0);
-                
-                // Вычисляем центр между пальцами для идеального фокусного зума
                 let focalX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
                 let focalY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-                
                 let rect = fViewport.getBoundingClientRect();
-                let viewFocalX = focalX - rect.left;
-                let viewFocalY = focalY - rect.top;
-                
-                let relX = (viewFocalX - fStartPanX) / fInitialScale;
-                let relY = (viewFocalY - fStartPanY) / fInitialScale;
-                
-                fScale = newScale;
-                fPanX = viewFocalX - relX * fScale;
-                fPanY = viewFocalY - relY * fScale;
-                
+                let viewFocalX = focalX - rect.left; let viewFocalY = focalY - rect.top;
+                let relX = (viewFocalX - fStartPanX) / fInitialScale; let relY = (viewFocalY - fStartPanY) / fInitialScale;
+                fScale = newScale; fPanX = viewFocalX - relX * fScale; fPanY = viewFocalY - relY * fScale;
                 requestCameraUpdate();
             }
         }, {passive: false});
 
-        fViewport.addEventListener('touchend', e => { fIsDragging = false; });
+        fViewport.addEventListener('touchend', e => { 
+            if (e.changedTouches.length === 1 && fStartX !== undefined) {
+                let dx = e.changedTouches[0].clientX - fStartX;
+                let dy = e.changedTouches[0].clientY - fStartY;
+                if (Math.hypot(dx, dy) < 10 && !harvestedThisSwipe) {
+                    handleFarmTap(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+                }
+            }
+            fIsDragging = false; 
+        });
         fViewport.addEventListener('touchcancel', e => { fIsDragging = false; });
     }
 
-    function requestCameraUpdate() {
-        if (!fReqAnim) {
-            fReqAnim = requestAnimationFrame(() => {
-                updateCamera();
-                fReqAnim = null;
-            });
-        }
-    }
-
+    function requestCameraUpdate() { if (!fReqAnim) { fReqAnim = requestAnimationFrame(() => { updateCamera(); fReqAnim = null; }); } }
     function updateCamera() {
-        let maxPanX = 0, maxPanY = 0;
-        let minPanX = -(2000 * fScale - fViewport.clientWidth);
-        let minPanY = -(2000 * fScale - fViewport.clientHeight);
-        
-        fPanX = Math.min(maxPanX, Math.max(minPanX, fPanX));
-        fPanY = Math.min(maxPanY, Math.max(minPanY, fPanY));
-        
+        let minPanX = -(2000 * fScale - fViewport.clientWidth); let minPanY = -(2000 * fScale - fViewport.clientHeight);
+        fPanX = Math.min(0, Math.max(minPanX, fPanX)); fPanY = Math.min(0, Math.max(minPanY, fPanY));
         if (fWorld) fWorld.style.transform = `translate(${fPanX}px, ${fPanY}px) scale(${fScale})`;
     }
     setTimeout(updateCamera, 100);
 
-    function showPreLevel(idx) {
-        selectedLevelIndex = idx; let lvl = LEVELS_DATA[idx];
-        document.getElementById("prelevel-title").innerText = `Уровень ${lvl.id}`;
-        document.getElementById("prelevel-icon").innerHTML = `<div style="width:100%;height:100%;">${getImgTag(lvl.targetItem)}</div>`;
-        document.getElementById("prelevel-count").innerText = `${lvl.targetCount} шт.`;
-        document.getElementById("prelevel-moves").innerText = `⏳ ${lvl.moves}`;
-        selectedBoosters = { bomb: false, plane: false, moves: false }; updateBoosterUI();
-        document.getElementById("prelevel-modal").style.display = "flex";
+    // --- МАГАЗИН И СТРОЙКА ---
+    let buildModeItem = null;
+
+    function renderFarmDrawer() {
+        let drawerHtml = `
+            <div class="drawer-item">
+                <div class="drawer-item-icon" style="background:#FFF3E0;">
+                    <img src="img/cherry.png" style="width:80%; height:80%; object-fit:contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span style="display:none; font-size:24px;">🍒</span>
+                </div>
+                <div class="drawer-item-info">
+                    <div class="drawer-item-title">Саженец черешни</div>
+                    <div style="font-size:11px; color:#666; margin-bottom:6px;">Растет: 2 мин (Дает 5-6 урожаев)</div>
+                    <button class="btn btn-accent" style="padding:6px 10px; font-size:12px; width:auto; border-radius: 8px;" onclick="startPlacement('cherry', 10)">Купить 10 🪙</button>
+                </div>
+            </div>
+        `;
+        document.getElementById('drawer-items').innerHTML = drawerHtml;
     }
+
+    function startPlacement(type, price) {
+        if (coins < price) { showModal("Мало монет 🪙", "Заработай монеты в уровнях Три-в-Ряд!", "Понятно", closeModal); return; }
+        buildModeItem = { type, price }; closeBuildMenu();
+        document.getElementById('placement-banner').style.display = 'flex';
+    }
+    function cancelPlacement() { buildModeItem = null; document.getElementById('placement-banner').style.display = 'none'; }
+
+    function handleFarmTap(clientX, clientY) {
+        let rect = fViewport.getBoundingClientRect();
+        let worldX = ((clientX - rect.left) - fPanX) / fScale;
+        let worldY = ((clientY - rect.top) - fPanY) / fScale;
+        let c = Math.floor(worldX / 80); let r = Math.floor(worldY / 80);
+        
+        // Проверка: кликнули ли мы по существующему дереву
+        let existingItem = farmItems.find(i => i.c === c && i.r === r);
+        if (existingItem) {
+            if (existingItem.state === 'dry') {
+                showModal("Засохшее дерево 🍂", "Это дерево больше не даст урожай. Нанять лесоруба и выкорчевать его?", "Выкорчевать (2 🪙)", () => {
+                    if (coins >= 2) {
+                        addCoins(-2);
+                        farmItems = farmItems.filter(i => i.id !== existingItem.id);
+                        localStorage.setItem('kz_farm_items', JSON.stringify(farmItems));
+                        closeModal(); renderFarmItems();
+                    } else {
+                        showModal("Мало монет", "Нужно 2 🪙 для оплаты работы лесоруба.", "Понятно", closeModal);
+                    }
+                }, "Оставить");
+            }
+            return; // Если тапнули по предмету, дальше стройку не обрабатываем
+        }
+
+        if (!buildModeItem) return;
+        if (c >= 11 && c <= 13 && r >= 11 && r <= 13) return; // Амбар
+        if (farmItems.length >= 10) { showModal("Мало места!", "У тебя лимит 10 саженцев.", "Понятно", closeModal); cancelPlacement(); return; }
+
+        addCoins(-buildModeItem.price);
+        // Даем случайное количество урожаев (5 или 6)
+        let maxHarvests = Math.floor(Math.random() * 2) + 5; 
+        farmItems.push({ id: Date.now(), type: buildModeItem.type, c: c, r: r, plantedAt: Date.now(), harvestsLeft: maxHarvests, state: 'growing' });
+        localStorage.setItem('kz_farm_items', JSON.stringify(farmItems));
+        renderFarmItems();
+        
+        let flash = document.createElement('div');
+        flash.style.position = 'absolute'; flash.style.left = (c*80)+'px'; flash.style.top = (r*80)+'px'; flash.style.width = '80px'; flash.style.height = '80px'; flash.style.background = 'rgba(255,255,255,0.6)'; flash.style.borderRadius = '50%'; flash.style.pointerEvents = 'none'; flash.style.animation = 'popAnim 0.3s forwards';
+        document.getElementById('farm-items-container').appendChild(flash); setTimeout(() => flash.remove(), 300);
+
+        cancelPlacement();
+    }
+
+    // --- РЕНДЕР И АНИМАЦИЯ ДЕРЕВЬЕВ ---
+    function renderFarmItems() {
+        let container = document.getElementById('farm-items-container');
+        if (!container) return;
+        container.innerHTML = '';
+        let now = Date.now();
+        
+        farmItems.forEach(item => {
+            let soil = document.createElement('div');
+            soil.style.position = 'absolute'; soil.style.left = (item.c * 80 + 10) + 'px'; soil.style.top = (item.r * 80 + 20) + 'px'; soil.style.width = '60px'; soil.style.height = '40px'; soil.style.background = 'rgba(100,60,30,0.4)'; soil.style.borderRadius = '50%'; soil.style.border = '2px dashed rgba(255,255,255,0.2)'; soil.style.pointerEvents = 'none';
+            container.appendChild(soil);
+
+            let el = document.createElement('div');
+            el.style.position = 'absolute'; el.style.left = (item.c * 80) + 'px'; el.style.top = (item.r * 80 - 15) + 'px'; el.style.width = '80px'; el.style.height = '80px'; el.style.display = 'flex'; el.style.alignItems = 'flex-end'; el.style.justifyContent = 'center'; el.style.pointerEvents = 'none';
+            
+            let age = now - item.plantedAt;
+            
+            if (item.state === 'dry') {
+                // Сухое дерево
+                el.innerHTML = `<img src="img/tree_dry.png" style="width:90%; height:90%; object-fit:contain; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.4));" onerror="this.src='img/cherry.png'; this.style.filter='grayscale(100%) sepia(100%) hue-rotate(30deg) drop-shadow(0 4px 4px rgba(0,0,0,0.4))';">`;
+            } else if (age < 120000) { 
+                // Растущий саженец (2 минуты)
+                let leftSec = Math.ceil((120000 - age) / 1000);
+                el.innerHTML = `
+                    <img src="img/sprout.png" style="width:50%; height:50%; object-fit:contain; margin-bottom:10px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div style="display:none; font-size:30px; margin-bottom:10px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));">🌱</div>
+                    <div style="position:absolute; bottom:-10px; background:rgba(0,0,0,0.6); color:white; font-size:12px; font-weight:800; border-radius:6px; padding:2px 6px;">${leftSec}с</div>
+                `;
+            } else { 
+                // Выросло (готов к сбору)
+                el.innerHTML = `<div class="sway" style="width:90%; height:90%;"><img src="img/tree_cherry.png" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 6px 6px rgba(0,0,0,0.4));" onerror="this.src='img/cherry.png';"></div>`;
+            }
+            container.appendChild(el);
+        });
+    }
+
+    // --- ЦИКЛ СБОРА УРОЖАЯ ---
+    function harvestItem(item, clientX, clientY) {
+        // Уменьшаем счетчик жизней дерева
+        item.harvestsLeft -= 1;
+        
+        if (item.harvestsLeft <= 0) {
+            item.state = 'dry'; // Умерло
+        } else {
+            item.plantedAt = Date.now(); // Снова стало ростком
+            item.state = 'growing';
+        }
+        localStorage.setItem('kz_farm_items', JSON.stringify(farmItems));
+        
+        storage.cherry = (storage.cherry || 0) + 1;
+        localStorage.setItem('kz_storage', JSON.stringify(storage));
+        updateStorageUI();
+        
+        // Анимация полета в склад
+        let flyEl = document.createElement('div');
+        flyEl.innerHTML = `<img src="img/cherry.png" style="width:100%; height:100%; object-fit:contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span style="display:none; font-size:40px;">🍒</span>`;
+        flyEl.style.position = 'fixed'; flyEl.style.left = clientX + 'px'; flyEl.style.top = clientY + 'px'; flyEl.style.width = '50px'; flyEl.style.height = '50px'; flyEl.style.zIndex = '9999'; flyEl.style.transition = 'all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)'; flyEl.style.pointerEvents = 'none'; flyEl.style.filter = 'drop-shadow(0 10px 10px rgba(0,0,0,0.4))';
+        document.body.appendChild(flyEl);
+        
+        setTimeout(() => {
+            let target = document.getElementById('storage-count').getBoundingClientRect();
+            flyEl.style.left = (target.left - 10) + 'px'; flyEl.style.top = (target.top - 10) + 'px'; flyEl.style.transform = 'scale(0.3)'; flyEl.style.opacity = '0';
+        }, 50);
+        setTimeout(() => flyEl.remove(), 650);
+        
+        let flash = document.createElement('div');
+        flash.style.position = 'fixed'; flash.style.left = (clientX-30) + 'px'; flash.style.top = (clientY-30) + 'px'; flash.style.width = '60px'; flash.style.height = '60px'; flash.style.background = '#FFF'; flash.style.borderRadius = '50%'; flash.style.zIndex = '9998'; flash.style.animation = 'popAnim 0.3s forwards'; flash.style.pointerEvents = 'none';
+        document.body.appendChild(flash);
+        setTimeout(() => flash.remove(), 300);
+        
+        renderFarmItems();
+    }
+
+    setInterval(() => { if (document.getElementById('screen-farm').classList.contains('active')) renderFarmItems(); }, 1000);
+
+    // --- СТАНДАРТНЫЕ ФУНКЦИИ (Сокращены) ---
+    function showPreLevel(idx) { selectedLevelIndex = idx; let lvl = LEVELS_DATA[idx]; document.getElementById("prelevel-title").innerText = `Уровень ${lvl.id}`; document.getElementById("prelevel-icon").innerHTML = `<div style="width:100%;height:100%;">${getImgTag(lvl.targetItem)}</div>`; document.getElementById("prelevel-count").innerText = `${lvl.targetCount} шт.`; document.getElementById("prelevel-moves").innerText = `⏳ ${lvl.moves}`; selectedBoosters = { bomb: false, plane: false, moves: false }; updateBoosterUI(); document.getElementById("prelevel-modal").style.display = "flex"; }
     function closePreLevel() { document.getElementById("prelevel-modal").style.display = "none"; }
     function toggleBooster(type) { selectedBoosters[type] = !selectedBoosters[type]; updateBoosterUI(); }
     function updateBoosterUI() { ['bomb', 'plane', 'moves'].forEach(type => { let el = document.getElementById(`boost-${type}`); if (selectedBoosters[type]) el.classList.add('selected'); else el.classList.remove('selected'); }); }
-    function startLevelFromModal() {
-        let totalCost = 0;
-        if (selectedBoosters.bomb) totalCost += BOOSTER_COSTS.bomb; if (selectedBoosters.plane) totalCost += BOOSTER_COSTS.plane; if (selectedBoosters.moves) totalCost += BOOSTER_COSTS.moves;
-        if (coins >= totalCost) { addCoins(-totalCost); closePreLevel(); showScreen('screen-game'); initLevel(); } 
-        else { closePreLevel(); showModal("Мало монет 🪙", "Убери часть бустеров.", "Понятно", () => { document.getElementById("prelevel-modal").style.display="flex"; }); }
-    }
-
+    function startLevelFromModal() { let totalCost = 0; if (selectedBoosters.bomb) totalCost += BOOSTER_COSTS.bomb; if (selectedBoosters.plane) totalCost += BOOSTER_COSTS.plane; if (selectedBoosters.moves) totalCost += BOOSTER_COSTS.moves; if (coins >= totalCost) { addCoins(-totalCost); closePreLevel(); showScreen('screen-game'); initLevel(); } else { closePreLevel(); showModal("Мало монет 🪙", "Заработай монеты на уровнях.", "Понятно", () => { document.getElementById("prelevel-modal").style.display="flex"; }); } }
     function addCoins(amount) { coins += amount; localStorage.setItem('kz_coins', coins); updateCoinsUI(); }
     function updateCoinsUI() { document.querySelectorAll('.coin-val').forEach(el => el.innerText = coins); }
-    function checkDailyBonus() {
-        let today = new Date().toDateString();
-        if (localStorage.getItem('kz_last_login') !== today) {
-            localStorage.setItem('kz_last_login', today);
-            setTimeout(() => { addCoins(150); showModal("Ежедневный бонус 🎁", "Держи монеты для старта фермы:\n\n+150 🪙", "Забрать", closeModal); }, 500);
-        }
-    }
-
-    function showScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
-        if (screenId === 'screen-levels') { renderLevelsMap(); }
-        if (screenId === 'screen-farm') { updateStorageUI(); setTimeout(updateCamera, 50); }
-    }
-
+    function checkDailyBonus() { let today = new Date().toDateString(); if (localStorage.getItem('kz_last_login') !== today) { localStorage.setItem('kz_last_login', today); setTimeout(() => { addCoins(150); showModal("Ежедневный бонус 🎁", "Держи монеты для старта фермы:\n\n+150 🪙", "Забрать", closeModal); }, 500); } }
+    function showScreen(screenId) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(screenId).classList.add('active'); if (screenId === 'screen-levels') { renderLevelsMap(); } if (screenId === 'screen-farm') { updateStorageUI(); renderFarmDrawer(); renderFarmItems(); setTimeout(updateCamera, 50); } }
     function openBuildMenu() { document.getElementById('drawer-overlay').style.display = 'block'; setTimeout(() => document.getElementById('build-drawer').classList.add('open'), 10); }
     function closeBuildMenu() { document.getElementById('build-drawer').classList.remove('open'); setTimeout(() => document.getElementById('drawer-overlay').style.display = 'none', 300); }
-
-    function renderLevelsMap() {
-        const container = document.getElementById('levels-container'); container.innerHTML = '';
-        LEVELS_DATA.forEach((lvl, idx) => {
-            const wrap = document.createElement('div'); const isCheckpoint = lvl.isCheckpoint || lvl.id % 10 === 0; wrap.className = `level-node-wrap ${isCheckpoint ? 'checkpoint' : ''}`;
-            const isLocked = lvl.id > maxUnlockedLevel, isCompleted = lvl.id < maxUnlockedLevel, isCurrent = lvl.id === maxUnlockedLevel;
-            let iconContent = isLocked ? '🔒' : lvl.id; if (isCheckpoint && !isLocked) iconContent = '▶️';
-            wrap.innerHTML = `<div class="level-node ${isLocked ? 'locked' : ''} ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}"><div>${iconContent}</div>${!isLocked && !isCheckpoint ? `<div class="level-badge">${getImgTag(lvl.targetItem)}${lvl.targetCount}</div>` : ''}</div>`;
-            if (!isLocked) wrap.onclick = () => showPreLevel(idx);
-            container.appendChild(wrap);
-        });
-    }
+    function renderLevelsMap() { const container = document.getElementById('levels-container'); container.innerHTML = ''; LEVELS_DATA.forEach((lvl, idx) => { const wrap = document.createElement('div'); const isCheckpoint = lvl.isCheckpoint || lvl.id % 10 === 0; wrap.className = `level-node-wrap ${isCheckpoint ? 'checkpoint' : ''}`; const isLocked = lvl.id > maxUnlockedLevel, isCompleted = lvl.id < maxUnlockedLevel, isCurrent = lvl.id === maxUnlockedLevel; let iconContent = isLocked ? '🔒' : lvl.id; if (isCheckpoint && !isLocked) iconContent = '▶️'; wrap.innerHTML = `<div class="level-node ${isLocked ? 'locked' : ''} ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}"><div>${iconContent}</div>${!isLocked && !isCheckpoint ? `<div class="level-badge">${getImgTag(lvl.targetItem)}${lvl.targetCount}</div>` : ''}</div>`; if (!isLocked) wrap.onclick = () => showPreLevel(idx); container.appendChild(wrap); }); }
+    function getImgTag(name, special = null) { if (!name) return ""; let fallback = ICON[name] || SPECIAL_ICON[name] || "❓"; let html = `<img src="img/${name}.png" class="item-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span class="fallback-icon" style="display:none; width: 100%; height: 100%; align-items:center; justify-content:center;">${fallback}</span>`; if (special) { let specIcon = SPECIAL_ICON[special] || "✨"; html += `<div class="booster-badge" style="position:absolute; right:-4px; bottom:-4px; background:#FFF; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:14px; box-shadow:0 2px 4px rgba(0,0,0,0.4); z-index:10; border:1px solid #E0E0E0;">${specIcon}</div>`; } return html; }
     
-    function getImgTag(name, special = null) { 
-        if (!name) return ""; 
-        let fallback = ICON[name] || SPECIAL_ICON[name] || "❓"; 
-        let html = `<img src="img/${name}.png" class="item-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span class="fallback-icon" style="display:none; width: 100%; height: 100%; align-items:center; justify-content:center;">${fallback}</span>`; 
-        if (special) {
-            let specIcon = SPECIAL_ICON[special] || "✨";
-            html += `<div class="booster-badge" style="position:absolute; right:-4px; bottom:-4px; background:#FFF; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:14px; box-shadow:0 2px 4px rgba(0,0,0,0.4); z-index:10; border:1px solid #E0E0E0;">${specIcon}</div>`;
-        }
-        return html; 
-    }
-
-    // --- СОКРАЩЕННЫЙ ДВИЖОК ДЛЯ ВМЕСТИМОСТИ (Без изменений логики) ---
-    function initLevel() { 
-        let lvl = LEVELS_DATA[selectedLevelIndex]; document.getElementById("game-level-indicator").innerText = `Уровень ${lvl.id}`; 
-        moves = lvl.moves; if (selectedBoosters.moves) moves += 5;
-        collectedCount = 0; finished = false; busy = false; selected = null; quizUsed = false; 
-        document.getElementById("board").innerHTML = ""; createBoard(); updateUI(); 
-    }
-
-    function createBoard() { 
-        do { board = []; for (let r = 0; r < SIZE; r++) { let row = []; for (let c = 0; c < SIZE; c++) { let type; do { type = TYPES[Math.floor(Math.random() * TYPES.length)]; } while ((c >= 2 && row[c-1].type === type && row[c-2].type === type) || (r >= 2 && board[r-1][c].type === type && board[r-2][c].type === type) || (r >= 1 && c >= 1 && board[r-1][c-1].type === type && board[r-1][c].type === type && row[c-1].type === type)); row.push({ type: type, special: null, counted: false, isNew: false }); } board.push(row); } } while (findAllMatches().length > 0); 
-        if (selectedBoosters.bomb) board[Math.floor(Math.random() * SIZE)][Math.floor(Math.random() * SIZE)].special = "bomb";
-        if (selectedBoosters.plane) board[Math.floor(Math.random() * SIZE)][Math.floor(Math.random() * SIZE)].special = "plane";
-    }
-
-    let swipeStartX = 0, swipeStartY = 0, swipeR = -1, swipeC = -1; let isSwiping = false;
-
-    function renderBoard() { 
-        const boardEl = document.getElementById("board"); 
-        if (boardEl.children.length === 0) {
-            for (let r = 0; r < SIZE; r++) { 
-                for (let c = 0; c < SIZE; c++) { 
-                    const cell = document.createElement("div"); cell.className = "cell"; cell.id = `cell-${r}-${c}`; cell.innerHTML = `<div class="cell-inner" id="inner-${r}-${c}"></div>`;
-                    cell.addEventListener('touchstart', (e) => { if (busy || finished) return; swipeStartX = e.touches[0].clientX; swipeStartY = e.touches[0].clientY; swipeR = r; swipeC = c; isSwiping = false; }, {passive: true});
-                    cell.addEventListener('touchmove', (e) => { isSwiping = true; }, {passive: true});
-                    cell.addEventListener('touchend', (e) => {
-                        if (busy || finished || swipeR === -1) return;
-                        let dx = e.changedTouches[0].clientX - swipeStartX; let dy = e.changedTouches[0].clientY - swipeStartY;
-                        if (Math.max(Math.abs(dx), Math.abs(dy)) > 20) { isSwiping = true; let tr = swipeR, tc = swipeC; if (Math.abs(dx) > Math.abs(dy)) { dx > 0 ? tc++ : tc--; } else { dy > 0 ? tr++ : tr--; } if (tr >= 0 && tr < SIZE && tc >= 0 && tc < SIZE) { selected = null; renderBoard(); animateSwapAndCheck(swipeR, swipeC, tr, tc); } }
-                        setTimeout(() => isSwiping = false, 100); swipeR = -1; swipeC = -1;
-                    });
-                    cell.onclick = (e) => { if (isSwiping) return; handleCellClick(r, c); }; boardEl.appendChild(cell); 
-                } 
-            } 
-        }
-        for (let r = 0; r < SIZE; r++) { for (let c = 0; c < SIZE; c++) { const cell = document.getElementById(`cell-${r}-${c}`); const inner = document.getElementById(`inner-${r}-${c}`); if (selected && selected.r === r && selected.c === c) cell.classList.add("selected"); else cell.classList.remove("selected"); const item = board[r][c]; if (item) { let content = getImgTag(item.type, item.special); if (inner.innerHTML !== content) { inner.innerHTML = content; } inner.className = `cell-inner ${item.isNew ? 'drop-anim' : ''}`; inner.style.transform = ''; } else { inner.innerHTML = ''; inner.className = 'cell-inner'; } } }
-    }
-
+    function initLevel() { let lvl = LEVELS_DATA[selectedLevelIndex]; document.getElementById("game-level-indicator").innerText = `Уровень ${lvl.id}`; moves = lvl.moves; if (selectedBoosters.moves) moves += 5; collectedCount = 0; finished = false; busy = false; selected = null; quizUsed = false; document.getElementById("board").innerHTML = ""; createBoard(); updateUI(); }
+    function createBoard() { do { board = []; for (let r = 0; r < SIZE; r++) { let row = []; for (let c = 0; c < SIZE; c++) { let type; do { type = TYPES[Math.floor(Math.random() * TYPES.length)]; } while ((c >= 2 && row[c-1].type === type && row[c-2].type === type) || (r >= 2 && board[r-1][c].type === type && board[r-2][c].type === type) || (r >= 1 && c >= 1 && board[r-1][c-1].type === type && board[r-1][c].type === type && row[c-1].type === type)); row.push({ type: type, special: null, counted: false, isNew: false }); } board.push(row); } } while (findAllMatches().length > 0); if (selectedBoosters.bomb) board[Math.floor(Math.random() * SIZE)][Math.floor(Math.random() * SIZE)].special = "bomb"; if (selectedBoosters.plane) board[Math.floor(Math.random() * SIZE)][Math.floor(Math.random() * SIZE)].special = "plane"; }
+    function renderBoard() { const boardEl = document.getElementById("board"); if (boardEl.children.length === 0) { for (let r = 0; r < SIZE; r++) { for (let c = 0; c < SIZE; c++) { const cell = document.createElement("div"); cell.className = "cell"; cell.id = `cell-${r}-${c}`; cell.innerHTML = `<div class="cell-inner" id="inner-${r}-${c}"></div>`; cell.addEventListener('touchstart', (e) => { if (busy || finished) return; swipeStartX = e.touches[0].clientX; swipeStartY = e.touches[0].clientY; swipeR = r; swipeC = c; isSwiping = false; }, {passive: true}); cell.addEventListener('touchmove', (e) => { isSwiping = true; }, {passive: true}); cell.addEventListener('touchend', (e) => { if (busy || finished || swipeR === -1) return; let dx = e.changedTouches[0].clientX - swipeStartX; let dy = e.changedTouches[0].clientY - swipeStartY; if (Math.max(Math.abs(dx), Math.abs(dy)) > 20) { isSwiping = true; let tr = swipeR, tc = swipeC; if (Math.abs(dx) > Math.abs(dy)) { dx > 0 ? tc++ : tc--; } else { dy > 0 ? tr++ : tr--; } if (tr >= 0 && tr < SIZE && tc >= 0 && tc < SIZE) { selected = null; renderBoard(); animateSwapAndCheck(swipeR, swipeC, tr, tc); } } setTimeout(() => isSwiping = false, 100); swipeR = -1; swipeC = -1; }); cell.onclick = (e) => { if (isSwiping) return; handleCellClick(r, c); }; boardEl.appendChild(cell); } } } for (let r = 0; r < SIZE; r++) { for (let c = 0; c < SIZE; c++) { const cell = document.getElementById(`cell-${r}-${c}`); const inner = document.getElementById(`inner-${r}-${c}`); if (selected && selected.r === r && selected.c === c) cell.classList.add("selected"); else cell.classList.remove("selected"); const item = board[r][c]; if (item) { let content = getImgTag(item.type, item.special); if (inner.innerHTML !== content) { inner.innerHTML = content; } inner.className = `cell-inner ${item.isNew ? 'drop-anim' : ''}`; inner.style.transform = ''; } else { inner.innerHTML = ''; inner.className = 'cell-inner'; } } } }
     function updateUI() { let lvl = LEVELS_DATA[selectedLevelIndex]; document.getElementById("target-icon").innerHTML = `<div style="width: 100%; height: 100%;">${getImgTag(lvl.targetItem)}</div>`; document.getElementById("target-count").innerText = `${collectedCount}/${lvl.targetCount}`; document.getElementById("moves-label").innerText = `Ходы: ${moves}`; renderBoard(); }
     function setMessage(text) { document.getElementById("message").innerText = text; }
     function collectItem(item) { let lvl = LEVELS_DATA[selectedLevelIndex]; if (item && item.type === lvl.targetItem && !item.counted) { collectedCount++; item.counted = true; } }
-
     function handleCellClick(r, c) { if (busy || finished) return; if (!selected) { selected = { r, c }; renderBoard(); setMessage(""); return; } if (selected.r === r && selected.c === c) { selected = null; renderBoard(); return; } if ((Math.abs(selected.r - r) + Math.abs(selected.c - c)) === 1) { let sr = selected.r, sc = selected.c; selected = null; renderBoard(); animateSwapAndCheck(sr, sc, r, c); } else { selected = { r, c }; renderBoard(); return; } }
-
-    function animateSwapAndCheck(r1, c1, r2, c2) {
-        busy = true; let inner1 = document.getElementById(`inner-${r1}-${c1}`); let inner2 = document.getElementById(`inner-${r2}-${c2}`);
-        let dx = (c2 - c1) * 100, dy = (r2 - r1) * 100;
-        if (inner1) { inner1.style.transition = 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)'; inner1.style.transform = `translate(${dx}%, ${dy}%)`; }
-        if (inner2) { inner2.style.transition = 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)'; inner2.style.transform = `translate(${-dx}%, ${-dy}%)`; }
-        setTimeout(() => {
-            let temp = board[r1][c1]; board[r1][c1] = board[r2][c2]; board[r2][c2] = temp; let item1 = board[r1][c1], item2 = board[r2][c2]; let matches = findAllMatches();
-            if ((item1 && item1.special) || (item2 && item2.special)) {
-                moves--; let toDestroy = new Set();
-                if (item1 && item1.special && item2 && item2.special) { toDestroy.add(`${r1},${c1}`); toDestroy.add(`${r2},${c2}`); activateSpecial(r1, c1, toDestroy); activateSpecial(r2, c2, toDestroy); } else if (item1 && item1.special) { toDestroy.add(`${r1},${c1}`); activateSpecial(r1, c1, toDestroy); } else { toDestroy.add(`${r2},${c2}`); activateSpecial(r2, c2, toDestroy); }
-                explodeCells(toDestroy, null); toDestroy.forEach(coord => { let parts = coord.split(','); let el = document.getElementById(`inner-${parts[0]}-${parts[1]}`); if (el) el.classList.add('pop'); });
-                setTimeout(() => { toDestroy.forEach(coord => { let parts = coord.split(','); let r = parseInt(parts[0]), c = parseInt(parts[1]); if (board[r][c]) { collectItem(board[r][c]); board[r][c] = null; } }); renderBoard(); setTimeout(() => dropAndFill(), 50); }, 300); return;
-            }
-            if (matches.length === 0) {
-                if (inner1) inner1.style.transform = `translate(0px, 0px)`; if (inner2) inner2.style.transform = `translate(0px, 0px)`;
-                setTimeout(() => { temp = board[r1][c1]; board[r1][c1] = board[r2][c2]; board[r2][c2] = temp; renderBoard(); let el1 = document.getElementById(`cell-${r1}-${c1}`); let el2 = document.getElementById(`cell-${r2}-${c2}`); if(el1) el1.classList.add('error-anim'); if(el2) el2.classList.add('error-anim'); setTimeout(() => { if(el1) el1.classList.remove('error-anim'); if(el2) el2.classList.remove('error-anim'); }, 300); busy = false; setMessage("Нет комбинации"); }, 250);
-            } else { moves--; setMessage(""); processMatches(r1, c1, r2, c2, matches); }
-        }, 250);
-    }
-
-    function explodeCells(coordsSet, safeCoordStr) {
-        let newlyAdded = true; let processedSpecials = new Set();
-        while (newlyAdded) { newlyAdded = false; let currentCoords = Array.from(coordsSet); for (let coord of currentCoords) { if (coord === safeCoordStr) continue; if (processedSpecials.has(coord)) continue; let parts = coord.split(','); let r = parseInt(parts[0]), c = parseInt(parts[1]); let item = board[r][c]; if (item && item.special) { processedSpecials.add(coord); let beforeSize = coordsSet.size; activateSpecial(r, c, coordsSet); if (coordsSet.size > beforeSize) newlyAdded = true; } } }
-    }
-
-    function processMatches(r1, c1, r2, c2, matches) {
-        let toDestroy = new Set(); let specialCoords = null;
-        if (r1 !== null) { specialCoords = checkAndCreateSpecial(r1, c1, matches); if (!specialCoords) specialCoords = checkAndCreateSpecial(r2, c2, matches); }
-        let safeCoordStr = specialCoords ? `${specialCoords.r},${specialCoords.c}` : null;
-        matches.forEach(m => { let coordStr = `${m.r},${m.c}`; if (coordStr === safeCoordStr) return; toDestroy.add(coordStr); });
-        explodeCells(toDestroy, safeCoordStr);
-        toDestroy.forEach(coord => { let parts = coord.split(','); let r = parseInt(parts[0]), c = parseInt(parts[1]); let inner = document.getElementById(`inner-${r}-${c}`); if (inner) inner.classList.add('pop'); });
-        setTimeout(() => { toDestroy.forEach(coord => { let parts = coord.split(','); let r = parseInt(parts[0]), c = parseInt(parts[1]); if (board[r][c]) { collectItem(board[r][c]); board[r][c] = null; } }); renderBoard(); setTimeout(() => dropAndFill(), 50); }, 300);
-    }
-
-    function dropAndFill() {
-        for (let c = 0; c < SIZE; c++) { let remaining = []; for (let r = SIZE - 1; r >= 0; r--) { if (board[r][c] !== null) remaining.push(board[r][c]); } let writeRow = SIZE - 1; for (let i = 0; i < remaining.length; i++) { board[writeRow][c] = remaining[i]; writeRow--; } while (writeRow >= 0) { board[writeRow][c] = { type: TYPES[Math.floor(Math.random() * TYPES.length)], special: null, counted: false, isNew: true }; writeRow--; } }
-        renderBoard(); setTimeout(() => { for (let r = 0; r < SIZE; r++) { for (let c = 0; c < SIZE; c++) { if (board[r][c]) board[r][c].isNew = false; } } let cascadeMatches = findAllMatches(); if (cascadeMatches.length > 0) { processMatches(null, null, null, null, cascadeMatches); } else { checkGameEnd(); busy = false; } }, 350);
-    }
-
+    function animateSwapAndCheck(r1, c1, r2, c2) { busy = true; let inner1 = document.getElementById(`inner-${r1}-${c1}`); let inner2 = document.getElementById(`inner-${r2}-${c2}`); let dx = (c2 - c1) * 100, dy = (r2 - r1) * 100; if (inner1) { inner1.style.transition = 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)'; inner1.style.transform = `translate(${dx}%, ${dy}%)`; } if (inner2) { inner2.style.transition = 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)'; inner2.style.transform = `translate(${-dx}%, ${-dy}%)`; } setTimeout(() => { let temp = board[r1][c1]; board[r1][c1] = board[r2][c2]; board[r2][c2] = temp; let item1 = board[r1][c1], item2 = board[r2][c2]; let matches = findAllMatches(); if ((item1 && item1.special) || (item2 && item2.special)) { moves--; let toDestroy = new Set(); if (item1 && item1.special && item2 && item2.special) { toDestroy.add(`${r1},${c1}`); toDestroy.add(`${r2},${c2}`); activateSpecial(r1, c1, toDestroy); activateSpecial(r2, c2, toDestroy); } else if (item1 && item1.special) { toDestroy.add(`${r1},${c1}`); activateSpecial(r1, c1, toDestroy); } else { toDestroy.add(`${r2},${c2}`); activateSpecial(r2, c2, toDestroy); } explodeCells(toDestroy, null); toDestroy.forEach(coord => { let parts = coord.split(','); let el = document.getElementById(`inner-${parts[0]}-${parts[1]}`); if (el) el.classList.add('pop'); }); setTimeout(() => { toDestroy.forEach(coord => { let parts = coord.split(','); let r = parseInt(parts[0]), c = parseInt(parts[1]); if (board[r][c]) { collectItem(board[r][c]); board[r][c] = null; } }); renderBoard(); setTimeout(() => dropAndFill(), 50); }, 300); return; } if (matches.length === 0) { if (inner1) inner1.style.transform = `translate(0px, 0px)`; if (inner2) inner2.style.transform = `translate(0px, 0px)`; setTimeout(() => { temp = board[r1][c1]; board[r1][c1] = board[r2][c2]; board[r2][c2] = temp; renderBoard(); let el1 = document.getElementById(`cell-${r1}-${c1}`); let el2 = document.getElementById(`cell-${r2}-${c2}`); if(el1) el1.classList.add('error-anim'); if(el2) el2.classList.add('error-anim'); setTimeout(() => { if(el1) el1.classList.remove('error-anim'); if(el2) el2.classList.remove('error-anim'); }, 300); busy = false; setMessage("Нет комбинации"); }, 250); } else { moves--; setMessage(""); processMatches(r1, c1, r2, c2, matches); } }, 250); }
+    function explodeCells(coordsSet, safeCoordStr) { let newlyAdded = true; let processedSpecials = new Set(); while (newlyAdded) { newlyAdded = false; let currentCoords = Array.from(coordsSet); for (let coord of currentCoords) { if (coord === safeCoordStr) continue; if (processedSpecials.has(coord)) continue; let parts = coord.split(','); let r = parseInt(parts[0]), c = parseInt(parts[1]); let item = board[r][c]; if (item && item.special) { processedSpecials.add(coord); let beforeSize = coordsSet.size; activateSpecial(r, c, coordsSet); if (coordsSet.size > beforeSize) newlyAdded = true; } } } }
+    function processMatches(r1, c1, r2, c2, matches) { let toDestroy = new Set(); let specialCoords = null; if (r1 !== null) { specialCoords = checkAndCreateSpecial(r1, c1, matches); if (!specialCoords) specialCoords = checkAndCreateSpecial(r2, c2, matches); } let safeCoordStr = specialCoords ? `${specialCoords.r},${specialCoords.c}` : null; matches.forEach(m => { let coordStr = `${m.r},${m.c}`; if (coordStr === safeCoordStr) return; toDestroy.add(coordStr); }); explodeCells(toDestroy, safeCoordStr); toDestroy.forEach(coord => { let parts = coord.split(','); let r = parseInt(parts[0]), c = parseInt(parts[1]); let inner = document.getElementById(`inner-${r}-${c}`); if (inner) inner.classList.add('pop'); }); setTimeout(() => { toDestroy.forEach(coord => { let parts = coord.split(','); let r = parseInt(parts[0]), c = parseInt(parts[1]); if (board[r][c]) { collectItem(board[r][c]); board[r][c] = null; } }); renderBoard(); setTimeout(() => dropAndFill(), 50); }, 300); }
+    function dropAndFill() { for (let c = 0; c < SIZE; c++) { let remaining = []; for (let r = SIZE - 1; r >= 0; r--) { if (board[r][c] !== null) remaining.push(board[r][c]); } let writeRow = SIZE - 1; for (let i = 0; i < remaining.length; i++) { board[writeRow][c] = remaining[i]; writeRow--; } while (writeRow >= 0) { board[writeRow][c] = { type: TYPES[Math.floor(Math.random() * TYPES.length)], special: null, counted: false, isNew: true }; writeRow--; } } renderBoard(); setTimeout(() => { for (let r = 0; r < SIZE; r++) { for (let c = 0; c < SIZE; c++) { if (board[r][c]) board[r][c].isNew = false; } } let cascadeMatches = findAllMatches(); if (cascadeMatches.length > 0) { processMatches(null, null, null, null, cascadeMatches); } else { checkGameEnd(); busy = false; } }, 350); }
     function getCluster(r, c, matches) { let type = board[r][c]?.type; if (!type) return []; let cluster = []; let queue = [{r,c}]; let visited = new Set(); visited.add(`${r},${c}`); while(queue.length > 0) { let curr = queue.shift(); cluster.push(curr); let adj = matches.filter(m => board[m.r][m.c]?.type === type && !visited.has(`${m.r},${m.c}`) && (Math.abs(m.r - curr.r) + Math.abs(m.c - curr.c) === 1)); adj.forEach(a => { visited.add(`${a.r},${a.c}`); queue.push(a); }); } return cluster; }
-
-    function checkAndCreateSpecial(r, c, matches) {
-        if (r === null || c === null || matches.length < 4) return null; let type = board[r][c]?.type; if (!type) return null; let inMatch = matches.some(m => m.r === r && m.c === c); if (!inMatch) return null; let cluster = getCluster(r, c, matches); if (cluster.length < 4) return null; let rowCount = cluster.filter(m => m.r === r).length; let colCount = cluster.filter(m => m.c === c).length;
-        if (rowCount >= 5 || colCount >= 5 || (rowCount >= 3 && colCount >= 3)) { board[r][c] = { type: type, special: "bomb", counted: false }; return { r, c }; }
-        let minR = Math.min(...cluster.map(m=>m.r)), maxR = Math.max(...cluster.map(m=>m.r)); let minC = Math.min(...cluster.map(m=>m.c)), maxC = Math.max(...cluster.map(m=>m.c));
-        if (maxR - minR === 1 && maxC - minC === 1 && cluster.length === 4) { board[r][c] = { type: type, special: "plane", counted: false }; return { r, c }; }
-        if (rowCount >= 4) { board[r][c] = { type: type, special: "arrowV", counted: false }; return { r, c }; }
-        if (colCount >= 4) { board[r][c] = { type: type, special: "arrowH", counted: false }; return { r, c }; } return null;
-    }
-
-    function activateSpecial(r, c, toDestroy) {
-        let item = board[r][c]; if (!item || !item.special) return; let spec = item.special;
-        if (spec === "arrowH") { for (let col = 0; col < SIZE; col++) if (board[r][col]) toDestroy.add(`${r},${col}`); } else if (spec === "arrowV") { for (let row = 0; row < SIZE; row++) if (board[row][c]) toDestroy.add(`${row},${c}`); } else if (spec === "bomb") { for (let dr = -2; dr <= 2; dr++) { for (let dc = -2; dc <= 2; dc++) { let nr = r + dr, nc = c + dc; if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE && board[nr][nc]) { toDestroy.add(`${nr},${nc}`); } } } } else if (spec === "plane") { for(let dr=-1; dr<=1; dr++) { for(let dc=-1; dc<=1; dc++) { if(r+dr>=0 && r+dr<SIZE && c+dc>=0 && c+dc<SIZE && board[r+dr][c+dc]) toDestroy.add(`${r+dr},${c+dc}`); } } let targets = []; let lvl = LEVELS_DATA[selectedLevelIndex]; for(let rr=0; rr<SIZE; rr++){ for(let cc=0; cc<SIZE; cc++){ if (board[rr][cc] && board[rr][cc].type === lvl.targetItem && !toDestroy.has(`${rr},${cc}`)) targets.push(`${rr},${cc}`); } } if (targets.length > 0) toDestroy.add(targets[Math.floor(Math.random()*targets.length)]); else { let tr = Math.floor(Math.random() * SIZE), tc = Math.floor(Math.random() * SIZE); if (board[tr][tc]) toDestroy.add(`${tr},${tc}`); } }
-    }
-
+    function checkAndCreateSpecial(r, c, matches) { if (r === null || c === null || matches.length < 4) return null; let type = board[r][c]?.type; if (!type) return null; let inMatch = matches.some(m => m.r === r && m.c === c); if (!inMatch) return null; let cluster = getCluster(r, c, matches); if (cluster.length < 4) return null; let rowCount = cluster.filter(m => m.r === r).length; let colCount = cluster.filter(m => m.c === c).length; if (rowCount >= 5 || colCount >= 5 || (rowCount >= 3 && colCount >= 3)) { board[r][c] = { type: type, special: "bomb", counted: false }; return { r, c }; } let minR = Math.min(...cluster.map(m=>m.r)), maxR = Math.max(...cluster.map(m=>m.r)); let minC = Math.min(...cluster.map(m=>m.c)), maxC = Math.max(...cluster.map(m=>m.c)); if (maxR - minR === 1 && maxC - minC === 1 && cluster.length === 4) { board[r][c] = { type: type, special: "plane", counted: false }; return { r, c }; } if (rowCount >= 4) { board[r][c] = { type: type, special: "arrowV", counted: false }; return { r, c }; } if (colCount >= 4) { board[r][c] = { type: type, special: "arrowH", counted: false }; return { r, c }; } return null; }
+    function activateSpecial(r, c, toDestroy) { let item = board[r][c]; if (!item || !item.special) return; let spec = item.special; if (spec === "arrowH") { for (let col = 0; col < SIZE; col++) if (board[r][col]) toDestroy.add(`${r},${col}`); } else if (spec === "arrowV") { for (let row = 0; row < SIZE; row++) if (board[row][c]) toDestroy.add(`${row},${c}`); } else if (spec === "bomb") { for (let dr = -2; dr <= 2; dr++) { for (let dc = -2; dc <= 2; dc++) { let nr = r + dr, nc = c + dc; if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE && board[nr][nc]) { toDestroy.add(`${nr},${nc}`); } } } } else if (spec === "plane") { for(let dr=-1; dr<=1; dr++) { for(let dc=-1; dc<=1; dc++) { if(r+dr>=0 && r+dr<SIZE && c+dc>=0 && c+dc<SIZE && board[r+dr][c+dc]) toDestroy.add(`${r+dr},${c+dc}`); } } let targets = []; let lvl = LEVELS_DATA[selectedLevelIndex]; for(let rr=0; rr<SIZE; rr++){ for(let cc=0; cc<SIZE; cc++){ if (board[rr][cc] && board[rr][cc].type === lvl.targetItem && !toDestroy.has(`${rr},${cc}`)) targets.push(`${rr},${cc}`); } } if (targets.length > 0) toDestroy.add(targets[Math.floor(Math.random()*targets.length)]); else { let tr = Math.floor(Math.random() * SIZE), tc = Math.floor(Math.random() * SIZE); if (board[tr][tc]) toDestroy.add(`${tr},${tc}`); } } }
     function findAllMatches() { let matchedCoords = new Set(); for (let r = 0; r < SIZE; r++) { let count = 1; for (let c = 0; c < SIZE; c++) { let cur = board[r][c]?.type, next = (c + 1 < SIZE) ? board[r][c+1]?.type : null; if (cur && cur === next) count++; else { if (count >= 3) { for (let i = 0; i < count; i++) matchedCoords.add(`${r},${c - i}`); } count = 1; } } } for (let c = 0; c < SIZE; c++) { let count = 1; for (let r = 0; r < SIZE; r++) { let cur = board[r][c]?.type, next = (r + 1 < SIZE) ? board[r+1][c]?.type : null; if (cur && cur === next) count++; else { if (count >= 3) { for (let i = 0; i < count; i++) matchedCoords.add(`${r - i},${c}`); } count = 1; } } } for (let r = 0; r < SIZE - 1; r++) { for (let c = 0; c < SIZE - 1; c++) { let t = board[r][c]?.type; if (t && board[r+1][c]?.type === t && board[r][c+1]?.type === t && board[r+1][c+1]?.type === t) { matchedCoords.add(`${r},${c}`); matchedCoords.add(`${r+1},${c}`); matchedCoords.add(`${r},${c+1}`); matchedCoords.add(`${r+1},${c+1}`); } } } let res = []; matchedCoords.forEach(item => { let p = item.split(","); res.push({ r: parseInt(p[0]), c: parseInt(p[1]) }); }); return res; }
-    
     function checkGameEnd() { updateUI(); let lvl = LEVELS_DATA[selectedLevelIndex]; if (collectedCount >= lvl.targetCount) { finished = true; addCoins(50); if (selectedLevelIndex + 1 >= maxUnlockedLevel) { maxUnlockedLevel = Math.min(selectedLevelIndex + 2, LEVELS_DATA.length); localStorage.setItem('kz_max_level', maxUnlockedLevel); } let isCheckpoint = lvl.isCheckpoint || lvl.id % 10 === 0; let rewardText = "Заработано: 50 🪙"; let hasCollectionReward = lvl.reward && !unlockedItems.includes(lvl.reward); if (hasCollectionReward) { unlockedItems.push(lvl.reward); localStorage.setItem('kz_unlocked', JSON.stringify(unlockedItems)); rewardText += "\nОткрыта новая карточка коллекции!"; document.getElementById("reward-box").style.display = "flex"; document.getElementById("reward-box").innerHTML = `<div style="width: 100%; height: 100%;">${getImgTag(lvl.reward)}</div>`; } else { document.getElementById("reward-box").style.display = "none"; } if (isCheckpoint) { showModal("Сюжетный чекпоинт!", "Ты дошел до важного этапа.\n" + rewardText, "Смотреть видео", () => { closeModal(); showScreen('screen-levels'); }); } else { showModal("Уровень пройден!", `Отличная работа!\n${rewardText}`, "К уровню", () => { closeModal(); showScreen('screen-levels'); }); } } else if (moves <= 0) { finished = true; document.getElementById("reward-box").style.display = "none"; showModal("Ходы закончились", "Попробуй еще раз!", "Заново", () => { closeModal(); initLevel(); }); } }
 
     function showModal(title, text, btnText, callback, secondaryBtnText = null, secondaryCallback = null) { document.getElementById("modal-title").innerText = title; document.getElementById("modal-text").innerText = text; let btn1 = document.getElementById("modal-btn"); btn1.innerText = btnText; btn1.onclick = callback; let btn2 = document.getElementById("modal-btn-secondary"); if (secondaryBtnText) { btn2.style.display = "block"; btn2.innerText = secondaryBtnText; btn2.onclick = secondaryCallback ? secondaryCallback : () => { closeModal(); }; } else { btn2.style.display = "none"; } document.getElementById("modal").style.display = "flex"; }
