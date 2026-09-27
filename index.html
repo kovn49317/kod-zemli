@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Код земли</title>
-    <!-- Предзагрузка обложки для мгновенного старта -->
     <link rel="preload" href="img/cover.jpg" as="image">
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
     <style>
@@ -56,7 +55,7 @@
         .factory-slot { min-width: 60px; height: 60px; background: #EEE; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; border: 2px dashed #CCC; position: relative;}
         .factory-slot.active { background: #FFF3E0; border: 2px solid #FFC107; }
 
-        /* --- СТАРЫЕ СТИЛИ (Мини-игра Три-в-Ряд) --- */
+        /* Три в ряд стили (минимизированы) */
         .map-container { flex: 1; overflow-y: auto; position: relative; padding: 40px 0; display: flex; flex-direction: column-reverse; align-items: center; scroll-behavior: smooth; } .map-container::before { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: repeating-linear-gradient(to bottom, rgba(67,105,50,0.3) 0, rgba(67,105,50,0.3) 15px, transparent 15px, transparent 30px); transform: translateX(-50%); z-index: 0; } .level-node-wrap { position: relative; z-index: 1; width: 100%; display: flex; justify-content: center; margin: 20px 0; } .level-node-wrap:nth-child(even) { transform: translateX(40px); } .level-node-wrap:nth-child(odd) { transform: translateX(-40px); } .level-node-wrap.checkpoint { transform: translateX(0); margin: 30px 0; } .level-node { width: 60px; height: 60px; border-radius: 50%; border: 3px solid rgba(67,105,50,0.4); background: #FFF; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: all 0.2s; font-weight: 800; font-size: 20px; color: #263326; box-shadow: 0 4px 10px rgba(0,0,0,0.1); } .level-node.completed { background: #E8F5E9; border-color: #81C784; color: #2E7D32; } .level-node.current { border-color: var(--accent); background: #FFF3E0; color: var(--accent); transform: scale(1.15); box-shadow: 0 6px 16px rgba(229,142,38,0.3); } .level-node.locked { background: rgba(0,0,0,0.05); border-color: transparent; color: #9E9E9E; cursor: not-allowed; } .level-node-wrap.checkpoint .level-node { width: 76px; height: 76px; border-color: #FFC107; background: #FFF8E1; color: #FF8F00; box-shadow: 0 0 20px rgba(255,193,7,0.4); border-width: 4px; } .level-node-wrap.checkpoint .level-node.completed { background: #FFE082; } .level-node-wrap.checkpoint .level-node.locked { border-color: #E0E0E0; background: #F5F5F5; color: #BDBDBD; box-shadow: none; } .level-badge { position: absolute; top: -16px; right: -16px; background: #FFF; border-radius: 12px; padding: 2px 6px; font-size: 12px; font-weight: 700; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 2px; } .checkpoint-label { position: absolute; bottom: -20px; white-space: nowrap; font-size: 12px; font-weight: 800; color: #FF8F00; background: rgba(255,255,255,0.8); padding: 2px 8px; border-radius: 10px; }
         .status-card { background: rgba(0,0,0,0.04); padding: 10px 14px; border-radius: 14px; margin-bottom: 12px; display: flex; justify-content: space-around; font-size: 15px; font-weight: 800; align-items: center; border: 1px solid rgba(0,0,0,0.05); } .board { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; background: rgba(67,105,50,0.15); padding: 8px; border-radius: 18px; aspect-ratio: 1; margin-bottom: 12px; touch-action: none; user-select: none; -webkit-user-select: none; position: relative; } .cell { background: var(--cell-bg); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; transition: 0.15s; aspect-ratio: 1; font-size: 32px; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.05); position: relative; overflow: visible; } .cell.selected { background: #d7ecd0; transform: scale(0.92); box-shadow: inset 0 0 0 3px var(--primary); } .cell-inner { width: 85%; height: 85%; position: absolute; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 5; } .item-img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.2)); user-select: none; -webkit-user-select: none; -webkit-user-drag: none; }
         @keyframes popAnim { 0% { transform: scale(1); opacity: 1; } 40% { transform: scale(1.25); opacity: 0.9; } 100% { transform: scale(0); opacity: 0; } } .pop { animation: popAnim 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important; } @keyframes dropDown { 0% { transform: translateY(-150%); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } } .drop-anim { animation: dropDown 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; } @keyframes pulseError { 0%, 100% { transform: translateX(0) scale(1); } 25% { transform: translateX(-4px) scale(1.05); } 75% { transform: translateX(4px) scale(1.05); } } .error-anim { animation: pulseError 0.3s; } .booster-badge { animation: pulseError 1.5s infinite; } .message { font-size: 13px; color: #555; min-height: 18px; margin-bottom: 10px; font-weight: 600; text-align: center; }
@@ -110,8 +109,8 @@
 
         <div id="farm-viewport" class="farm-viewport">
             <div id="farm-world" class="farm-world">
-                <div class="cloud-layer" style="top: 150px; animation-duration: 80s;"><img src="img/cloud1.png" style="width: 300px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span style="display:none; font-size: 80px;">☁️</span></div>
-                <div class="cloud-layer" style="top: 800px; animation-duration: 110s; animation-delay: -30s;"><img src="img/cloud2.png" style="width: 400px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span style="display:none; font-size: 120px;">☁️</span></div>
+                <div class="cloud-layer" style="top: 150px; animation-duration: 80s;"><img src="img/cloud1.png" style="width: 300px;" onerror="this.style.display='none';"><span style="display:none; font-size: 80px;">☁️</span></div>
+                <div class="cloud-layer" style="top: 800px; animation-duration: 110s; animation-delay: -30s;"><img src="img/cloud2.png" style="width: 400px;" onerror="this.style.display='none';"><span style="display:none; font-size: 120px;">☁️</span></div>
                 
                 <!-- Рендер сетки и зданий -->
                 <div id="farm-items-container" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none;"></div>
@@ -206,22 +205,26 @@
     const ICON = { plum: "🍑", cherry: "🍒", strawberry: "🍓", bread: "🍞", tractor: "🚜" };
     const SPECIAL_ICON = { arrowH: "↔️", arrowV: "↕️", bomb: "💣", plane: "✈️" };
 
-    const LEVELS_DATA = [ { id: 1, targetItem: "plum", targetCount: 10, moves: 15, reward: null }, { id: 2, targetItem: "cherry", targetCount: 15, moves: 18, reward: "plum" } ];
+    const LEVELS_DATA = [ 
+        { id: 1, targetItem: "plum", targetCount: 10, moves: 15, reward: null }, 
+        { id: 2, targetItem: "cherry", targetCount: 15, moves: 18, reward: "plum" },
+        { id: 3, targetItem: "strawberry", targetCount: 20, moves: 20, reward: "strawberry" }
+    ];
 
     let maxUnlockedLevel = localStorage.getItem('kz_max_level') ? parseInt(localStorage.getItem('kz_max_level')) : 1;
     let selectedLevelIndex = maxUnlockedLevel - 1; 
     let unlockedItems = localStorage.getItem('kz_unlocked') ? JSON.parse(localStorage.getItem('kz_unlocked')) : [];
-    let coins = localStorage.getItem('kz_coins') ? parseInt(localStorage.getItem('kz_coins')) : 500; // Для тестов
+    let coins = localStorage.getItem('kz_coins') ? parseInt(localStorage.getItem('kz_coins')) : 500; 
     
     let storage = JSON.parse(localStorage.getItem('kz_storage')) || { cherry: 0, jam: 0 };
     let soilBeds = JSON.parse(localStorage.getItem('kz_soil_beds')) || [];
     
-    // --- СИСТЕМА ЗДАНИЙ (Амбары, Заводы, Рынок) ---
+    // --- СИСТЕМА ЗДАНИЙ ---
     let buildings = JSON.parse(localStorage.getItem('kz_buildings')) || [
         { id: 'start_barn', type: 'barn', c: 11, r: 11, level: 1, queue: [] }
     ];
     
-    // --- РЫНОК (Слоты продаж) ---
+    // --- РЫНОК ---
     let marketSlots = JSON.parse(localStorage.getItem('kz_market')) || [
         { id: 1, item: null, qty: 0, price: 0, start: 0, duration: 0, status: 'empty' },
         { id: 2, item: null, qty: 0, price: 0, start: 0, duration: 0, status: 'empty' },
@@ -245,8 +248,7 @@
     function openBarn(bId) {
         let b = bId ? buildings.find(x => x.id === bId) : buildings.find(x => x.type === 'barn');
         if (!b) return;
-        let cap = b.level * 50;
-        let upCost = b.level * 100;
+        let cap = b.level * 50; let upCost = b.level * 100;
         
         let content = `<div style="text-align:left;">`;
         content += `<p style="font-size:13px; color:#555; text-align:center;">Вместимость этого амбара: ${cap} ед.</p>`;
@@ -269,8 +271,7 @@
         else content += `<p style="color:#E58E26; font-weight:bold; margin-top:15px; text-align:center;">Максимальный 5 уровень!</p>`;
         
         content += `</div>`;
-        showModal(`📦 Амбар (Ур. ${b.level})`, "", "Закрыть", closeModal);
-        document.getElementById('modal-text').innerHTML = content;
+        showModal(`📦 Амбар (Ур. ${b.level})`, "", "Закрыть", closeModal); document.getElementById('modal-text').innerHTML = content;
     }
 
     // КЛИК ПО ЗАВОДУ
@@ -309,7 +310,7 @@
         if ((storage.cherry || 0) < 6) { showModal("Нет сырья!", "Для одной банки варенья нужно 6 черешен.", "Понятно", () => openFactoryInfo(bId)); return; }
         let b = buildings.find(x => x.id === bId);
         storage.cherry -= 6;
-        b.queue.push({ item: 'jam', start: Date.now(), duration: 420000 }); // 7 минут = 420000мс
+        b.queue.push({ item: 'jam', start: Date.now(), duration: 420000 }); // 7 минут
         localStorage.setItem('kz_buildings', JSON.stringify(buildings)); localStorage.setItem('kz_storage', JSON.stringify(storage));
         updateStorageUI(); openFactoryInfo(bId); renderFarmItems();
     }
@@ -317,8 +318,7 @@
     function upgradeBuilding(bId, cost) {
         if (coins < cost) { alert("Мало монет!"); return; }
         let b = buildings.find(x => x.id === bId); addCoins(-cost); b.level++;
-        localStorage.setItem('kz_buildings', JSON.stringify(buildings));
-        updateStorageUI(); closeModal(); renderFarmItems();
+        localStorage.setItem('kz_buildings', JSON.stringify(buildings)); updateStorageUI(); closeModal(); renderFarmItems();
     }
 
     // --- ЛОГИКА РЫНКА ---
@@ -327,8 +327,7 @@
         else openMarket();
     }
     function openBarnHeader() {
-        let b = buildings.find(x => x.type === 'barn');
-        if (b) openBarn(b.id);
+        let b = buildings.find(x => x.type === 'barn'); if (b) openBarn(b.id);
     }
 
     function openMarket() {
@@ -444,7 +443,7 @@
                 <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
                     <div class="drawer-item-icon" style="background:#FFF3E0;"><span style="font-size:20px;">🟫</span></div>
                     <div class="drawer-item-info">
-                        <div class="drawer-item-title">Грядка (1х1)</div><div style="font-size:11px; color:#666;">Земля для посадки</div>
+                        <div class="drawer-item-title">Грядка земли</div><div style="font-size:11px; color:#666;">Место для посадки (1х1)</div>
                     </div>
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:center; background:#FFF; border:1px solid #CCC; border-radius:12px; padding:6px;">
@@ -455,7 +454,7 @@
 
             <div class="drawer-item" style="flex-direction:column; align-items:stretch;">
                 <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-                    <div class="drawer-item-icon" style="background:#FFF3E0;"><img src="img/cherry.png" style="width:80%; height:80%; object-fit:contain;" onerror="this.style.display='none';"><span style="display:none; font-size:20px;">🍒</span></div>
+                    <div class="drawer-item-icon" style="background:#FFF3E0;"><img src="img/cherry.png" style="width:70%; height:70%; object-fit:contain;" onerror="this.style.display='none';"><span style="display:none; font-size:20px;">🍒</span></div>
                     <div class="drawer-item-info">
                         <div class="drawer-item-title">Саженец черешни</div><div style="font-size:11px; color:#666;">Сажать на грядку</div>
                     </div>
@@ -465,32 +464,32 @@
 
             <div class="drawer-item" style="flex-direction:column; align-items:stretch;">
                 <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-                    <div class="drawer-item-icon" style="background:#FFF3E0;"><img src="img/barn.png" style="width:80%; height:80%; object-fit:contain;" onerror="this.style.display='none';"><span style="display:none; font-size:20px;">🏠</span></div>
+                    <div class="drawer-item-icon" style="background:#FFF3E0;"><img src="img/barn.png" style="width:70%; height:70%; object-fit:contain;" onerror="this.style.display='none';"><span style="display:none; font-size:20px;">🏠</span></div>
                     <div class="drawer-item-info">
-                        <div class="drawer-item-title">Новый Амбар (2х2)</div><div style="font-size:11px; color:#666;">+50 к вместимости</div>
+                        <div class="drawer-item-title">Новый Амбар</div><div style="font-size:11px; color:#666;">Вместимость (2х2 клетки)</div>
                     </div>
                 </div>
-                <button class="btn btn-accent" style="padding:8px 12px; font-size:13px; border-radius: 8px;" onclick="startPlacement('barn', 150)">Купить (150 🪙)</button>
+                <button class="btn btn-accent" style="padding:8px 12px; font-size:13px; border-radius: 8px;" onclick="startPlacement('barn', 150)">Построить (150 🪙)</button>
             </div>
 
             <div class="drawer-item" style="flex-direction:column; align-items:stretch;">
                 <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
                     <div class="drawer-item-icon" style="background:#FFF3E0;"><span style="font-size:20px;">🏭</span></div>
                     <div class="drawer-item-info">
-                        <div class="drawer-item-title">Завод варенья (2х2)</div><div style="font-size:11px; color:#666;">Делает варенье из черешни</div>
+                        <div class="drawer-item-title">Завод варенья</div><div style="font-size:11px; color:#666;">Переработка (2х2 клетки)</div>
                     </div>
                 </div>
-                <button class="btn btn-accent" style="padding:8px 12px; font-size:13px; border-radius: 8px;" onclick="startPlacement('factory', 300)">Купить (300 🪙)</button>
+                <button class="btn btn-accent" style="padding:8px 12px; font-size:13px; border-radius: 8px;" onclick="startPlacement('factory', 300)">Построить (300 🪙)</button>
             </div>
             
             <div class="drawer-item" style="flex-direction:column; align-items:stretch;">
                 <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
                     <div class="drawer-item-icon" style="background:#FFF3E0;"><span style="font-size:20px;">🏪</span></div>
                     <div class="drawer-item-info">
-                        <div class="drawer-item-title">Рынок (2х2)</div><div style="font-size:11px; color:#666;">Продажа товаров за монетки</div>
+                        <div class="drawer-item-title">Рынок фермера</div><div style="font-size:11px; color:#666;">Продажа товаров (2х2)</div>
                     </div>
                 </div>
-                <button class="btn btn-accent" style="padding:8px 12px; font-size:13px; border-radius: 8px;" onclick="startPlacement('market', 200)">Купить (200 🪙)</button>
+                <button class="btn btn-accent" style="padding:8px 12px; font-size:13px; border-radius: 8px;" onclick="startPlacement('market', 200)">Построить (200 🪙)</button>
             </div>
         `;
         document.getElementById('drawer-items').innerHTML = drawerHtml;
@@ -567,57 +566,74 @@
         }
     }
 
-    // --- РЕНДЕР: 3D ГРЯДКИ И ОГРОМНЫЕ ДЕРЕВЬЯ ---
+    // --- УЛЬТРА-ОПТИМИЗИРОВАННЫЙ РЕНДЕР (Virtual DOM Style) ---
+    // Это полностью уберет лаги!
     function renderFarmItems() {
         let container = document.getElementById('farm-items-container'); if (!container) return;
-        container.innerHTML = ''; let now = Date.now();
-        
-        // Сначала рисуем все грядки (единым полотном с перспективой)
-        soilBeds.forEach(bed => {
-            let soil = document.createElement('div');
-            soil.style.position = 'absolute'; soil.style.left = (bed.c * 80) + 'px'; soil.style.top = (bed.r * 80) + 'px'; soil.style.width = '80px'; soil.style.height = '80px'; 
-            soil.style.background = '#6D4C41'; soil.style.boxShadow = 'inset 0 0 5px rgba(0,0,0,0.3)'; soil.style.outline = '1px solid rgba(100,60,30,0.2)';
-            soil.style.transformOrigin = 'bottom center'; soil.style.transform = 'perspective(600px) rotateX(25deg)'; soil.style.pointerEvents = 'none';
-            soil.innerHTML = `<img src="img/soil.png" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none';">`;
-            container.appendChild(soil);
-        });
+        let now = Date.now();
+        let activeIds = new Set();
 
-        // Затем Здания
+        // 1. Рендер зданий
         buildings.forEach(b => {
-            let el = document.createElement('div');
-            el.style.position = 'absolute'; el.style.left = (b.c * 80) + 'px'; el.style.top = (b.r * 80) + 'px'; el.style.width = '160px'; el.style.height = '160px';
-            el.style.display = 'flex'; el.style.flexDirection = 'column'; el.style.alignItems = 'center'; el.style.justifyContent = 'flex-end'; el.style.zIndex = '50'; el.style.pointerEvents = 'none';
+            activeIds.add(b.id);
+            let el = document.getElementById(b.id);
+            if (!el) {
+                el = document.createElement('div'); el.id = b.id;
+                el.style.position = 'absolute'; el.style.left = (b.c * 80) + 'px'; el.style.top = (b.r * 80) + 'px'; el.style.width = '160px'; el.style.height = '160px';
+                el.style.display = 'flex'; el.style.flexDirection = 'column'; el.style.alignItems = 'center'; el.style.justifyContent = 'flex-end'; el.style.zIndex = '50'; el.style.pointerEvents = 'none';
+                container.appendChild(el);
+            }
             
+            let html = '';
             if (b.type === 'barn') {
                 let total = (storage.cherry || 0) + (storage.jam || 0); let cap = b.level * 50; let percent = Math.min(100, (total / cap) * 100);
-                el.innerHTML = `<div class="storage-bar-wrap" style="position:absolute; top:-20px; left:20px;"><div class="storage-bar-fill" style="width:${percent}%"></div><div class="storage-bar-text">${total}/${cap}</div></div><div class="barn-shadow"></div><img src="img/barn.png" class="barn-img" onerror="this.style.display='none';"><span style="display:none; font-size:80px; z-index:2; filter:drop-shadow(0 15px 15px rgba(0,0,0,0.3));">🏠</span>`;
+                html = `<div class="storage-bar-wrap" style="position:absolute; top:-20px; left:20px; width:120px; height:18px; background:rgba(0,0,0,0.6); border:2px solid #FFF; border-radius:10px; overflow:hidden; display:flex; align-items:center; justify-content:center; pointer-events:none;"><div style="position:absolute; left:0; top:0; bottom:0; width:${percent}%; background:linear-gradient(90deg, #81C784, #4CAF50); transition:width 0.4s ease-out;"></div><div style="position:relative; color:#FFF; font-size:10px; font-weight:800;">${total}/${cap}</div></div><div class="barn-shadow"></div><img src="img/barn.png" style="width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 15px 15px rgba(0,0,0,0.3)); pointer-events:none;" onerror="this.style.display='none';"><span style="display:none; font-size:80px; z-index:2; filter:drop-shadow(0 15px 15px rgba(0,0,0,0.3));">🏠</span>`;
             } else if (b.type === 'factory') {
                 let hasReady = b.queue && b.queue.some(q => now >= q.start + q.duration);
                 let readyBadge = hasReady ? `<div class="booster-badge" style="position:absolute; top:-20px; font-size:40px; z-index:100; filter:drop-shadow(0 4px 10px rgba(0,0,0,0.5));">🍯</div>` : '';
-                el.innerHTML = `${readyBadge}<div class="barn-shadow"></div><span style="font-size:90px; z-index:2; filter:drop-shadow(0 10px 10px rgba(0,0,0,0.3));">🏭</span>`;
+                html = `${readyBadge}<div class="barn-shadow"></div><span style="font-size:90px; z-index:2; filter:drop-shadow(0 10px 10px rgba(0,0,0,0.3));">🏭</span>`;
             } else if (b.type === 'market') {
-                el.innerHTML = `<div class="barn-shadow"></div><span style="font-size:90px; z-index:2; filter:drop-shadow(0 10px 10px rgba(0,0,0,0.3));">🏪</span>`;
+                html = `<div class="barn-shadow"></div><span style="font-size:90px; z-index:2; filter:drop-shadow(0 10px 10px rgba(0,0,0,0.3));">🏪</span>`;
             }
-            container.appendChild(el);
+            
+            if (el.innerHTML !== html) el.innerHTML = html;
         });
 
-        // Затем Деревья (Поверх грядок, без перспективы)
+        // 2. Рендер грядок и деревьев
         soilBeds.forEach(bed => {
-            if (bed.item) {
-                let el = document.createElement('div');
-                // Огромное дерево (160х160)
-                el.style.position = 'absolute'; el.style.left = (bed.c * 80 - 40) + 'px'; el.style.top = (bed.r * 80 - 80) + 'px'; el.style.width = '160px'; el.style.height = '160px'; el.style.display = 'flex'; el.style.alignItems = 'flex-end'; el.style.justifyContent = 'center'; el.style.pointerEvents = 'none'; el.style.zIndex = '60';
-                let age = now - bed.item.plantedAt;
-                if (bed.item.state === 'dry') {
-                    el.innerHTML = `<img src="img/tree_dry.png" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 6px 6px rgba(0,0,0,0.4));" onerror="this.src='img/cherry.png'; this.style.filter='grayscale(100%) sepia(100%) hue-rotate(30deg) drop-shadow(0 6px 6px rgba(0,0,0,0.4))';">`;
-                } else if (age < 120000) { 
-                    let percent = Math.min(100, Math.floor((age / 120000) * 100));
-                    el.innerHTML = `<img src="img/sprout.png" style="width:30%; height:30%; object-fit:contain; margin-bottom:10px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));" onerror="this.style.display='none';"><div style="position:absolute; bottom:15px; background:rgba(0,0,0,0.7); border: 1px solid #FFF; color:white; font-size:11px; font-weight:800; border-radius:8px; padding:2px 6px;">${percent}%</div>`;
-                } else { 
-                    el.innerHTML = `<div class="sway" style="width:100%; height:100%;"><img src="img/tree_cherry.png" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 8px 8px rgba(0,0,0,0.4));" onerror="this.src='img/cherry.png';"></div>`;
-                }
+            let id = 'bed_'+bed.c+'_'+bed.r;
+            activeIds.add(id);
+            let el = document.getElementById(id);
+            if (!el) {
+                el = document.createElement('div'); el.id = id;
+                el.style.position = 'absolute'; el.style.left = (bed.c * 80) + 'px'; el.style.top = (bed.r * 80) + 'px'; el.style.width = '80px'; el.style.height = '80px'; el.style.pointerEvents = 'none';
                 container.appendChild(el);
             }
+            
+            // Рендерим грядку БЕЗ всяких фонов и рамок! Только чистая картинка 80х80
+            let html = `<img src="img/soil.png" style="position:absolute; left:0; top:0; width:100%; height:100%; object-fit:cover; display:block;" onerror="this.style.display='none';">`;
+            
+            if (bed.item) {
+                let age = now - bed.item.plantedAt;
+                let innerHTML = '';
+                if (bed.item.state === 'dry') {
+                    innerHTML = `<img src="img/tree_dry.png" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 6px 6px rgba(0,0,0,0.4));" onerror="this.src='img/cherry.png'; this.style.filter='grayscale(100%) sepia(100%) hue-rotate(30deg) drop-shadow(0 6px 6px rgba(0,0,0,0.4))';">`;
+                } else if (age < 120000) { 
+                    let percent = Math.min(100, Math.floor((age / 120000) * 100));
+                    innerHTML = `<img src="img/sprout.png" style="width:30%; height:30%; object-fit:contain; margin-bottom:10px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));" onerror="this.style.display='none';"><div style="display:none; font-size:30px; margin-bottom:10px;">🌱</div><div style="position:absolute; bottom:15px; background:rgba(0,0,0,0.7); border: 1px solid #FFF; color:white; font-size:11px; font-weight:800; border-radius:8px; padding:2px 6px;">${percent}%</div>`;
+                } else { 
+                    innerHTML = `<div class="sway" style="width:100%; height:100%;"><img src="img/tree_cherry.png" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 8px 8px rgba(0,0,0,0.4));" onerror="this.src='img/cherry.png';"></div>`;
+                }
+                html += `<div style="position:absolute; left:-40px; top:-80px; width:160px; height:160px; display:flex; align-items:flex-end; justify-content:center; z-index:60;">${innerHTML}</div>`;
+            }
+            
+            // Перерисовываем ТОЛЬКО если изменился процент или статус (Никаких лагов!)
+            if (el.innerHTML !== html) el.innerHTML = html;
+        });
+
+        // 3. Удаляем старые/проданные объекты
+        Array.from(container.children).forEach(child => {
+            if (!activeIds.has(child.id)) child.remove();
         });
     }
 
@@ -650,7 +666,7 @@
         } 
     }, 1000);
 
-    // --- СТАНДАРТНЫЕ ФУНКЦИИ (Сокращены) ---
+    // --- СТАНДАРТНЫЕ ФУНКЦИИ ---
     function showPreLevel(idx) { selectedLevelIndex = idx; let lvl = LEVELS_DATA[idx]; document.getElementById("prelevel-title").innerText = `Уровень ${lvl.id}`; document.getElementById("prelevel-icon").innerHTML = `<div style="width:100%;height:100%;">${getImgTag(lvl.targetItem)}</div>`; document.getElementById("prelevel-count").innerText = `${lvl.targetCount} шт.`; document.getElementById("prelevel-moves").innerText = `⏳ ${lvl.moves}`; selectedBoosters = { bomb: false, plane: false, moves: false }; updateBoosterUI(); document.getElementById("prelevel-modal").style.display = "flex"; }
     function closePreLevel() { document.getElementById("prelevel-modal").style.display = "none"; }
     function toggleBooster(type) { selectedBoosters[type] = !selectedBoosters[type]; updateBoosterUI(); }
@@ -672,7 +688,7 @@
     function setMessage(text) { document.getElementById("message").innerText = text; }
     function collectItem(item) { let lvl = LEVELS_DATA[selectedLevelIndex]; if (item && item.type === lvl.targetItem && !item.counted) { collectedCount++; item.counted = true; } }
     function handleCellClick(r, c) { if (busy || finished) return; if (!selected) { selected = { r, c }; renderBoard(); setMessage(""); return; } if (selected.r === r && selected.c === c) { selected = null; renderBoard(); return; } if ((Math.abs(selected.r - r) + Math.abs(selected.c - c)) === 1) { let sr = selected.r, sc = selected.c; selected = null; renderBoard(); animateSwapAndCheck(sr, sc, r, c); } else { selected = { r, c }; renderBoard(); return; } }
-    function animateSwapAndCheck(r1, c1, r2, c2) { busy = true; let inner1 = document.getElementById(`inner-${r1}-${c1}`); let inner2 = document.getElementById(`inner-${r2}-${c2}`); let dx = (c2 - c1) * 100, dy = (r2 - r1) * 100; if (inner1) { inner1.style.transition = 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)'; inner1.style.transform = `translate(${dx}%, ${dy}%)`; } if (inner2) { inner2.style.transition = 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)'; inner2.style.transform = `translate(${-dx}%, ${-dy}%)`; } setTimeout(() => { let temp = board[r1][c1]; board[r1][c1] = board[r2][c2]; board[r2][c2] = temp; let item1 = board[r1][c1], item2 = board[r2][c2]; let matches = findAllMatches(); if ((item1 && item1.special) || (item2 && item2.special)) { moves--; let toDestroy = new Set(); if (item1 && item1.special && item2 && item2.special) { toDestroy.add(`${r1},${c1}`); toDestroy.add(`${r2},${c2}`); activateSpecial(r1, c1, toDestroy); activateSpecial(r2, c2, toDestroy); } else if (item1 && item1.special) { toDestroy.add(`${r1},${c1}`); activateSpecial(r1, c1, toDestroy); } else { toDestroy.add(`${r2},${c2}`); activateSpecial(r2, c2, toDestroy); } explodeCells(toDestroy, null); toDestroy.forEach(coord => { let parts = coord.split(','); let el = document.getElementById(`inner-${parts[0]}-${parts[1]}`); if (el) el.classList.add('pop'); }); setTimeout(() => { toDestroy.forEach(coord => { let parts = coord.split(','); let r = parseInt(parts[0]), c = parseInt(parts[1]); if (board[r][c]) { collectItem(board[r][c]); board[r][c] = null; } }); renderBoard(); setTimeout(() => dropAndFill(), 50); }, 300); return; } if (matches.length === 0) { if (inner1) inner1.style.transform = `translate(0px, 0px)`; if (inner2) inner2.style.transform = `translate(0px, 0px)`; setTimeout(() => { temp = board[r1][c1]; board[r1][c1] = board[r2][c2]; board[r2][c2] = temp; renderBoard(); let el1 = document.getElementById(`cell-${r1}-${c1}`); let el2 = document.getElementById(`cell-${r2}-${c2}`); if(el1) el1.classList.add('error-anim'); if(el2) el2.classList.add('error-anim'); setTimeout(() => { if(el1) el1.classList.remove('error-anim'); if(el2) el2.classList.remove('error-anim'); }, 300); busy = false; setMessage("Нет комбинации"); }, 250); } else { moves--; setMessage(""); processMatches(r1, c1, r2, c2, matches); } }, 250); }
+    function animateSwapAndCheck(r1, c1, r2, c2) { busy = true; let inner1 = document.getElementById(`inner-${r1}-${c1}`); let inner2 = document.getElementById(`inner-${r2}-${c2}`); let dx = (c2 - c1) * 100, dy = (r2 - r1) * 100; if (inner1) { inner1.style.transition = 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)'; inner1.style.transform = `translate(${dx}%, ${dy}%)`; } if (inner2) { inner2.style.transition = 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)'; inner2.style.transform = `translate(${-dx}%, ${-dy}%)`; } setTimeout(() => { let temp = board[r1][c1]; board[r1][c1] = board[r2][c2]; board[r2][c2] = temp; let item1 = board[r1][c1], item2 = board[r2][c2]; let matches = findAllMatches(); if ((item1 && item1.special) || (item2 && item2.special)) { moves--; let toDestroy = new Set(); if (item1 && item1.special && item2 && item2.special) { toDestroy.add(`${r1},${c1}`); toDestroy.add(`${r2},${c2}`); activateSpecial(r1, c1, toDestroy); activateSpecial(r2, c2, toDestroy); } else if (item1 && item1.special) { toDestroy.add(`${r1},${c1}`); activateSpecial(r1, c1, toDestroy); } else { toDestroy.add(`${r2},${c2}`); activateSpecial(r2, c2, toDestroy); } explodeCells(toDestroy, null); toDestroy.forEach(coord => { let parts = coord.split(','); let el = document.getElementById(`inner-${parts[0]}-${parts[1]}`); if (el) el.classList.add('pop'); }); setTimeout(() => { toDestroy.forEach(coord => { let parts = split(','); let r = parseInt(parts[0]), c = parseInt(parts[1]); if (board[r][c]) { collectItem(board[r][c]); board[r][c] = null; } }); renderBoard(); setTimeout(() => dropAndFill(), 50); }, 300); return; } if (matches.length === 0) { if (inner1) inner1.style.transform = `translate(0px, 0px)`; if (inner2) inner2.style.transform = `translate(0px, 0px)`; setTimeout(() => { temp = board[r1][c1]; board[r1][c1] = board[r2][c2]; board[r2][c2] = temp; renderBoard(); let el1 = document.getElementById(`cell-${r1}-${c1}`); let el2 = document.getElementById(`cell-${r2}-${c2}`); if(el1) el1.classList.add('error-anim'); if(el2) el2.classList.add('error-anim'); setTimeout(() => { if(el1) el1.classList.remove('error-anim'); if(el2) el2.classList.remove('error-anim'); }, 300); busy = false; setMessage("Нет комбинации"); }, 250); } else { moves--; setMessage(""); processMatches(r1, c1, r2, c2, matches); } }, 250); }
     function explodeCells(coordsSet, safeCoordStr) { let newlyAdded = true; let processedSpecials = new Set(); while (newlyAdded) { newlyAdded = false; let currentCoords = Array.from(coordsSet); for (let coord of currentCoords) { if (coord === safeCoordStr) continue; if (processedSpecials.has(coord)) continue; let parts = coord.split(','); let r = parseInt(parts[0]), c = parseInt(parts[1]); let item = board[r][c]; if (item && item.special) { processedSpecials.add(coord); let beforeSize = coordsSet.size; activateSpecial(r, c, coordsSet); if (coordsSet.size > beforeSize) newlyAdded = true; } } } }
     function processMatches(r1, c1, r2, c2, matches) { let toDestroy = new Set(); let specialCoords = null; if (r1 !== null) { specialCoords = checkAndCreateSpecial(r1, c1, matches); if (!specialCoords) specialCoords = checkAndCreateSpecial(r2, c2, matches); } let safeCoordStr = specialCoords ? `${specialCoords.r},${specialCoords.c}` : null; matches.forEach(m => { let coordStr = `${m.r},${m.c}`; if (coordStr === safeCoordStr) return; toDestroy.add(coordStr); }); explodeCells(toDestroy, safeCoordStr); toDestroy.forEach(coord => { let parts = coord.split(','); let r = parseInt(parts[0]), c = parseInt(parts[1]); let inner = document.getElementById(`inner-${r}-${c}`); if (inner) inner.classList.add('pop'); }); setTimeout(() => { toDestroy.forEach(coord => { let parts = coord.split(','); let r = parseInt(parts[0]), c = parseInt(parts[1]); if (board[r][c]) { collectItem(board[r][c]); board[r][c] = null; } }); renderBoard(); setTimeout(() => dropAndFill(), 50); }, 300); }
     function dropAndFill() { for (let c = 0; c < SIZE; c++) { let remaining = []; for (let r = SIZE - 1; r >= 0; r--) { if (board[r][c] !== null) remaining.push(board[r][c]); } let writeRow = SIZE - 1; for (let i = 0; i < remaining.length; i++) { board[writeRow][c] = remaining[i]; writeRow--; } while (writeRow >= 0) { board[writeRow][c] = { type: TYPES[Math.floor(Math.random() * TYPES.length)], special: null, counted: false, isNew: true }; writeRow--; } } renderBoard(); setTimeout(() => { for (let r = 0; r < SIZE; r++) { for (let c = 0; c < SIZE; c++) { if (board[r][c]) board[r][c].isNew = false; } } let cascadeMatches = findAllMatches(); if (cascadeMatches.length > 0) { processMatches(null, null, null, null, cascadeMatches); } else { checkGameEnd(); busy = false; } }, 350); }
