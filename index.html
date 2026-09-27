@@ -31,14 +31,18 @@
         
         /* --- ФЕРМА --- */
         .farm-viewport { flex: 1; overflow: hidden; position: relative; border-radius: 20px; border: 4px solid rgba(255,255,255,0.5); box-shadow: inset 0 0 20px rgba(0,0,0,0.2); background: #7CB342; touch-action: none; user-select: none; -webkit-user-select: none; margin-bottom: 10px; }
-        .farm-world { position: absolute; top: 0; left: 0; width: 2000px; height: 2000px; background-color: #8BC34A; background-image: linear-gradient(rgba(255,255,255,0.15) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.15) 2px, transparent 2px), url('img/bg_farm.jpg'); background-size: 80px 80px, 80px 80px, 400px 400px; transform-origin: 0 0; will-change: transform; transition: transform 0.05s linear; }
+        .farm-world { position: absolute; top: 0; left: 0; width: 2000px; height: 2000px; background-color: #8BC34A; background-image: url('img/bg_farm.jpg'); background-size: 400px 400px; transform-origin: 0 0; will-change: transform; transition: transform 0.05s linear; }
         
+        /* Сетка показывается только во время стройки */
+        .farm-world.planting-mode { background-image: linear-gradient(rgba(255,255,255,0.2) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.2) 2px, transparent 2px), url('img/bg_farm.jpg'); background-size: 80px 80px, 80px 80px, 400px 400px; }
+
         .farm-build-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 85%; z-index: 200; box-shadow: 0 4px 15px rgba(0,0,0,0.3); padding: 14px; font-size: 16px; border-radius: 14px;}
         .storage-badge { background: #E8F5E9; border: 2px solid #81C784; color: #2E7D32; font-weight: 800; padding: 6px 12px; border-radius: 14px; font-size: 14px; display: flex; align-items: center; gap: 4px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
         .main-barn { position: absolute; left: 880px; top: 880px; width: 240px; height: 240px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; z-index: 50; }
         .barn-shadow { background: rgba(0,0,0,0.25); width: 180px; height: 50px; border-radius: 50%; position: absolute; bottom: 10px; z-index: 1; filter: blur(4px); }
         .barn-img { width: 100%; height: 100%; object-fit: contain; z-index: 2; position: relative; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.3)); pointer-events: none;}
+        
         .storage-bar-wrap { position: absolute; top: 0px; width: 140px; height: 22px; background: rgba(0,0,0,0.6); border: 2px solid #FFF; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .storage-bar-fill { position: absolute; top: 0; left: 0; bottom: 0; width: 0%; background: linear-gradient(90deg, #81C784, #4CAF50); transition: width 0.4s ease-out; z-index: 1; }
         .storage-bar-text { position: relative; z-index: 2; color: #FFF; font-size: 12px; font-weight: 800; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
@@ -47,6 +51,11 @@
         @keyframes floatCloud { 0% { transform: translateX(-400px); } 100% { transform: translateX(2400px); } }
         @keyframes sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
         .sway { animation: sway 3s ease-in-out infinite; transform-origin: bottom center; }
+
+        /* Магазин (+/- кнопки) */
+        .qty-btn { background: #E0E0E0; border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 16px; font-weight: bold; color: #333; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .qty-btn:active { background: #BDBDBD; }
+        .qty-val { font-size: 16px; font-weight: 900; width: 24px; text-align: center; }
 
         /* --- СТАРЫЕ СТИЛИ --- */
         .map-container { flex: 1; overflow-y: auto; position: relative; padding: 40px 0; display: flex; flex-direction: column-reverse; align-items: center; scroll-behavior: smooth; }
@@ -100,11 +109,7 @@
         .drawer-overlay { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; backdrop-filter: blur(2px); border-radius: inherit; }
         .build-drawer { position: absolute; top: 0; right: -320px; bottom: 0; width: 280px; background: #FFF; z-index: 201; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 24px 16px; display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.2); overflow-y: auto; }
         .build-drawer.open { right: 0; }
-        .drawer-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: #F5F5F5; border-radius: 12px; margin-bottom: 12px; border: 1px solid #E0E0E0; }
-        .drawer-item-icon { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 30px; background: white; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); flex-shrink: 0; }
-        .drawer-item-info { flex: 1; }
-        .drawer-item-title { font-weight: 800; font-size: 13px; color: #333; margin-bottom: 6px; line-height: 1.2; }
-
+        
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); justify-content: center; align-items: center; z-index: 300; }
         .modal-content { background: #FFF; padding: 26px; border-radius: 22px; text-align: center; max-width: 320px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.3); position: relative; }
         
@@ -155,7 +160,7 @@
         </div>
         
         <div id="placement-banner" style="display:none; position:absolute; top:80px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.85); color:white; padding:12px 24px; border-radius:24px; z-index:300; font-weight:800; white-space:nowrap; align-items:center; gap:12px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);">
-            Укажи место на поле! 🌱
+            Осталось саженцев: <span id="place-qty">0</span> 🌱
             <button onclick="cancelPlacement()" style="background:#E53935; border:none; color:white; border-radius:50%; width:28px; height:28px; font-weight:bold; cursor:pointer;">✖</button>
         </div>
 
@@ -266,8 +271,7 @@
     try { if (typeof vkBridge !== 'undefined') vkBridge.send('VKWebAppInit'); } catch (e) {}
 
     const MOCK_VK_POSTS = [ 
-        { text: "🛰️ <b>Точное земледелие:</b> Сегодня тракторы ездят сами благодаря GPS и ГЛОНАСС! Они не перекрывают ряды при посеве, экономят топливо и берегут почву от лишнего уплотнения.", date: "Сегодня" }, 
-        { text: "💧 <b>Системы полива:</b> Почему капельный полив лучше распылителей? Он доставляет воду и удобрения прямо к корням растения, снижая расход воды на 50% и не давая расти сорнякам между рядами.", date: "Вчера" }
+        { text: "🛰️ <b>Точное земледелие:</b> Сегодня тракторы ездят сами благодаря GPS и ГЛОНАСС! Они не перекрывают ряды при посеве, экономят топливо и берегут почву от лишнего уплотнения.", date: "Сегодня" }
     ];
     const QUIZ_LEVEL_FAIL = [ { q: "Как называется профессия человека, выращивающего урожай?", a: ["Агроном", "Ветеринар", "Зоотехник"], correct: 0 } ];
 
@@ -276,10 +280,7 @@
     const ICON = { plum: "🍑", cherry: "🍒", strawberry: "🍓", bread: "🍞", tractor: "🚜" };
     const SPECIAL_ICON = { arrowH: "↔️", arrowV: "↕️", bomb: "💣", plane: "✈️" };
 
-    const LEVELS_DATA = [ 
-        { id: 1, targetItem: "plum", targetCount: 10, moves: 15, reward: null }, 
-        { id: 2, targetItem: "cherry", targetCount: 15, moves: 18, reward: "plum" }
-    ];
+    const LEVELS_DATA = [ { id: 1, targetItem: "plum", targetCount: 10, moves: 15, reward: null }, { id: 2, targetItem: "cherry", targetCount: 15, moves: 18, reward: "plum" } ];
 
     let maxUnlockedLevel = localStorage.getItem('kz_max_level') ? parseInt(localStorage.getItem('kz_max_level')) : 1;
     let selectedLevelIndex = maxUnlockedLevel - 1; 
@@ -287,13 +288,16 @@
     let coins = localStorage.getItem('kz_coins') ? parseInt(localStorage.getItem('kz_coins')) : 100;
     let storage = JSON.parse(localStorage.getItem('kz_storage')) || { cherry: 0, capacity: 50 };
     
-    let farmItems = JSON.parse(localStorage.getItem('kz_farm_items')) || [];
-
-    // Миграция старых данных: добавляем кол-во урожаев (harvestsLeft) и статус (state)
-    farmItems.forEach(item => {
-        if (item.harvestsLeft === undefined) item.harvestsLeft = 5;
-        if (!item.state) item.state = 'growing';
-    });
+    // --- ГРЯДКИ И ПОСАДКИ (СЕТКА) ---
+    let soilBeds = JSON.parse(localStorage.getItem('kz_soil_beds'));
+    if (!soilBeds) {
+        // Стартовые грядки рядом с амбаром
+        soilBeds = [
+            {c: 8, r: 12, item: null}, {c: 9, r: 12, item: null}, {c: 10, r: 12, item: null},
+            {c: 8, r: 13, item: null}, {c: 9, r: 13, item: null}, {c: 10, r: 13, item: null}
+        ];
+        localStorage.setItem('kz_soil_beds', JSON.stringify(soilBeds));
+    }
 
     let board = [], selected = null, busy = false, finished = false;
     let moves = 0, collectedCount = 0, quizUsed = false;
@@ -323,22 +327,13 @@
                         <button class="btn btn-secondary" style="padding:6px 10px; font-size:12px; border:1px solid #CCC;" onclick="processJam()">На завод</button>
                     </div>
                 </div>`;
-        } else {
-            content += `<div style="color:#777; text-align:center; padding: 20px 0;">Амбар пуст. Посади деревья и собери урожай!</div>`;
-        }
-        content += `</div>`;
-        showModal("📦 Амбар", "", "Закрыть", closeModal);
-        document.getElementById('modal-text').innerHTML = content;
+        } else { content += `<div style="color:#777; text-align:center; padding: 20px 0;">Амбар пуст. Посади деревья и собери урожай!</div>`; }
+        content += `</div>`; showModal("📦 Амбар", "", "Закрыть", closeModal); document.getElementById('modal-text').innerHTML = content;
     }
 
     function sellItem(type, price) {
-        if (storage[type] > 0) {
-            storage[type]--; addCoins(price);
-            localStorage.setItem('kz_storage', JSON.stringify(storage));
-            updateStorageUI(); openBarn(); 
-        }
+        if (storage[type] > 0) { storage[type]--; addCoins(price); localStorage.setItem('kz_storage', JSON.stringify(storage)); updateStorageUI(); openBarn(); }
     }
-
     function processJam() { showModal("Завод варенья 🏭", "Завод варенья пока не построен! Накопи ресурсы, он станет доступен в следующих обновлениях.", "Понятно", openBarn); }
 
     // --- УМНАЯ КАМЕРА ---
@@ -356,11 +351,9 @@
         fViewport.addEventListener('touchstart', e => {
             harvestedThisSwipe = false;
             if (e.touches.length === 1) {
-                fIsDragging = true; fStartX = e.touches[0].clientX; fStartY = e.touches[0].clientY;
-                fStartPanX = fPanX; fStartPanY = fPanY;
+                fIsDragging = true; fStartX = e.touches[0].clientX; fStartY = e.touches[0].clientY; fStartPanX = fPanX; fStartPanY = fPanY;
             } else if (e.touches.length === 2) {
-                fIsDragging = false;
-                fInitialPinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                fIsDragging = false; fInitialPinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
                 fInitialScale = fScale; fStartPanX = fPanX; fStartPanY = fPanY;
             }
         }, {passive: false});
@@ -370,32 +363,40 @@
             if (e.touches.length === 1 && fIsDragging) {
                 let touch = e.touches[0];
                 let rect = fViewport.getBoundingClientRect();
-                
                 let worldX = ((touch.clientX - rect.left) - fPanX) / fScale;
                 let worldY = ((touch.clientY - rect.top) - fPanY) / fScale;
                 let c = Math.floor(worldX / 80); let r = Math.floor(worldY / 80);
                 
-                let item = farmItems.find(i => i.c === c && i.r === r);
-                if (item && item.state !== 'dry' && !buildModeItem) {
-                    let age = Date.now() - item.plantedAt;
-                    if (age >= 120000) { // 2 минуты
-                        harvestItem(item, touch.clientX, touch.clientY);
-                        harvestedThisSwipe = true;
-                    }
+                let bed = soilBeds.find(b => b.c === c && b.r === r);
+
+                // Если в режиме стройки — сажаем!
+                if (buildModeItem && buildModeItem.count > 0 && bed && !bed.item) {
+                    bed.item = { type: buildModeItem.type, plantedAt: Date.now(), harvestsLeft: Math.floor(Math.random()*2)+5, state: 'growing' };
+                    buildModeItem.count--;
+                    document.getElementById('place-qty').innerText = buildModeItem.count;
+                    localStorage.setItem('kz_soil_beds', JSON.stringify(soilBeds));
+                    renderFarmItems();
+                    
+                    let flash = document.createElement('div'); flash.style.position = 'absolute'; flash.style.left = (c*80)+'px'; flash.style.top = (r*80)+'px'; flash.style.width = '80px'; flash.style.height = '80px'; flash.style.background = 'rgba(255,255,255,0.6)'; flash.style.borderRadius = '50%'; flash.style.pointerEvents = 'none'; flash.style.animation = 'popAnim 0.3s forwards'; document.getElementById('farm-items-container').appendChild(flash); setTimeout(() => flash.remove(), 300);
+                    
+                    if (buildModeItem.count <= 0) cancelPlacement();
+                    harvestedThisSwipe = true; // Блокируем скролл
+                }
+                // Иначе проверяем урожай
+                else if (bed && bed.item && bed.item.state !== 'dry' && !buildModeItem) {
+                    let age = Date.now() - bed.item.plantedAt;
+                    if (age >= 120000) { harvestItem(bed, touch.clientX, touch.clientY); harvestedThisSwipe = true; }
                 }
 
                 if (!harvestedThisSwipe) {
-                    fPanX = fStartPanX + (touch.clientX - fStartX); 
-                    fPanY = fStartPanY + (touch.clientY - fStartY);
+                    fPanX = fStartPanX + (touch.clientX - fStartX); fPanY = fStartPanY + (touch.clientY - fStartY);
                     requestCameraUpdate();
                 }
             } else if (e.touches.length === 2) {
                 let dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
                 let newScale = Math.min(Math.max(0.4, fInitialScale * (dist / fInitialPinchDist)), 2.0);
-                let focalX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                let focalY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-                let rect = fViewport.getBoundingClientRect();
-                let viewFocalX = focalX - rect.left; let viewFocalY = focalY - rect.top;
+                let focalX = (e.touches[0].clientX + e.touches[1].clientX) / 2; let focalY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                let rect = fViewport.getBoundingClientRect(); let viewFocalX = focalX - rect.left; let viewFocalY = focalY - rect.top;
                 let relX = (viewFocalX - fStartPanX) / fInitialScale; let relY = (viewFocalY - fStartPanY) / fInitialScale;
                 fScale = newScale; fPanX = viewFocalX - relX * fScale; fPanY = viewFocalY - relY * fScale;
                 requestCameraUpdate();
@@ -404,11 +405,8 @@
 
         fViewport.addEventListener('touchend', e => { 
             if (e.changedTouches.length === 1 && fStartX !== undefined) {
-                let dx = e.changedTouches[0].clientX - fStartX;
-                let dy = e.changedTouches[0].clientY - fStartY;
-                if (Math.hypot(dx, dy) < 10 && !harvestedThisSwipe) {
-                    handleFarmTap(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-                }
+                let dx = e.changedTouches[0].clientX - fStartX; let dy = e.changedTouches[0].clientY - fStartY;
+                if (Math.hypot(dx, dy) < 10 && !harvestedThisSwipe) handleFarmTap(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
             }
             fIsDragging = false; 
         });
@@ -423,144 +421,155 @@
     }
     setTimeout(updateCamera, 100);
 
-    // --- МАГАЗИН И СТРОЙКА ---
+    // --- УМНЫЙ МАГАЗИН И СТРОЙКА ---
     let buildModeItem = null;
+    let shopQty = 1;
+
+    function changeShopQty(delta) {
+        shopQty += delta;
+        if (shopQty < 1) shopQty = 1;
+        if (shopQty > 10) shopQty = 10; // Максимум 10 за раз
+        let qtyEl = document.getElementById('shop-qty');
+        let priceEl = document.getElementById('shop-price');
+        if (qtyEl) qtyEl.innerText = shopQty;
+        if (priceEl) priceEl.innerText = shopQty * 10;
+    }
 
     function renderFarmDrawer() {
+        shopQty = 1;
         let drawerHtml = `
-            <div class="drawer-item">
-                <div class="drawer-item-icon" style="background:#FFF3E0;">
-                    <img src="img/cherry.png" style="width:80%; height:80%; object-fit:contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span style="display:none; font-size:24px;">🍒</span>
+            <div class="drawer-item" style="flex-direction:column; align-items:stretch;">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                    <div class="drawer-item-icon" style="background:#FFF3E0;">
+                        <img src="img/cherry.png" style="width:80%; height:80%; object-fit:contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span style="display:none; font-size:24px;">🍒</span>
+                    </div>
+                    <div class="drawer-item-info">
+                        <div class="drawer-item-title">Саженец черешни</div>
+                        <div style="font-size:11px; color:#666;">Растет 2 мин</div>
+                    </div>
                 </div>
-                <div class="drawer-item-info">
-                    <div class="drawer-item-title">Саженец черешни</div>
-                    <div style="font-size:11px; color:#666; margin-bottom:6px;">Растет: 2 мин (Дает 5-6 урожаев)</div>
-                    <button class="btn btn-accent" style="padding:6px 10px; font-size:12px; width:auto; border-radius: 8px;" onclick="startPlacement('cherry', 10)">Купить 10 🪙</button>
+                
+                <div style="display:flex; justify-content:space-between; align-items:center; background:#FFF; border:1px solid #CCC; border-radius:12px; padding:6px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <button class="qty-btn" onclick="changeShopQty(-1)">-</button>
+                        <span class="qty-val" id="shop-qty">1</span>
+                        <button class="qty-btn" onclick="changeShopQty(1)">+</button>
+                    </div>
+                    <button class="btn btn-accent" style="padding:8px 12px; font-size:13px; width:auto; border-radius: 8px;" onclick="startPlacement('cherry')">Купить <span id="shop-price">10</span> 🪙</button>
                 </div>
             </div>
         `;
         document.getElementById('drawer-items').innerHTML = drawerHtml;
     }
 
-    function startPlacement(type, price) {
-        if (coins < price) { showModal("Мало монет 🪙", "Заработай монеты в уровнях Три-в-Ряд!", "Понятно", closeModal); return; }
-        buildModeItem = { type, price }; closeBuildMenu();
+    function startPlacement(type) {
+        let totalCost = shopQty * 10;
+        if (coins < totalCost) { showModal("Мало монет 🪙", "Заработай монеты в уровнях Три-в-Ряд!", "Понятно", closeModal); return; }
+        addCoins(-totalCost);
+        buildModeItem = { type: type, count: shopQty }; 
+        closeBuildMenu();
+        document.getElementById('place-qty').innerText = buildModeItem.count;
         document.getElementById('placement-banner').style.display = 'flex';
+        document.getElementById('farm-world').classList.add('planting-mode');
     }
-    function cancelPlacement() { buildModeItem = null; document.getElementById('placement-banner').style.display = 'none'; }
+    
+    function cancelPlacement() { 
+        if (buildModeItem && buildModeItem.count > 0) { addCoins(buildModeItem.count * 10); } // Возврат денег
+        buildModeItem = null; 
+        document.getElementById('placement-banner').style.display = 'none'; 
+        document.getElementById('farm-world').classList.remove('planting-mode');
+    }
 
     function handleFarmTap(clientX, clientY) {
         let rect = fViewport.getBoundingClientRect();
-        let worldX = ((clientX - rect.left) - fPanX) / fScale;
-        let worldY = ((clientY - rect.top) - fPanY) / fScale;
+        let worldX = ((clientX - rect.left) - fPanX) / fScale; let worldY = ((clientY - rect.top) - fPanY) / fScale;
         let c = Math.floor(worldX / 80); let r = Math.floor(worldY / 80);
         
-        // Проверка: кликнули ли мы по существующему дереву
-        let existingItem = farmItems.find(i => i.c === c && i.r === r);
-        if (existingItem) {
-            if (existingItem.state === 'dry') {
-                showModal("Засохшее дерево 🍂", "Это дерево больше не даст урожай. Нанять лесоруба и выкорчевать его?", "Выкорчевать (2 🪙)", () => {
-                    if (coins >= 2) {
-                        addCoins(-2);
-                        farmItems = farmItems.filter(i => i.id !== existingItem.id);
-                        localStorage.setItem('kz_farm_items', JSON.stringify(farmItems));
-                        closeModal(); renderFarmItems();
-                    } else {
-                        showModal("Мало монет", "Нужно 2 🪙 для оплаты работы лесоруба.", "Понятно", closeModal);
-                    }
-                }, "Оставить");
-            }
-            return; // Если тапнули по предмету, дальше стройку не обрабатываем
+        let bed = soilBeds.find(b => b.c === c && b.r === r);
+        if (bed && bed.item && bed.item.state === 'dry') {
+            showModal("Засохшее дерево 🍂", "Это дерево больше не даст урожай. Нанять лесоруба и выкорчевать его?", "Выкорчевать (2 🪙)", () => {
+                if (coins >= 2) { addCoins(-2); bed.item = null; localStorage.setItem('kz_soil_beds', JSON.stringify(soilBeds)); closeModal(); renderFarmItems(); } 
+                else { showModal("Мало монет", "Нужно 2 🪙 для оплаты работы лесоруба.", "Понятно", closeModal); }
+            }, "Оставить");
+            return; 
         }
 
-        if (!buildModeItem) return;
-        if (c >= 11 && c <= 13 && r >= 11 && r <= 13) return; // Амбар
-        if (farmItems.length >= 10) { showModal("Мало места!", "У тебя лимит 10 саженцев.", "Понятно", closeModal); cancelPlacement(); return; }
-
-        addCoins(-buildModeItem.price);
-        // Даем случайное количество урожаев (5 или 6)
-        let maxHarvests = Math.floor(Math.random() * 2) + 5; 
-        farmItems.push({ id: Date.now(), type: buildModeItem.type, c: c, r: r, plantedAt: Date.now(), harvestsLeft: maxHarvests, state: 'growing' });
-        localStorage.setItem('kz_farm_items', JSON.stringify(farmItems));
-        renderFarmItems();
-        
-        let flash = document.createElement('div');
-        flash.style.position = 'absolute'; flash.style.left = (c*80)+'px'; flash.style.top = (r*80)+'px'; flash.style.width = '80px'; flash.style.height = '80px'; flash.style.background = 'rgba(255,255,255,0.6)'; flash.style.borderRadius = '50%'; flash.style.pointerEvents = 'none'; flash.style.animation = 'popAnim 0.3s forwards';
-        document.getElementById('farm-items-container').appendChild(flash); setTimeout(() => flash.remove(), 300);
-
-        cancelPlacement();
+        if (buildModeItem && bed && !bed.item) {
+            bed.item = { type: buildModeItem.type, plantedAt: Date.now(), harvestsLeft: Math.floor(Math.random()*2)+5, state: 'growing' };
+            buildModeItem.count--;
+            document.getElementById('place-qty').innerText = buildModeItem.count;
+            localStorage.setItem('kz_soil_beds', JSON.stringify(soilBeds));
+            renderFarmItems();
+            
+            let flash = document.createElement('div'); flash.style.position = 'absolute'; flash.style.left = (c*80)+'px'; flash.style.top = (r*80)+'px'; flash.style.width = '80px'; flash.style.height = '80px'; flash.style.background = 'rgba(255,255,255,0.6)'; flash.style.borderRadius = '50%'; flash.style.pointerEvents = 'none'; flash.style.animation = 'popAnim 0.3s forwards'; document.getElementById('farm-items-container').appendChild(flash); setTimeout(() => flash.remove(), 300);
+            
+            if (buildModeItem.count <= 0) cancelPlacement();
+        }
     }
 
-    // --- РЕНДЕР И АНИМАЦИЯ ДЕРЕВЬЕВ ---
+    // --- РЕНДЕР ГРЯДОК И ДЕРЕВЬЕВ ---
     function renderFarmItems() {
-        let container = document.getElementById('farm-items-container');
-        if (!container) return;
-        container.innerHTML = '';
-        let now = Date.now();
+        let container = document.getElementById('farm-items-container'); if (!container) return;
+        container.innerHTML = ''; let now = Date.now();
         
-        farmItems.forEach(item => {
+        soilBeds.forEach(bed => {
+            // Рисуем грядку
             let soil = document.createElement('div');
-            soil.style.position = 'absolute'; soil.style.left = (item.c * 80 + 10) + 'px'; soil.style.top = (item.r * 80 + 20) + 'px'; soil.style.width = '60px'; soil.style.height = '40px'; soil.style.background = 'rgba(100,60,30,0.4)'; soil.style.borderRadius = '50%'; soil.style.border = '2px dashed rgba(255,255,255,0.2)'; soil.style.pointerEvents = 'none';
+            soil.style.position = 'absolute'; soil.style.left = (bed.c * 80 + 4) + 'px'; soil.style.top = (bed.r * 80 + 4) + 'px'; soil.style.width = '72px'; soil.style.height = '72px'; 
+            soil.style.background = '#6D4C41'; soil.style.borderRadius = '12px'; soil.style.border = '3px solid #5D4037'; soil.style.pointerEvents = 'none';
             container.appendChild(soil);
 
-            let el = document.createElement('div');
-            el.style.position = 'absolute'; el.style.left = (item.c * 80) + 'px'; el.style.top = (item.r * 80 - 15) + 'px'; el.style.width = '80px'; el.style.height = '80px'; el.style.display = 'flex'; el.style.alignItems = 'flex-end'; el.style.justifyContent = 'center'; el.style.pointerEvents = 'none';
-            
-            let age = now - item.plantedAt;
-            
-            if (item.state === 'dry') {
-                // Сухое дерево
-                el.innerHTML = `<img src="img/tree_dry.png" style="width:90%; height:90%; object-fit:contain; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.4));" onerror="this.src='img/cherry.png'; this.style.filter='grayscale(100%) sepia(100%) hue-rotate(30deg) drop-shadow(0 4px 4px rgba(0,0,0,0.4))';">`;
-            } else if (age < 120000) { 
-                // Растущий саженец (2 минуты)
-                let leftSec = Math.ceil((120000 - age) / 1000);
-                el.innerHTML = `
-                    <img src="img/sprout.png" style="width:50%; height:50%; object-fit:contain; margin-bottom:10px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                    <div style="display:none; font-size:30px; margin-bottom:10px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));">🌱</div>
-                    <div style="position:absolute; bottom:-10px; background:rgba(0,0,0,0.6); color:white; font-size:12px; font-weight:800; border-radius:6px; padding:2px 6px;">${leftSec}с</div>
-                `;
-            } else { 
-                // Выросло (готов к сбору)
-                el.innerHTML = `<div class="sway" style="width:90%; height:90%;"><img src="img/tree_cherry.png" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 6px 6px rgba(0,0,0,0.4));" onerror="this.src='img/cherry.png';"></div>`;
+            if (bed.item) {
+                let el = document.createElement('div');
+                // Центруем огромное дерево относительно грядки
+                el.style.position = 'absolute'; el.style.left = (bed.c * 80 - 20) + 'px'; el.style.top = (bed.r * 80 - 40) + 'px'; el.style.width = '120px'; el.style.height = '120px'; el.style.display = 'flex'; el.style.alignItems = 'flex-end'; el.style.justifyContent = 'center'; el.style.pointerEvents = 'none';
+                
+                let age = now - bed.item.plantedAt;
+                if (bed.item.state === 'dry') {
+                    el.innerHTML = `<img src="img/tree_dry.png" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 6px 6px rgba(0,0,0,0.4));" onerror="this.src='img/cherry.png'; this.style.filter='grayscale(100%) sepia(100%) hue-rotate(30deg) drop-shadow(0 6px 6px rgba(0,0,0,0.4))';">`;
+                } else if (age < 120000) { 
+                    // Проценты роста (0-100%)
+                    let percent = Math.min(100, Math.floor((age / 120000) * 100));
+                    el.innerHTML = `
+                        <img src="img/sprout.png" style="width:40%; height:40%; object-fit:contain; margin-bottom:10px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div style="display:none; font-size:30px; margin-bottom:10px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));">🌱</div>
+                        <div style="position:absolute; bottom:15px; background:rgba(0,0,0,0.7); border: 1px solid #FFF; color:white; font-size:11px; font-weight:800; border-radius:8px; padding:2px 6px;">${percent}%</div>
+                    `;
+                } else { 
+                    el.innerHTML = `<div class="sway" style="width:100%; height:100%;"><img src="img/tree_cherry.png" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 8px 8px rgba(0,0,0,0.4));" onerror="this.src='img/cherry.png';"></div>`;
+                }
+                container.appendChild(el);
             }
-            container.appendChild(el);
         });
     }
 
-    // --- ЦИКЛ СБОРА УРОЖАЯ ---
-    function harvestItem(item, clientX, clientY) {
-        // Уменьшаем счетчик жизней дерева
-        item.harvestsLeft -= 1;
+    // --- УМНЫЙ СВАЙП-СБОР (3-4 ЧЕРЕШНИ ЗА РАЗ) ---
+    function harvestItem(bed, clientX, clientY) {
+        bed.item.harvestsLeft -= 1;
+        if (bed.item.harvestsLeft <= 0) { bed.item.state = 'dry'; } 
+        else { bed.item.plantedAt = Date.now(); bed.item.state = 'growing'; }
+        localStorage.setItem('kz_soil_beds', JSON.stringify(soilBeds));
         
-        if (item.harvestsLeft <= 0) {
-            item.state = 'dry'; // Умерло
-        } else {
-            item.plantedAt = Date.now(); // Снова стало ростком
-            item.state = 'growing';
-        }
-        localStorage.setItem('kz_farm_items', JSON.stringify(farmItems));
-        
-        storage.cherry = (storage.cherry || 0) + 1;
+        // Даем 3 или 4 черешни
+        let yieldAmt = Math.floor(Math.random() * 2) + 3;
+        storage.cherry = (storage.cherry || 0) + yieldAmt;
         localStorage.setItem('kz_storage', JSON.stringify(storage));
         updateStorageUI();
         
-        // Анимация полета в склад
-        let flyEl = document.createElement('div');
-        flyEl.innerHTML = `<img src="img/cherry.png" style="width:100%; height:100%; object-fit:contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span style="display:none; font-size:40px;">🍒</span>`;
-        flyEl.style.position = 'fixed'; flyEl.style.left = clientX + 'px'; flyEl.style.top = clientY + 'px'; flyEl.style.width = '50px'; flyEl.style.height = '50px'; flyEl.style.zIndex = '9999'; flyEl.style.transition = 'all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)'; flyEl.style.pointerEvents = 'none'; flyEl.style.filter = 'drop-shadow(0 10px 10px rgba(0,0,0,0.4))';
-        document.body.appendChild(flyEl);
+        // Летит несколько ягод
+        for(let i=0; i<3; i++) {
+            setTimeout(() => {
+                let flyEl = document.createElement('div');
+                flyEl.innerHTML = `<img src="img/cherry.png" style="width:100%; height:100%; object-fit:contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span style="display:none; font-size:30px;">🍒</span>`;
+                flyEl.style.position = 'fixed'; flyEl.style.left = (clientX + (Math.random()*40-20)) + 'px'; flyEl.style.top = (clientY + (Math.random()*40-20)) + 'px'; flyEl.style.width = '40px'; flyEl.style.height = '40px'; flyEl.style.zIndex = '9999'; flyEl.style.transition = 'all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)'; flyEl.style.pointerEvents = 'none'; flyEl.style.filter = 'drop-shadow(0 6px 6px rgba(0,0,0,0.4))';
+                document.body.appendChild(flyEl);
+                
+                setTimeout(() => { let target = document.getElementById('storage-count').getBoundingClientRect(); flyEl.style.left = (target.left) + 'px'; flyEl.style.top = (target.top) + 'px'; flyEl.style.transform = 'scale(0.3)'; flyEl.style.opacity = '0'; }, 50);
+                setTimeout(() => flyEl.remove(), 600);
+            }, i * 100);
+        }
         
-        setTimeout(() => {
-            let target = document.getElementById('storage-count').getBoundingClientRect();
-            flyEl.style.left = (target.left - 10) + 'px'; flyEl.style.top = (target.top - 10) + 'px'; flyEl.style.transform = 'scale(0.3)'; flyEl.style.opacity = '0';
-        }, 50);
-        setTimeout(() => flyEl.remove(), 650);
-        
-        let flash = document.createElement('div');
-        flash.style.position = 'fixed'; flash.style.left = (clientX-30) + 'px'; flash.style.top = (clientY-30) + 'px'; flash.style.width = '60px'; flash.style.height = '60px'; flash.style.background = '#FFF'; flash.style.borderRadius = '50%'; flash.style.zIndex = '9998'; flash.style.animation = 'popAnim 0.3s forwards'; flash.style.pointerEvents = 'none';
-        document.body.appendChild(flash);
-        setTimeout(() => flash.remove(), 300);
-        
+        let flash = document.createElement('div'); flash.style.position = 'fixed'; flash.style.left = (clientX-30) + 'px'; flash.style.top = (clientY-30) + 'px'; flash.style.width = '60px'; flash.style.height = '60px'; flash.style.background = '#FFF'; flash.style.borderRadius = '50%'; flash.style.zIndex = '9998'; flash.style.animation = 'popAnim 0.3s forwards'; flash.style.pointerEvents = 'none'; document.body.appendChild(flash); setTimeout(() => flash.remove(), 300);
         renderFarmItems();
     }
 
