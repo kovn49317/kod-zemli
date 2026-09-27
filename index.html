@@ -4,124 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Код земли</title>
+    <!-- Предзагрузка обложки для мгновенного старта -->
+    <link rel="preload" href="img/cover.jpg" as="image">
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
     <style>
         :root { --primary: #436932; --accent: #E58E26; --card-bg: rgba(255, 255, 255, 0.9); --cell-bg: rgba(255, 255, 255, 0.95); }
         * { box-sizing: border-box; }
         body { background-color: #8da680; background-image: linear-gradient(180deg, rgba(50,80,38,0.3) 0%, rgba(30,50,25,0.6) 100%), url('img/bg.jpg'); background-size: cover; background-position: center; background-attachment: fixed; color: #263326; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 0; touch-action: manipulation; }
-        
         .app-container { background: var(--card-bg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 16px 40px rgba(0,0,0,0.4); max-width: 420px; width: 100%; height: 100vh; max-height: 850px; display: flex; flex-direction: column; position: relative; overflow: hidden; }
         @media (min-width: 421px) { .app-container { height: 90vh; border-radius: 24px; border: 1px solid rgba(255,255,255,0.6); } }
-        
-        .screen { display: none; width: 100%; height: 100%; flex-direction: column; }
-        .screen.active { display: flex; }
-        .screen-padded { padding: 14px; }
-        @media (min-width: 421px) { .screen-padded { padding: 24px; } }
-
-        .btn { background: var(--primary); color: white; border: none; padding: 16px 20px; font-size: 17px; border-radius: 16px; font-weight: 800; cursor: pointer; transition: all 0.15s; text-align: center; display: block; width: 100%; box-shadow: 0 4px 12px rgba(67,105,50,0.35); text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn:active { transform: scale(0.97); }
-        .btn-secondary { background: rgba(255,255,255,0.95); color: #1a1a1a; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: none; }
-        .btn-accent { background: var(--accent); box-shadow: 0 6px 15px rgba(229,142,38,0.4); }
-        
-        .nav-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-shrink: 0; z-index: 10; position: relative;}
-        .nav-back-btn { background: rgba(0,0,0,0.06); border: none; border-radius: 12px; padding: 8px 14px; font-weight: 700; cursor: pointer; font-size: 14px; transition: 0.2s; }
-        .nav-back-btn:active { background: rgba(0,0,0,0.1); }
-
+        .screen { display: none; width: 100%; height: 100%; flex-direction: column; } .screen.active { display: flex; } .screen-padded { padding: 14px; } @media (min-width: 421px) { .screen-padded { padding: 24px; } }
+        .btn { background: var(--primary); color: white; border: none; padding: 16px 20px; font-size: 17px; border-radius: 16px; font-weight: 800; cursor: pointer; transition: all 0.15s; text-align: center; display: block; width: 100%; box-shadow: 0 4px 12px rgba(67,105,50,0.35); text-transform: uppercase; letter-spacing: 0.5px; } .btn:active { transform: scale(0.97); } .btn-secondary { background: rgba(255,255,255,0.95); color: #1a1a1a; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: none; } .btn-accent { background: var(--accent); box-shadow: 0 6px 15px rgba(229,142,38,0.4); }
+        .nav-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-shrink: 0; z-index: 10; position: relative;} .nav-back-btn { background: rgba(0,0,0,0.06); border: none; border-radius: 12px; padding: 8px 14px; font-weight: 700; cursor: pointer; font-size: 14px; transition: 0.2s; } .nav-back-btn:active { background: rgba(0,0,0,0.1); }
         .coin-balance { background: #FFF8E1; border: 2px solid #FFECB3; padding: 6px 12px; border-radius: 14px; font-weight: 800; color: #F57F17; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 15px; }
         
-        /* --- ФЕРМА --- */
+        /* --- ФЕРМА И МИР --- */
         .farm-viewport { flex: 1; overflow: hidden; position: relative; border-radius: 20px; border: 4px solid rgba(255,255,255,0.5); box-shadow: inset 0 0 20px rgba(0,0,0,0.2); background: #7CB342; touch-action: none; user-select: none; -webkit-user-select: none; margin-bottom: 10px; }
         .farm-world { position: absolute; top: 0; left: 0; width: 2000px; height: 2000px; background-color: #8BC34A; background-image: url('img/bg_farm.jpg'); background-size: 400px 400px; transform-origin: 0 0; will-change: transform; transition: transform 0.05s linear; }
-        
-        /* Сетка показывается только во время стройки */
         .farm-world.planting-mode { background-image: linear-gradient(rgba(255,255,255,0.2) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.2) 2px, transparent 2px), url('img/bg_farm.jpg'); background-size: 80px 80px, 80px 80px, 400px 400px; }
-
         .farm-build-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 85%; z-index: 200; box-shadow: 0 4px 15px rgba(0,0,0,0.3); padding: 14px; font-size: 16px; border-radius: 14px;}
-        .storage-badge { background: #E8F5E9; border: 2px solid #81C784; color: #2E7D32; font-weight: 800; padding: 6px 12px; border-radius: 14px; font-size: 14px; display: flex; align-items: center; gap: 4px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
-        .main-barn { position: absolute; left: 880px; top: 880px; width: 240px; height: 240px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; z-index: 50; }
-        .barn-shadow { background: rgba(0,0,0,0.25); width: 180px; height: 50px; border-radius: 50%; position: absolute; bottom: 10px; z-index: 1; filter: blur(4px); }
+        .header-badges { display: flex; gap: 6px; }
+        .badge-ui { background: #E8F5E9; border: 2px solid #81C784; color: #2E7D32; font-weight: 800; padding: 6px 10px; border-radius: 14px; font-size: 13px; display: flex; align-items: center; gap: 4px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
+        .barn-shadow { background: rgba(0,0,0,0.25); width: 140px; height: 40px; border-radius: 50%; position: absolute; bottom: 10px; z-index: 1; filter: blur(4px); }
         .barn-img { width: 100%; height: 100%; object-fit: contain; z-index: 2; position: relative; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.3)); pointer-events: none;}
-        
-        .storage-bar-wrap { position: absolute; top: 0px; width: 140px; height: 22px; background: rgba(0,0,0,0.6); border: 2px solid #FFF; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .storage-bar-wrap { position: absolute; top: -15px; width: 120px; height: 18px; background: rgba(0,0,0,0.6); border: 2px solid #FFF; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.3); pointer-events: none;}
         .storage-bar-fill { position: absolute; top: 0; left: 0; bottom: 0; width: 0%; background: linear-gradient(90deg, #81C784, #4CAF50); transition: width 0.4s ease-out; z-index: 1; }
-        .storage-bar-text { position: relative; z-index: 2; color: #FFF; font-size: 12px; font-weight: 800; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
+        .storage-bar-text { position: relative; z-index: 2; color: #FFF; font-size: 10px; font-weight: 800; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
 
         .cloud-layer { position: absolute; pointer-events: none; z-index: 150; opacity: 0.85; animation: floatCloud linear infinite; }
         @keyframes floatCloud { 0% { transform: translateX(-400px); } 100% { transform: translateX(2400px); } }
         @keyframes sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
         .sway { animation: sway 3s ease-in-out infinite; transform-origin: bottom center; }
 
-        /* Магазин (+/- кнопки) */
-        .qty-btn { background: #E0E0E0; border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 16px; font-weight: bold; color: #333; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .qty-btn:active { background: #BDBDBD; }
+        .qty-btn { background: #E0E0E0; border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 16px; font-weight: bold; color: #333; cursor: pointer; display: flex; align-items: center; justify-content: center; } .qty-btn:active { background: #BDBDBD; }
         .qty-val { font-size: 16px; font-weight: 900; width: 24px; text-align: center; }
-
-        /* --- СТАРЫЕ СТИЛИ --- */
-        .map-container { flex: 1; overflow-y: auto; position: relative; padding: 40px 0; display: flex; flex-direction: column-reverse; align-items: center; scroll-behavior: smooth; }
-        .map-container::before { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: repeating-linear-gradient(to bottom, rgba(67,105,50,0.3) 0, rgba(67,105,50,0.3) 15px, transparent 15px, transparent 30px); transform: translateX(-50%); z-index: 0; }
-        .level-node-wrap { position: relative; z-index: 1; width: 100%; display: flex; justify-content: center; margin: 20px 0; }
-        .level-node-wrap:nth-child(even) { transform: translateX(40px); }
-        .level-node-wrap:nth-child(odd) { transform: translateX(-40px); }
-        .level-node-wrap.checkpoint { transform: translateX(0); margin: 30px 0; }
-        .level-node { width: 60px; height: 60px; border-radius: 50%; border: 3px solid rgba(67,105,50,0.4); background: #FFF; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: all 0.2s; font-weight: 800; font-size: 20px; color: #263326; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .level-node.completed { background: #E8F5E9; border-color: #81C784; color: #2E7D32; }
-        .level-node.current { border-color: var(--accent); background: #FFF3E0; color: var(--accent); transform: scale(1.15); box-shadow: 0 6px 16px rgba(229,142,38,0.3); }
-        .level-node.locked { background: rgba(0,0,0,0.05); border-color: transparent; color: #9E9E9E; cursor: not-allowed; }
-        .level-node-wrap.checkpoint .level-node { width: 76px; height: 76px; border-color: #FFC107; background: #FFF8E1; color: #FF8F00; box-shadow: 0 0 20px rgba(255,193,7,0.4); border-width: 4px; }
-        .level-node-wrap.checkpoint .level-node.completed { background: #FFE082; }
-        .level-node-wrap.checkpoint .level-node.locked { border-color: #E0E0E0; background: #F5F5F5; color: #BDBDBD; box-shadow: none; }
-        .level-badge { position: absolute; top: -16px; right: -16px; background: #FFF; border-radius: 12px; padding: 2px 6px; font-size: 12px; font-weight: 700; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 2px; }
-        .checkpoint-label { position: absolute; bottom: -20px; white-space: nowrap; font-size: 12px; font-weight: 800; color: #FF8F00; background: rgba(255,255,255,0.8); padding: 2px 8px; border-radius: 10px; }
-
-        .status-card { background: rgba(0,0,0,0.04); padding: 10px 14px; border-radius: 14px; margin-bottom: 12px; display: flex; justify-content: space-around; font-size: 15px; font-weight: 800; align-items: center; border: 1px solid rgba(0,0,0,0.05); }
-        .board { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; background: rgba(67,105,50,0.15); padding: 8px; border-radius: 18px; aspect-ratio: 1; margin-bottom: 12px; touch-action: none; user-select: none; -webkit-user-select: none; position: relative; }
-        .cell { background: var(--cell-bg); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; transition: 0.15s; aspect-ratio: 1; font-size: 32px; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.05); position: relative; overflow: visible; }
-        .cell.selected { background: #d7ecd0; transform: scale(0.92); box-shadow: inset 0 0 0 3px var(--primary); }
-        .cell-inner { width: 85%; height: 85%; position: absolute; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 5; }
-        .item-img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.2)); user-select: none; -webkit-user-select: none; -webkit-user-drag: none; }
-        
-        @keyframes popAnim { 0% { transform: scale(1); opacity: 1; } 40% { transform: scale(1.25); opacity: 0.9; } 100% { transform: scale(0); opacity: 0; } }
-        .pop { animation: popAnim 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important; }
-        @keyframes dropDown { 0% { transform: translateY(-150%); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
-        .drop-anim { animation: dropDown 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-        @keyframes pulseError { 0%, 100% { transform: translateX(0) scale(1); } 25% { transform: translateX(-4px) scale(1.05); } 75% { transform: translateX(4px) scale(1.05); } }
-        .error-anim { animation: pulseError 0.3s; }
-        .booster-badge { animation: pulseError 1.5s infinite; }
-        .message { font-size: 13px; color: #555; min-height: 18px; margin-bottom: 10px; font-weight: 600; text-align: center; }
-        
-        .collection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 10px 0; flex: 1; overflow-y: auto; }
-        .collection-card { background: #FFF; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 1px solid rgba(0,0,0,0.08); opacity: 0.45; filter: grayscale(100%); transition: all 0.3s; }
-        .collection-card.unlocked { opacity: 1; filter: grayscale(0%); cursor: pointer; border-color: var(--primary); box-shadow: 0 6px 16px rgba(67,105,50,0.15); }
-        .collection-icon { font-size: 40px; margin-bottom: 6px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; }
-        .collection-title { font-weight: 800; font-size: 14px; margin-bottom: 4px; }
-        .collection-status { font-size: 11px; font-weight: 700; color: #777; }
-        .collection-card.unlocked .collection-status { color: #2E7D32; }
-
-        .blog-feed { flex: 1; overflow-y: auto; padding-bottom: 20px; display: flex; flex-direction: column; gap: 16px; }
-        .post-card { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.04); text-align: left; }
-        .post-header { display: flex; align-items: center; margin-bottom: 12px; }
-        .post-avatar { width: 44px; height: 44px; border-radius: 50%; background: #E8F5E9; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-right: 12px; border: 1px solid #C8E6C9; overflow: hidden; }
-        .post-author { font-weight: 800; font-size: 15px; color: #1a1a1a; margin-bottom: 2px; }
-        .post-date { font-size: 12px; color: #888; font-weight: 500; }
-        .post-text { font-size: 14px; line-height: 1.45; color: #333; margin-bottom: 14px; }
 
         .drawer-overlay { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; backdrop-filter: blur(2px); border-radius: inherit; }
         .build-drawer { position: absolute; top: 0; right: -320px; bottom: 0; width: 280px; background: #FFF; z-index: 201; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 24px 16px; display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.2); overflow-y: auto; }
         .build-drawer.open { right: 0; }
-        
+        .drawer-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: #F5F5F5; border-radius: 12px; margin-bottom: 12px; border: 1px solid #E0E0E0; }
+        .drawer-item-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); flex-shrink: 0; }
+        .drawer-item-info { flex: 1; } .drawer-item-title { font-weight: 800; font-size: 13px; color: #333; margin-bottom: 6px; line-height: 1.2; }
+
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); justify-content: center; align-items: center; z-index: 300; }
-        .modal-content { background: #FFF; padding: 26px; border-radius: 22px; text-align: center; max-width: 320px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.3); position: relative; }
+        .modal-content { background: #FFF; padding: 26px; border-radius: 22px; text-align: center; max-width: 320px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.3); position: relative; max-height: 85vh; overflow-y: auto;}
         
-        .booster-grid { display: flex; justify-content: center; gap: 12px; margin: 16px 0; }
-        .booster-card { background: rgba(0,0,0,0.04); border: 2px solid rgba(0,0,0,0.1); border-radius: 14px; padding: 12px 8px; cursor: pointer; transition: 0.2s; position: relative; width: 75px; display: flex; flex-direction: column; align-items: center; }
-        .booster-card.selected { background: #FFF8E1; border-color: #FFC107; box-shadow: 0 4px 12px rgba(255,193,7,0.3); transform: translateY(-3px); }
-        .booster-icon { font-size: 28px; margin-bottom: 6px; }
-        .booster-price { font-size: 12px; font-weight: 800; color: #F57F17; }
-        .booster-check { position: absolute; top: -8px; right: -8px; background: #4CAF50; color: white; border-radius: 50%; width: 22px; height: 22px; font-size: 13px; display: none; align-items: center; justify-content: center; font-weight: bold; border: 2px solid #FFF;}
-        .booster-card.selected .booster-check { display: flex; }
-        .target-wrap { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 26px; font-weight: 900; background: rgba(67,105,50,0.1); border-radius: 16px; padding: 12px; margin-bottom: 20px; }
-        .target-img-wrap { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
+        .market-slot { background: #F5F5F5; border: 1px solid #E0E0E0; border-radius: 12px; padding: 10px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+        .factory-queue { display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; padding-bottom: 5px; }
+        .factory-slot { min-width: 60px; height: 60px; background: #EEE; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; border: 2px dashed #CCC; position: relative;}
+        .factory-slot.active { background: #FFF3E0; border: 2px solid #FFC107; }
+
+        /* --- СТАРЫЕ СТИЛИ (Мини-игра Три-в-Ряд) --- */
+        .map-container { flex: 1; overflow-y: auto; position: relative; padding: 40px 0; display: flex; flex-direction: column-reverse; align-items: center; scroll-behavior: smooth; } .map-container::before { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: repeating-linear-gradient(to bottom, rgba(67,105,50,0.3) 0, rgba(67,105,50,0.3) 15px, transparent 15px, transparent 30px); transform: translateX(-50%); z-index: 0; } .level-node-wrap { position: relative; z-index: 1; width: 100%; display: flex; justify-content: center; margin: 20px 0; } .level-node-wrap:nth-child(even) { transform: translateX(40px); } .level-node-wrap:nth-child(odd) { transform: translateX(-40px); } .level-node-wrap.checkpoint { transform: translateX(0); margin: 30px 0; } .level-node { width: 60px; height: 60px; border-radius: 50%; border: 3px solid rgba(67,105,50,0.4); background: #FFF; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: all 0.2s; font-weight: 800; font-size: 20px; color: #263326; box-shadow: 0 4px 10px rgba(0,0,0,0.1); } .level-node.completed { background: #E8F5E9; border-color: #81C784; color: #2E7D32; } .level-node.current { border-color: var(--accent); background: #FFF3E0; color: var(--accent); transform: scale(1.15); box-shadow: 0 6px 16px rgba(229,142,38,0.3); } .level-node.locked { background: rgba(0,0,0,0.05); border-color: transparent; color: #9E9E9E; cursor: not-allowed; } .level-node-wrap.checkpoint .level-node { width: 76px; height: 76px; border-color: #FFC107; background: #FFF8E1; color: #FF8F00; box-shadow: 0 0 20px rgba(255,193,7,0.4); border-width: 4px; } .level-node-wrap.checkpoint .level-node.completed { background: #FFE082; } .level-node-wrap.checkpoint .level-node.locked { border-color: #E0E0E0; background: #F5F5F5; color: #BDBDBD; box-shadow: none; } .level-badge { position: absolute; top: -16px; right: -16px; background: #FFF; border-radius: 12px; padding: 2px 6px; font-size: 12px; font-weight: 700; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 2px; } .checkpoint-label { position: absolute; bottom: -20px; white-space: nowrap; font-size: 12px; font-weight: 800; color: #FF8F00; background: rgba(255,255,255,0.8); padding: 2px 8px; border-radius: 10px; }
+        .status-card { background: rgba(0,0,0,0.04); padding: 10px 14px; border-radius: 14px; margin-bottom: 12px; display: flex; justify-content: space-around; font-size: 15px; font-weight: 800; align-items: center; border: 1px solid rgba(0,0,0,0.05); } .board { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; background: rgba(67,105,50,0.15); padding: 8px; border-radius: 18px; aspect-ratio: 1; margin-bottom: 12px; touch-action: none; user-select: none; -webkit-user-select: none; position: relative; } .cell { background: var(--cell-bg); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; transition: 0.15s; aspect-ratio: 1; font-size: 32px; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.05); position: relative; overflow: visible; } .cell.selected { background: #d7ecd0; transform: scale(0.92); box-shadow: inset 0 0 0 3px var(--primary); } .cell-inner { width: 85%; height: 85%; position: absolute; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 5; } .item-img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.2)); user-select: none; -webkit-user-select: none; -webkit-user-drag: none; }
+        @keyframes popAnim { 0% { transform: scale(1); opacity: 1; } 40% { transform: scale(1.25); opacity: 0.9; } 100% { transform: scale(0); opacity: 0; } } .pop { animation: popAnim 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important; } @keyframes dropDown { 0% { transform: translateY(-150%); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } } .drop-anim { animation: dropDown 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; } @keyframes pulseError { 0%, 100% { transform: translateX(0) scale(1); } 25% { transform: translateX(-4px) scale(1.05); } 75% { transform: translateX(4px) scale(1.05); } } .error-anim { animation: pulseError 0.3s; } .booster-badge { animation: pulseError 1.5s infinite; } .message { font-size: 13px; color: #555; min-height: 18px; margin-bottom: 10px; font-weight: 600; text-align: center; }
+        .collection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 10px 0; flex: 1; overflow-y: auto; } .collection-card { background: #FFF; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 1px solid rgba(0,0,0,0.08); opacity: 0.45; filter: grayscale(100%); transition: all 0.3s; } .collection-card.unlocked { opacity: 1; filter: grayscale(0%); cursor: pointer; border-color: var(--primary); box-shadow: 0 6px 16px rgba(67,105,50,0.15); } .collection-icon { font-size: 40px; margin-bottom: 6px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; } .collection-title { font-weight: 800; font-size: 14px; margin-bottom: 4px; } .collection-status { font-size: 11px; font-weight: 700; color: #777; } .collection-card.unlocked .collection-status { color: #2E7D32; }
+        .blog-feed { flex: 1; overflow-y: auto; padding-bottom: 20px; display: flex; flex-direction: column; gap: 16px; } .post-card { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.04); text-align: left; } .post-header { display: flex; align-items: center; margin-bottom: 12px; } .post-avatar { width: 44px; height: 44px; border-radius: 50%; background: #E8F5E9; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-right: 12px; border: 1px solid #C8E6C9; overflow: hidden; } .post-author { font-weight: 800; font-size: 15px; color: #1a1a1a; margin-bottom: 2px; } .post-date { font-size: 12px; color: #888; font-weight: 500; } .post-text { font-size: 14px; line-height: 1.45; color: #333; margin-bottom: 14px; }
+        .booster-grid { display: flex; justify-content: center; gap: 12px; margin: 16px 0; } .booster-card { background: rgba(0,0,0,0.04); border: 2px solid rgba(0,0,0,0.1); border-radius: 14px; padding: 12px 8px; cursor: pointer; transition: 0.2s; position: relative; width: 75px; display: flex; flex-direction: column; align-items: center; } .booster-card.selected { background: #FFF8E1; border-color: #FFC107; box-shadow: 0 4px 12px rgba(255,193,7,0.3); transform: translateY(-3px); } .booster-icon { font-size: 28px; margin-bottom: 6px; } .booster-price { font-size: 12px; font-weight: 800; color: #F57F17; } .booster-check { position: absolute; top: -8px; right: -8px; background: #4CAF50; color: white; border-radius: 50%; width: 22px; height: 22px; font-size: 13px; display: none; align-items: center; justify-content: center; font-weight: bold; border: 2px solid #FFF;} .booster-card.selected .booster-check { display: flex; } .target-wrap { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 26px; font-weight: 900; background: rgba(67,105,50,0.1); border-radius: 16px; padding: 12px; margin-bottom: 20px; } .target-img-wrap { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
@@ -155,47 +96,34 @@
     <div id="screen-farm" class="screen screen-padded" style="padding-bottom: 0;">
         <div class="nav-header">
             <button class="nav-back-btn" onclick="showScreen('screen-menu')">← Меню</button>
-            <div class="storage-badge" onclick="openBarn()">📦 <span id="storage-count">0/50</span></div>
+            <div class="header-badges">
+                <div class="badge-ui" onclick="openBarnHeader()">📦 <span id="storage-count">0/50</span></div>
+                <div class="badge-ui" style="background:#FFF8E1; border-color:#FFC107; color:#F57F17;" onclick="openMarketHeader()">🏪 РЫНОК</div>
+            </div>
             <div class="coin-balance" style="padding: 4px 10px; font-size: 13px;">🪙 <span class="coin-val">0</span></div>
         </div>
         
         <div id="placement-banner" style="display:none; position:absolute; top:80px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.85); color:white; padding:12px 24px; border-radius:24px; z-index:300; font-weight:800; white-space:nowrap; align-items:center; gap:12px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);">
-            Осталось саженцев: <span id="place-qty">0</span> 🌱
+            Осталось: <span id="place-qty">0</span> 📌
             <button onclick="cancelPlacement()" style="background:#E53935; border:none; color:white; border-radius:50%; width:28px; height:28px; font-weight:bold; cursor:pointer;">✖</button>
         </div>
 
         <div id="farm-viewport" class="farm-viewport">
             <div id="farm-world" class="farm-world">
+                <div class="cloud-layer" style="top: 150px; animation-duration: 80s;"><img src="img/cloud1.png" style="width: 300px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span style="display:none; font-size: 80px;">☁️</span></div>
+                <div class="cloud-layer" style="top: 800px; animation-duration: 110s; animation-delay: -30s;"><img src="img/cloud2.png" style="width: 400px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span style="display:none; font-size: 120px;">☁️</span></div>
                 
-                <div class="cloud-layer" style="top: 150px; animation-duration: 80s;">
-                    <img src="img/cloud1.png" style="width: 300px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                    <span style="display:none; font-size: 80px; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));">☁️</span>
-                </div>
-                <div class="cloud-layer" style="top: 800px; animation-duration: 110s; animation-delay: -30s;">
-                    <img src="img/cloud2.png" style="width: 400px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                    <span style="display:none; font-size: 120px; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));">☁️</span>
-                </div>
-                
+                <!-- Рендер сетки и зданий -->
                 <div id="farm-items-container" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events: none;"></div>
-
-                <div class="main-barn">
-                    <div class="storage-bar-wrap">
-                        <div class="storage-bar-fill" id="barn-storage-fill"></div>
-                        <div class="storage-bar-text" id="barn-storage-text">0/50</div>
-                    </div>
-                    <div class="barn-shadow"></div>
-                    <img src="img/barn.png" class="barn-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                    <span style="display:none; font-size: 120px; z-index: 2;">🏠</span>
-                </div>
             </div>
             
-            <button class="btn btn-accent farm-build-btn" onclick="openBuildMenu()">🛒 МАГАЗИН</button>
+            <button class="btn btn-accent farm-build-btn" onclick="openBuildMenu()">🛒 МАГАЗИН И СТРОЙКА</button>
         </div>
 
         <div class="drawer-overlay" id="drawer-overlay" onclick="closeBuildMenu()"></div>
         <div class="build-drawer" id="build-drawer">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <div style="font-size: 18px; font-weight: 900; color: #263326;">Магазин фермера</div>
+                <div style="font-size: 18px; font-weight: 900; color: #263326;">Магазин</div>
                 <button style="background: rgba(0,0,0,0.05); border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 14px; font-weight: 800; cursor: pointer; color: #555;" onclick="closeBuildMenu()">✖</button>
             </div>
             <div id="drawer-items"></div>
@@ -270,9 +198,7 @@
 <script>
     try { if (typeof vkBridge !== 'undefined') vkBridge.send('VKWebAppInit'); } catch (e) {}
 
-    const MOCK_VK_POSTS = [ 
-        { text: "🛰️ <b>Точное земледелие:</b> Сегодня тракторы ездят сами благодаря GPS и ГЛОНАСС! Они не перекрывают ряды при посеве, экономят топливо и берегут почву от лишнего уплотнения.", date: "Сегодня" }
-    ];
+    const MOCK_VK_POSTS = [ { text: "🛰️ <b>Точное земледелие:</b> Тракторы экономят топливо благодаря GPS.", date: "Сегодня" } ];
     const QUIZ_LEVEL_FAIL = [ { q: "Как называется профессия человека, выращивающего урожай?", a: ["Агроном", "Ветеринар", "Зоотехник"], correct: 0 } ];
 
     const SIZE = 6;
@@ -285,113 +211,203 @@
     let maxUnlockedLevel = localStorage.getItem('kz_max_level') ? parseInt(localStorage.getItem('kz_max_level')) : 1;
     let selectedLevelIndex = maxUnlockedLevel - 1; 
     let unlockedItems = localStorage.getItem('kz_unlocked') ? JSON.parse(localStorage.getItem('kz_unlocked')) : [];
-    let coins = localStorage.getItem('kz_coins') ? parseInt(localStorage.getItem('kz_coins')) : 100;
-    let storage = JSON.parse(localStorage.getItem('kz_storage')) || { cherry: 0, capacity: 50 };
+    let coins = localStorage.getItem('kz_coins') ? parseInt(localStorage.getItem('kz_coins')) : 500; // Для тестов
     
-    // --- ГРЯДКИ И ПОСАДКИ (СЕТКА) ---
-    let soilBeds = JSON.parse(localStorage.getItem('kz_soil_beds'));
-    if (!soilBeds) {
-        // Стартовые грядки рядом с амбаром
-        soilBeds = [
-            {c: 8, r: 12, item: null}, {c: 9, r: 12, item: null}, {c: 10, r: 12, item: null},
-            {c: 8, r: 13, item: null}, {c: 9, r: 13, item: null}, {c: 10, r: 13, item: null}
-        ];
-        localStorage.setItem('kz_soil_beds', JSON.stringify(soilBeds));
-    }
+    let storage = JSON.parse(localStorage.getItem('kz_storage')) || { cherry: 0, jam: 0 };
+    let soilBeds = JSON.parse(localStorage.getItem('kz_soil_beds')) || [];
+    
+    // --- СИСТЕМА ЗДАНИЙ (Амбары, Заводы, Рынок) ---
+    let buildings = JSON.parse(localStorage.getItem('kz_buildings')) || [
+        { id: 'start_barn', type: 'barn', c: 11, r: 11, level: 1, queue: [] }
+    ];
+    
+    // --- РЫНОК (Слоты продаж) ---
+    let marketSlots = JSON.parse(localStorage.getItem('kz_market')) || [
+        { id: 1, item: null, qty: 0, price: 0, start: 0, duration: 0, status: 'empty' },
+        { id: 2, item: null, qty: 0, price: 0, start: 0, duration: 0, status: 'empty' },
+        { id: 3, item: null, qty: 0, price: 0, start: 0, duration: 0, status: 'empty' }
+    ];
 
     let board = [], selected = null, busy = false, finished = false;
     let moves = 0, collectedCount = 0, quizUsed = false;
     let selectedBoosters = { bomb: false, plane: false, moves: false };
     const BOOSTER_COSTS = { bomb: 30, plane: 30, moves: 40 };
 
+    function getCapacity() { return buildings.filter(b => b.type === 'barn').reduce((sum, b) => sum + (b.level * 50), 0); }
+
     function updateStorageUI() {
-        let total = storage.cherry || 0;
-        let percent = Math.min(100, (total / storage.capacity) * 100);
-        let elTop = document.getElementById('storage-count'); if (elTop) elTop.innerText = `${total}/${storage.capacity}`;
-        let elFill = document.getElementById('barn-storage-fill'); let elText = document.getElementById('barn-storage-text');
-        if (elFill) elFill.style.width = percent + "%"; if (elText) elText.innerText = `${total} / ${storage.capacity}`;
+        let total = (storage.cherry || 0) + (storage.jam || 0);
+        let cap = getCapacity();
+        let elTop = document.getElementById('storage-count'); if (elTop) elTop.innerText = `${total}/${cap}`;
     }
 
-    function openBarn() {
+    // КЛИК ПО АМБАРУ
+    function openBarn(bId) {
+        let b = bId ? buildings.find(x => x.id === bId) : buildings.find(x => x.type === 'barn');
+        if (!b) return;
+        let cap = b.level * 50;
+        let upCost = b.level * 100;
+        
         let content = `<div style="text-align:left;">`;
-        if ((storage.cherry || 0) > 0) {
-            content += `
-                <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px; background:#F5F5F5; padding:12px; border-radius:12px;">
-                    <div style="width:44px; height:44px;"><img src="img/cherry.png" style="width:100%; height:100%; object-fit:contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span style="display:none; font-size:30px;">🍒</span></div>
-                    <div style="flex:1;">
-                        <b style="color:#263326; font-size:16px;">Черешня</b><br>
-                        <span style="color:#666; font-size:12px; font-weight:700;">В наличии: ${storage.cherry}</span>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:6px;">
-                        <button class="btn btn-accent" style="padding:6px 10px; font-size:12px;" onclick="sellItem('cherry', 1)">Продать (1 🪙)</button>
-                        <button class="btn btn-secondary" style="padding:6px 10px; font-size:12px; border:1px solid #CCC;" onclick="processJam()">На завод</button>
-                    </div>
+        content += `<p style="font-size:13px; color:#555; text-align:center;">Вместимость этого амбара: ${cap} ед.</p>`;
+        
+        let empty = true;
+        ['cherry', 'jam'].forEach(item => {
+            if ((storage[item] || 0) > 0) {
+                empty = false;
+                let name = item === 'cherry' ? 'Черешня 🍒' : 'Варенье 🍯';
+                content += `<div style="padding:10px; border-bottom:1px solid #EEE; display:flex; justify-content:space-between; align-items:center;">
+                    <b>${name}</b><span style="font-weight:800; color:#436932;">${storage[item]} шт.</span>
                 </div>`;
-        } else { content += `<div style="color:#777; text-align:center; padding: 20px 0;">Амбар пуст. Посади деревья и собери урожай!</div>`; }
-        content += `</div>`; showModal("📦 Амбар", "", "Закрыть", closeModal); document.getElementById('modal-text').innerHTML = content;
+            }
+        });
+        
+        if (empty) content += `<div style="color:#777; padding: 20px 0; text-align:center;">Амбар пуст. Собери урожай!</div>`;
+        else content += `<p style="font-size:11px; color:#E58E26; text-align:center; margin-top:10px;">Продавать товары можно на Рынке 🏪</p>`;
+        
+        if (b.level < 5) content += `<button class="btn btn-secondary" style="margin-top:15px; width:100%; border:1px solid #CCC;" onclick="upgradeBuilding('${b.id}', ${upCost})">Улучшить до ур.${b.level+1} (${upCost} 🪙)</button>`;
+        else content += `<p style="color:#E58E26; font-weight:bold; margin-top:15px; text-align:center;">Максимальный 5 уровень!</p>`;
+        
+        content += `</div>`;
+        showModal(`📦 Амбар (Ур. ${b.level})`, "", "Закрыть", closeModal);
+        document.getElementById('modal-text').innerHTML = content;
     }
 
-    function sellItem(type, price) {
-        if (storage[type] > 0) { storage[type]--; addCoins(price); localStorage.setItem('kz_storage', JSON.stringify(storage)); updateStorageUI(); openBarn(); }
+    // КЛИК ПО ЗАВОДУ
+    function openFactoryInfo(bId) {
+        let b = buildings.find(x => x.id === bId); if (!b) return;
+        let upCost = b.level * 150; let now = Date.now();
+        
+        let readyItems = b.queue ? b.queue.filter(q => now >= q.start + q.duration) : [];
+        if (readyItems.length > 0) {
+            let total = (storage.cherry || 0) + (storage.jam || 0);
+            if (total + readyItems.length > getCapacity()) { showModal("Склад полон!", "Освободи место в амбаре.", "Ок", closeModal); return; }
+            storage.jam = (storage.jam || 0) + readyItems.length;
+            b.queue = b.queue.filter(q => now < q.start + q.duration);
+            localStorage.setItem('kz_buildings', JSON.stringify(buildings)); localStorage.setItem('kz_storage', JSON.stringify(storage));
+            updateStorageUI(); renderFarmItems(); return; 
+        }
+
+        let content = `<div style="text-align:left;"><p>Варим варенье! (6 Черешен 🍒 = 1 Варенье 🍯). Время: 7 минут.</p><div class="factory-queue">`;
+        if (!b.queue) b.queue = [];
+        for (let i = 0; i < b.level; i++) {
+            if (i < b.queue.length) {
+                let qItem = b.queue[i]; let left = Math.max(0, Math.ceil(((qItem.start + qItem.duration) - now)/1000));
+                content += `<div class="factory-slot active">⏳ ${Math.ceil(left/60)}м</div>`;
+            } else {
+                content += `<div class="factory-slot" style="cursor:pointer;" onclick="startProduction('${bId}')">➕</div>`;
+            }
+        }
+        content += `</div>`;
+        if (b.level < 5) content += `<button class="btn btn-secondary" style="margin-top:15px; border:1px solid #CCC; width:100%;" onclick="upgradeBuilding('${b.id}', ${upCost})">Улучшить (Слот +1) за ${upCost} 🪙</button>`;
+        else content += `<p style="color:#E58E26; font-weight:bold; margin-top:10px; text-align:center;">Максимальный 5 уровень!</p>`;
+        
+        showModal(`🏭 Завод варенья (Ур. ${b.level})`, "", "Закрыть", closeModal); document.getElementById('modal-text').innerHTML = content;
     }
-    function processJam() { showModal("Завод варенья 🏭", "Завод варенья пока не построен! Накопи ресурсы, он станет доступен в следующих обновлениях.", "Понятно", openBarn); }
+
+    function startProduction(bId) {
+        if ((storage.cherry || 0) < 6) { showModal("Нет сырья!", "Для одной банки варенья нужно 6 черешен.", "Понятно", () => openFactoryInfo(bId)); return; }
+        let b = buildings.find(x => x.id === bId);
+        storage.cherry -= 6;
+        b.queue.push({ item: 'jam', start: Date.now(), duration: 420000 }); // 7 минут = 420000мс
+        localStorage.setItem('kz_buildings', JSON.stringify(buildings)); localStorage.setItem('kz_storage', JSON.stringify(storage));
+        updateStorageUI(); openFactoryInfo(bId); renderFarmItems();
+    }
+
+    function upgradeBuilding(bId, cost) {
+        if (coins < cost) { alert("Мало монет!"); return; }
+        let b = buildings.find(x => x.id === bId); addCoins(-cost); b.level++;
+        localStorage.setItem('kz_buildings', JSON.stringify(buildings));
+        updateStorageUI(); closeModal(); renderFarmItems();
+    }
+
+    // --- ЛОГИКА РЫНКА ---
+    function openMarketHeader() {
+        if (!buildings.some(b => b.type === 'market')) showModal("Рынок закрыт", "Сначала построй Рынок (из Магазина), чтобы продавать товары!", "Понятно", closeModal);
+        else openMarket();
+    }
+    function openBarnHeader() {
+        let b = buildings.find(x => x.type === 'barn');
+        if (b) openBarn(b.id);
+    }
+
+    function openMarket() {
+        let content = `<div style="text-align:left;"><p style="font-size:13px; color:#555;">Выставляй товары, чтобы заработать монеты!</p>`;
+        let now = Date.now();
+        marketSlots.forEach((slot, idx) => {
+            if (slot.status === 'empty') {
+                content += `<div class="market-slot"><span style="color:#999;">Слот свободен</span><button class="btn btn-accent" style="padding:6px; font-size:12px; width:80px;" onclick="marketSelect(${idx})">Продать</button></div>`;
+            } else if (slot.status === 'selling') {
+                if (now >= slot.start + slot.duration) {
+                    slot.status = 'ready'; localStorage.setItem('kz_market', JSON.stringify(marketSlots));
+                    content += `<div class="market-slot" style="background:#E8F5E9; border-color:#4CAF50;"><b>Продано! (+${slot.price} 🪙)</b><button class="btn btn-secondary" style="padding:6px; font-size:12px; width:80px; background:#4CAF50; color:white;" onclick="marketCollect(${idx})">Забрать</button></div>`;
+                } else {
+                    let left = Math.ceil(((slot.start + slot.duration) - now)/1000);
+                    let name = slot.item === 'cherry' ? '🍒' : '🍯';
+                    content += `<div class="market-slot"><span>Продажа ${name} x${slot.qty}...</span><span style="color:#E58E26; font-weight:bold;">⏳ ${left}с</span></div>`;
+                }
+            } else if (slot.status === 'ready') {
+                content += `<div class="market-slot" style="background:#E8F5E9; border-color:#4CAF50;"><b>Продано! (+${slot.price} 🪙)</b><button class="btn btn-secondary" style="padding:6px; font-size:12px; width:80px; background:#4CAF50; color:white;" onclick="marketCollect(${idx})">Забрать</button></div>`;
+            }
+        });
+        content += `</div>`; showModal("🏪 РЫНОК", "", "Закрыть", closeModal); document.getElementById('modal-text').innerHTML = content;
+    }
+
+    function marketSelect(slotIdx) {
+        let content = `<div style="text-align:left;">Что выставить на продажу?</div>`;
+        if ((storage.cherry || 0) >= 6) { content += `<button class="btn btn-secondary" style="margin-top:10px; width:100%; border:1px solid #CCC;" onclick="marketStart(${slotIdx}, 'cherry')">Черешня x6 (30 сек) ➡️ <b>2 🪙</b></button>`; } 
+        else { content += `<div style="color:#777; margin-top:10px; font-size:12px; text-align:center;">Нужно минимум 6 Черешен для продажи.</div>`; }
+        
+        if ((storage.jam || 0) >= 1) { content += `<button class="btn btn-secondary" style="margin-top:10px; width:100%; border:1px solid #CCC; background:#FFF8E1;" onclick="marketStart(${slotIdx}, 'jam')">Варенье x1 (1 мин) ➡️ <b style="color:#E58E26;">3 🪙</b></button>`; }
+        
+        showModal("Выбор товара", "", "Назад", openMarket); document.getElementById('modal-text').innerHTML = content;
+    }
+
+    function marketStart(slotIdx, type) {
+        let cost = type === 'cherry' ? 6 : 1;
+        if ((storage[type] || 0) >= cost) {
+            storage[type] -= cost; localStorage.setItem('kz_storage', JSON.stringify(storage));
+            let slot = marketSlots[slotIdx]; slot.status = 'selling'; slot.item = type; slot.qty = cost; slot.start = Date.now();
+            if (type === 'cherry') { slot.price = 2; slot.duration = 30000; }
+            if (type === 'jam') { slot.price = 3; slot.duration = 60000; }
+            localStorage.setItem('kz_market', JSON.stringify(marketSlots)); updateStorageUI(); openMarket();
+        }
+    }
+
+    function marketCollect(slotIdx) { let slot = marketSlots[slotIdx]; addCoins(slot.price); slot.status = 'empty'; slot.item = null; localStorage.setItem('kz_market', JSON.stringify(marketSlots)); openMarket(); }
 
     // --- УМНАЯ КАМЕРА ---
-    const fViewport = document.getElementById('farm-viewport');
-    const fWorld = document.getElementById('farm-world');
-    let fScale = 1;
-    let fPanX = window.innerWidth < 400 ? -800 : -850; 
-    let fPanY = -750;
-    let fIsDragging = false, fStartX, fStartY, fStartPanX, fStartPanY;
-    let fInitialPinchDist = 0, fInitialScale = 1;
-    let fReqAnim = null;
-    let harvestedThisSwipe = false; 
+    const fViewport = document.getElementById('farm-viewport'); const fWorld = document.getElementById('farm-world');
+    let fScale = 1; let fPanX = window.innerWidth < 400 ? -800 : -850; let fPanY = -750;
+    let fIsDragging = false, fStartX, fStartY, fStartPanX, fStartPanY; let fInitialPinchDist = 0, fInitialScale = 1; let fReqAnim = null; let harvestedThisSwipe = false; 
 
     if (fViewport) {
         fViewport.addEventListener('touchstart', e => {
             harvestedThisSwipe = false;
-            if (e.touches.length === 1) {
-                fIsDragging = true; fStartX = e.touches[0].clientX; fStartY = e.touches[0].clientY; fStartPanX = fPanX; fStartPanY = fPanY;
-            } else if (e.touches.length === 2) {
-                fIsDragging = false; fInitialPinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-                fInitialScale = fScale; fStartPanX = fPanX; fStartPanY = fPanY;
-            }
+            if (e.touches.length === 1) { fIsDragging = true; fStartX = e.touches[0].clientX; fStartY = e.touches[0].clientY; fStartPanX = fPanX; fStartPanY = fPanY; } 
+            else if (e.touches.length === 2) { fIsDragging = false; fInitialPinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); fInitialScale = fScale; fStartPanX = fPanX; fStartPanY = fPanY; }
         }, {passive: false});
 
         fViewport.addEventListener('touchmove', e => {
             e.preventDefault();
             if (e.touches.length === 1 && fIsDragging) {
-                let touch = e.touches[0];
-                let rect = fViewport.getBoundingClientRect();
-                let worldX = ((touch.clientX - rect.left) - fPanX) / fScale;
-                let worldY = ((touch.clientY - rect.top) - fPanY) / fScale;
+                let touch = e.touches[0]; let rect = fViewport.getBoundingClientRect();
+                let worldX = ((touch.clientX - rect.left) - fPanX) / fScale; let worldY = ((touch.clientY - rect.top) - fPanY) / fScale;
                 let c = Math.floor(worldX / 80); let r = Math.floor(worldY / 80);
                 
                 let bed = soilBeds.find(b => b.c === c && b.r === r);
-
-                // Если в режиме стройки — сажаем!
-                if (buildModeItem && buildModeItem.count > 0 && bed && !bed.item) {
+                if (buildModeItem && buildModeItem.type === 'cherry' && buildModeItem.count > 0 && bed && !bed.item) {
                     bed.item = { type: buildModeItem.type, plantedAt: Date.now(), harvestsLeft: Math.floor(Math.random()*2)+5, state: 'growing' };
-                    buildModeItem.count--;
-                    document.getElementById('place-qty').innerText = buildModeItem.count;
-                    localStorage.setItem('kz_soil_beds', JSON.stringify(soilBeds));
-                    renderFarmItems();
-                    
+                    buildModeItem.count--; document.getElementById('place-qty').innerText = buildModeItem.count;
+                    localStorage.setItem('kz_soil_beds', JSON.stringify(soilBeds)); renderFarmItems();
                     let flash = document.createElement('div'); flash.style.position = 'absolute'; flash.style.left = (c*80)+'px'; flash.style.top = (r*80)+'px'; flash.style.width = '80px'; flash.style.height = '80px'; flash.style.background = 'rgba(255,255,255,0.6)'; flash.style.borderRadius = '50%'; flash.style.pointerEvents = 'none'; flash.style.animation = 'popAnim 0.3s forwards'; document.getElementById('farm-items-container').appendChild(flash); setTimeout(() => flash.remove(), 300);
-                    
-                    if (buildModeItem.count <= 0) cancelPlacement();
-                    harvestedThisSwipe = true; // Блокируем скролл
+                    if (buildModeItem.count <= 0) cancelPlacement(); harvestedThisSwipe = true; 
                 }
-                // Иначе проверяем урожай
                 else if (bed && bed.item && bed.item.state !== 'dry' && !buildModeItem) {
-                    let age = Date.now() - bed.item.plantedAt;
-                    if (age >= 120000) { harvestItem(bed, touch.clientX, touch.clientY); harvestedThisSwipe = true; }
+                    if (Date.now() - bed.item.plantedAt >= 120000) { harvestItem(bed, touch.clientX, touch.clientY); harvestedThisSwipe = true; }
                 }
 
-                if (!harvestedThisSwipe) {
-                    fPanX = fStartPanX + (touch.clientX - fStartX); fPanY = fStartPanY + (touch.clientY - fStartY);
-                    requestCameraUpdate();
-                }
+                if (!harvestedThisSwipe) { fPanX = fStartPanX + (touch.clientX - fStartX); fPanY = fStartPanY + (touch.clientY - fStartY); requestCameraUpdate(); }
             } else if (e.touches.length === 2) {
                 let dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
                 let newScale = Math.min(Math.max(0.4, fInitialScale * (dist / fInitialPinchDist)), 2.0);
@@ -414,59 +430,78 @@
     }
 
     function requestCameraUpdate() { if (!fReqAnim) { fReqAnim = requestAnimationFrame(() => { updateCamera(); fReqAnim = null; }); } }
-    function updateCamera() {
-        let minPanX = -(2000 * fScale - fViewport.clientWidth); let minPanY = -(2000 * fScale - fViewport.clientHeight);
-        fPanX = Math.min(0, Math.max(minPanX, fPanX)); fPanY = Math.min(0, Math.max(minPanY, fPanY));
-        if (fWorld) fWorld.style.transform = `translate(${fPanX}px, ${fPanY}px) scale(${fScale})`;
-    }
+    function updateCamera() { let minPanX = -(2000 * fScale - fViewport.clientWidth); let minPanY = -(2000 * fScale - fViewport.clientHeight); fPanX = Math.min(0, Math.max(minPanX, fPanX)); fPanY = Math.min(0, Math.max(minPanY, fPanY)); if (fWorld) fWorld.style.transform = `translate(${fPanX}px, ${fPanY}px) scale(${fScale})`; }
     setTimeout(updateCamera, 100);
 
-    // --- УМНЫЙ МАГАЗИН И СТРОЙКА ---
-    let buildModeItem = null;
-    let shopQty = 1;
-
-    function changeShopQty(delta) {
-        shopQty += delta;
-        if (shopQty < 1) shopQty = 1;
-        if (shopQty > 10) shopQty = 10; // Максимум 10 за раз
-        let qtyEl = document.getElementById('shop-qty');
-        let priceEl = document.getElementById('shop-price');
-        if (qtyEl) qtyEl.innerText = shopQty;
-        if (priceEl) priceEl.innerText = shopQty * 10;
-    }
+    // --- МАГАЗИН ---
+    let buildModeItem = null; let shopQty = 1;
+    function changeShopQty(delta) { shopQty += delta; if (shopQty < 1) shopQty = 1; if (shopQty > 10) shopQty = 10; document.getElementById('shop-qty').innerText = shopQty; }
 
     function renderFarmDrawer() {
         shopQty = 1;
         let drawerHtml = `
             <div class="drawer-item" style="flex-direction:column; align-items:stretch;">
                 <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-                    <div class="drawer-item-icon" style="background:#FFF3E0;">
-                        <img src="img/cherry.png" style="width:80%; height:80%; object-fit:contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span style="display:none; font-size:24px;">🍒</span>
-                    </div>
+                    <div class="drawer-item-icon" style="background:#FFF3E0;"><span style="font-size:20px;">🟫</span></div>
                     <div class="drawer-item-info">
-                        <div class="drawer-item-title">Саженец черешни</div>
-                        <div style="font-size:11px; color:#666;">Растет 2 мин</div>
+                        <div class="drawer-item-title">Грядка (1х1)</div><div style="font-size:11px; color:#666;">Земля для посадки</div>
                     </div>
                 </div>
-                
                 <div style="display:flex; justify-content:space-between; align-items:center; background:#FFF; border:1px solid #CCC; border-radius:12px; padding:6px;">
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <button class="qty-btn" onclick="changeShopQty(-1)">-</button>
-                        <span class="qty-val" id="shop-qty">1</span>
-                        <button class="qty-btn" onclick="changeShopQty(1)">+</button>
-                    </div>
-                    <button class="btn btn-accent" style="padding:8px 12px; font-size:13px; width:auto; border-radius: 8px;" onclick="startPlacement('cherry')">Купить <span id="shop-price">10</span> 🪙</button>
+                    <div style="display:flex; align-items:center; gap:8px;"><button class="qty-btn" onclick="changeShopQty(-1)">-</button><span class="qty-val" id="shop-qty">1</span><button class="qty-btn" onclick="changeShopQty(1)">+</button></div>
+                    <button class="btn btn-accent" style="padding:8px 12px; font-size:13px; width:auto; border-radius: 8px;" onclick="startPlacement('soil', 5)">Купить (5 🪙/шт)</button>
                 </div>
+            </div>
+
+            <div class="drawer-item" style="flex-direction:column; align-items:stretch;">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                    <div class="drawer-item-icon" style="background:#FFF3E0;"><img src="img/cherry.png" style="width:80%; height:80%; object-fit:contain;" onerror="this.style.display='none';"><span style="display:none; font-size:20px;">🍒</span></div>
+                    <div class="drawer-item-info">
+                        <div class="drawer-item-title">Саженец черешни</div><div style="font-size:11px; color:#666;">Сажать на грядку</div>
+                    </div>
+                </div>
+                <button class="btn btn-accent" style="padding:8px 12px; font-size:13px; border-radius: 8px;" onclick="startPlacement('cherry', 10)">Купить саженцы (10 🪙/шт)</button>
+            </div>
+
+            <div class="drawer-item" style="flex-direction:column; align-items:stretch;">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                    <div class="drawer-item-icon" style="background:#FFF3E0;"><img src="img/barn.png" style="width:80%; height:80%; object-fit:contain;" onerror="this.style.display='none';"><span style="display:none; font-size:20px;">🏠</span></div>
+                    <div class="drawer-item-info">
+                        <div class="drawer-item-title">Новый Амбар (2х2)</div><div style="font-size:11px; color:#666;">+50 к вместимости</div>
+                    </div>
+                </div>
+                <button class="btn btn-accent" style="padding:8px 12px; font-size:13px; border-radius: 8px;" onclick="startPlacement('barn', 150)">Купить (150 🪙)</button>
+            </div>
+
+            <div class="drawer-item" style="flex-direction:column; align-items:stretch;">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                    <div class="drawer-item-icon" style="background:#FFF3E0;"><span style="font-size:20px;">🏭</span></div>
+                    <div class="drawer-item-info">
+                        <div class="drawer-item-title">Завод варенья (2х2)</div><div style="font-size:11px; color:#666;">Делает варенье из черешни</div>
+                    </div>
+                </div>
+                <button class="btn btn-accent" style="padding:8px 12px; font-size:13px; border-radius: 8px;" onclick="startPlacement('factory', 300)">Купить (300 🪙)</button>
+            </div>
+            
+            <div class="drawer-item" style="flex-direction:column; align-items:stretch;">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                    <div class="drawer-item-icon" style="background:#FFF3E0;"><span style="font-size:20px;">🏪</span></div>
+                    <div class="drawer-item-info">
+                        <div class="drawer-item-title">Рынок (2х2)</div><div style="font-size:11px; color:#666;">Продажа товаров за монетки</div>
+                    </div>
+                </div>
+                <button class="btn btn-accent" style="padding:8px 12px; font-size:13px; border-radius: 8px;" onclick="startPlacement('market', 200)">Купить (200 🪙)</button>
             </div>
         `;
         document.getElementById('drawer-items').innerHTML = drawerHtml;
     }
 
-    function startPlacement(type) {
-        let totalCost = shopQty * 10;
-        if (coins < totalCost) { showModal("Мало монет 🪙", "Заработай монеты в уровнях Три-в-Ряд!", "Понятно", closeModal); return; }
+    function startPlacement(type, basePrice) {
+        let count = (type === 'soil' || type === 'cherry') ? shopQty : 1;
+        let totalCost = count * basePrice;
+        if (coins < totalCost) { showModal("Мало монет 🪙", "Заработай монеты!", "Понятно", closeModal); return; }
         addCoins(-totalCost);
-        buildModeItem = { type: type, count: shopQty }; 
+        buildModeItem = { type: type, count: count, pricePerUnit: basePrice }; 
         closeBuildMenu();
         document.getElementById('place-qty').innerText = buildModeItem.count;
         document.getElementById('placement-banner').style.display = 'flex';
@@ -474,10 +509,19 @@
     }
     
     function cancelPlacement() { 
-        if (buildModeItem && buildModeItem.count > 0) { addCoins(buildModeItem.count * 10); } // Возврат денег
-        buildModeItem = null; 
-        document.getElementById('placement-banner').style.display = 'none'; 
-        document.getElementById('farm-world').classList.remove('planting-mode');
+        if (buildModeItem && buildModeItem.count > 0) { addCoins(buildModeItem.count * buildModeItem.pricePerUnit); } 
+        buildModeItem = null; document.getElementById('placement-banner').style.display = 'none'; document.getElementById('farm-world').classList.remove('planting-mode');
+    }
+
+    function isSpaceFree(c, r, w, h) {
+        for(let i=0; i<w; i++){
+            for(let j=0; j<h; j++){
+                let cc = c+i, rr = r+j;
+                if(soilBeds.some(b => b.c===cc && b.r===rr)) return false;
+                if(buildings.some(b => cc >= b.c && cc < b.c+2 && rr >= b.r && rr < b.r+2)) return false;
+            }
+        }
+        return true;
     }
 
     function handleFarmTap(clientX, clientY) {
@@ -485,56 +529,90 @@
         let worldX = ((clientX - rect.left) - fPanX) / fScale; let worldY = ((clientY - rect.top) - fPanY) / fScale;
         let c = Math.floor(worldX / 80); let r = Math.floor(worldY / 80);
         
-        let bed = soilBeds.find(b => b.c === c && b.r === r);
-        if (bed && bed.item && bed.item.state === 'dry') {
-            showModal("Засохшее дерево 🍂", "Это дерево больше не даст урожай. Нанять лесоруба и выкорчевать его?", "Выкорчевать (2 🪙)", () => {
-                if (coins >= 2) { addCoins(-2); bed.item = null; localStorage.setItem('kz_soil_beds', JSON.stringify(soilBeds)); closeModal(); renderFarmItems(); } 
-                else { showModal("Мало монет", "Нужно 2 🪙 для оплаты работы лесоруба.", "Понятно", closeModal); }
-            }, "Оставить");
-            return; 
+        // Клик по зданию
+        let clickedBld = buildings.find(b => c >= b.c && c < b.c+2 && r >= b.r && r < b.r+2);
+        if (clickedBld && !buildModeItem) {
+            if (clickedBld.type === 'barn') openBarn(clickedBld.id);
+            if (clickedBld.type === 'factory') openFactoryInfo(clickedBld.id);
+            if (clickedBld.type === 'market') openMarket();
+            return;
         }
 
-        if (buildModeItem && bed && !bed.item) {
-            bed.item = { type: buildModeItem.type, plantedAt: Date.now(), harvestsLeft: Math.floor(Math.random()*2)+5, state: 'growing' };
-            buildModeItem.count--;
-            document.getElementById('place-qty').innerText = buildModeItem.count;
-            localStorage.setItem('kz_soil_beds', JSON.stringify(soilBeds));
-            renderFarmItems();
-            
-            let flash = document.createElement('div'); flash.style.position = 'absolute'; flash.style.left = (c*80)+'px'; flash.style.top = (r*80)+'px'; flash.style.width = '80px'; flash.style.height = '80px'; flash.style.background = 'rgba(255,255,255,0.6)'; flash.style.borderRadius = '50%'; flash.style.pointerEvents = 'none'; flash.style.animation = 'popAnim 0.3s forwards'; document.getElementById('farm-items-container').appendChild(flash); setTimeout(() => flash.remove(), 300);
-            
+        let bed = soilBeds.find(b => b.c === c && b.r === r);
+        if (bed && bed.item && bed.item.state === 'dry') {
+            showModal("Засохшее дерево 🍂", "Выкорчевать?", "Да (2 🪙)", () => {
+                if (coins >= 2) { addCoins(-2); bed.item = null; localStorage.setItem('kz_soil_beds', JSON.stringify(soilBeds)); closeModal(); renderFarmItems(); } 
+                else { showModal("Мало монет", "Нужно 2 🪙", "Понятно", closeModal); }
+            }, "Нет", closeModal); return; 
+        }
+
+        if (!buildModeItem) return;
+
+        if (buildModeItem.type === 'soil' && isSpaceFree(c, r, 1, 1)) {
+            soilBeds.push({c: c, r: r, item: null}); buildModeItem.count--; document.getElementById('place-qty').innerText = buildModeItem.count;
+            localStorage.setItem('kz_soil_beds', JSON.stringify(soilBeds)); renderFarmItems();
+            if (buildModeItem.count <= 0) cancelPlacement();
+        }
+        else if (buildModeItem.type === 'cherry' && bed && !bed.item) {
+            bed.item = { type: 'cherry', plantedAt: Date.now(), harvestsLeft: Math.floor(Math.random()*2)+5, state: 'growing' };
+            buildModeItem.count--; document.getElementById('place-qty').innerText = buildModeItem.count;
+            localStorage.setItem('kz_soil_beds', JSON.stringify(soilBeds)); renderFarmItems();
+            if (buildModeItem.count <= 0) cancelPlacement();
+        }
+        else if ((buildModeItem.type === 'barn' || buildModeItem.type === 'factory' || buildModeItem.type === 'market') && isSpaceFree(c, r, 2, 2)) {
+            buildings.push({ id: 'b_'+Date.now(), type: buildModeItem.type, c: c, r: r, level: 1, queue: [] });
+            buildModeItem.count--; document.getElementById('place-qty').innerText = buildModeItem.count;
+            localStorage.setItem('kz_buildings', JSON.stringify(buildings)); updateStorageUI(); renderFarmItems();
             if (buildModeItem.count <= 0) cancelPlacement();
         }
     }
 
-    // --- РЕНДЕР ГРЯДОК И ДЕРЕВЬЕВ ---
+    // --- РЕНДЕР: 3D ГРЯДКИ И ОГРОМНЫЕ ДЕРЕВЬЯ ---
     function renderFarmItems() {
         let container = document.getElementById('farm-items-container'); if (!container) return;
         container.innerHTML = ''; let now = Date.now();
         
+        // Сначала рисуем все грядки (единым полотном с перспективой)
         soilBeds.forEach(bed => {
-            // Рисуем грядку
             let soil = document.createElement('div');
-            soil.style.position = 'absolute'; soil.style.left = (bed.c * 80 + 4) + 'px'; soil.style.top = (bed.r * 80 + 4) + 'px'; soil.style.width = '72px'; soil.style.height = '72px'; 
-            soil.style.background = '#6D4C41'; soil.style.borderRadius = '12px'; soil.style.border = '3px solid #5D4037'; soil.style.pointerEvents = 'none';
+            soil.style.position = 'absolute'; soil.style.left = (bed.c * 80) + 'px'; soil.style.top = (bed.r * 80) + 'px'; soil.style.width = '80px'; soil.style.height = '80px'; 
+            soil.style.background = '#6D4C41'; soil.style.boxShadow = 'inset 0 0 5px rgba(0,0,0,0.3)'; soil.style.outline = '1px solid rgba(100,60,30,0.2)';
+            soil.style.transformOrigin = 'bottom center'; soil.style.transform = 'perspective(600px) rotateX(25deg)'; soil.style.pointerEvents = 'none';
+            soil.innerHTML = `<img src="img/soil.png" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none';">`;
             container.appendChild(soil);
+        });
 
+        // Затем Здания
+        buildings.forEach(b => {
+            let el = document.createElement('div');
+            el.style.position = 'absolute'; el.style.left = (b.c * 80) + 'px'; el.style.top = (b.r * 80) + 'px'; el.style.width = '160px'; el.style.height = '160px';
+            el.style.display = 'flex'; el.style.flexDirection = 'column'; el.style.alignItems = 'center'; el.style.justifyContent = 'flex-end'; el.style.zIndex = '50'; el.style.pointerEvents = 'none';
+            
+            if (b.type === 'barn') {
+                let total = (storage.cherry || 0) + (storage.jam || 0); let cap = b.level * 50; let percent = Math.min(100, (total / cap) * 100);
+                el.innerHTML = `<div class="storage-bar-wrap" style="position:absolute; top:-20px; left:20px;"><div class="storage-bar-fill" style="width:${percent}%"></div><div class="storage-bar-text">${total}/${cap}</div></div><div class="barn-shadow"></div><img src="img/barn.png" class="barn-img" onerror="this.style.display='none';"><span style="display:none; font-size:80px; z-index:2; filter:drop-shadow(0 15px 15px rgba(0,0,0,0.3));">🏠</span>`;
+            } else if (b.type === 'factory') {
+                let hasReady = b.queue && b.queue.some(q => now >= q.start + q.duration);
+                let readyBadge = hasReady ? `<div class="booster-badge" style="position:absolute; top:-20px; font-size:40px; z-index:100; filter:drop-shadow(0 4px 10px rgba(0,0,0,0.5));">🍯</div>` : '';
+                el.innerHTML = `${readyBadge}<div class="barn-shadow"></div><span style="font-size:90px; z-index:2; filter:drop-shadow(0 10px 10px rgba(0,0,0,0.3));">🏭</span>`;
+            } else if (b.type === 'market') {
+                el.innerHTML = `<div class="barn-shadow"></div><span style="font-size:90px; z-index:2; filter:drop-shadow(0 10px 10px rgba(0,0,0,0.3));">🏪</span>`;
+            }
+            container.appendChild(el);
+        });
+
+        // Затем Деревья (Поверх грядок, без перспективы)
+        soilBeds.forEach(bed => {
             if (bed.item) {
                 let el = document.createElement('div');
-                // Центруем огромное дерево относительно грядки
-                el.style.position = 'absolute'; el.style.left = (bed.c * 80 - 20) + 'px'; el.style.top = (bed.r * 80 - 40) + 'px'; el.style.width = '120px'; el.style.height = '120px'; el.style.display = 'flex'; el.style.alignItems = 'flex-end'; el.style.justifyContent = 'center'; el.style.pointerEvents = 'none';
-                
+                // Огромное дерево (160х160)
+                el.style.position = 'absolute'; el.style.left = (bed.c * 80 - 40) + 'px'; el.style.top = (bed.r * 80 - 80) + 'px'; el.style.width = '160px'; el.style.height = '160px'; el.style.display = 'flex'; el.style.alignItems = 'flex-end'; el.style.justifyContent = 'center'; el.style.pointerEvents = 'none'; el.style.zIndex = '60';
                 let age = now - bed.item.plantedAt;
                 if (bed.item.state === 'dry') {
                     el.innerHTML = `<img src="img/tree_dry.png" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 6px 6px rgba(0,0,0,0.4));" onerror="this.src='img/cherry.png'; this.style.filter='grayscale(100%) sepia(100%) hue-rotate(30deg) drop-shadow(0 6px 6px rgba(0,0,0,0.4))';">`;
                 } else if (age < 120000) { 
-                    // Проценты роста (0-100%)
                     let percent = Math.min(100, Math.floor((age / 120000) * 100));
-                    el.innerHTML = `
-                        <img src="img/sprout.png" style="width:40%; height:40%; object-fit:contain; margin-bottom:10px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                        <div style="display:none; font-size:30px; margin-bottom:10px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));">🌱</div>
-                        <div style="position:absolute; bottom:15px; background:rgba(0,0,0,0.7); border: 1px solid #FFF; color:white; font-size:11px; font-weight:800; border-radius:8px; padding:2px 6px;">${percent}%</div>
-                    `;
+                    el.innerHTML = `<img src="img/sprout.png" style="width:30%; height:30%; object-fit:contain; margin-bottom:10px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));" onerror="this.style.display='none';"><div style="position:absolute; bottom:15px; background:rgba(0,0,0,0.7); border: 1px solid #FFF; color:white; font-size:11px; font-weight:800; border-radius:8px; padding:2px 6px;">${percent}%</div>`;
                 } else { 
                     el.innerHTML = `<div class="sway" style="width:100%; height:100%;"><img src="img/tree_cherry.png" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 8px 8px rgba(0,0,0,0.4));" onerror="this.src='img/cherry.png';"></div>`;
                 }
@@ -543,37 +621,34 @@
         });
     }
 
-    // --- УМНЫЙ СВАЙП-СБОР (3-4 ЧЕРЕШНИ ЗА РАЗ) ---
     function harvestItem(bed, clientX, clientY) {
+        if ((storage.cherry||0) + (storage.jam||0) >= getCapacity()) { showModal("Склад полон!", "Расширьте амбар или продайте товар на Рынке.", "Ок", closeModal); return; }
         bed.item.harvestsLeft -= 1;
-        if (bed.item.harvestsLeft <= 0) { bed.item.state = 'dry'; } 
-        else { bed.item.plantedAt = Date.now(); bed.item.state = 'growing'; }
+        if (bed.item.harvestsLeft <= 0) { bed.item.state = 'dry'; } else { bed.item.plantedAt = Date.now(); bed.item.state = 'growing'; }
         localStorage.setItem('kz_soil_beds', JSON.stringify(soilBeds));
         
-        // Даем 3 или 4 черешни
         let yieldAmt = Math.floor(Math.random() * 2) + 3;
-        storage.cherry = (storage.cherry || 0) + yieldAmt;
-        localStorage.setItem('kz_storage', JSON.stringify(storage));
-        updateStorageUI();
+        storage.cherry = (storage.cherry || 0) + yieldAmt; localStorage.setItem('kz_storage', JSON.stringify(storage)); updateStorageUI();
         
-        // Летит несколько ягод
         for(let i=0; i<3; i++) {
             setTimeout(() => {
-                let flyEl = document.createElement('div');
-                flyEl.innerHTML = `<img src="img/cherry.png" style="width:100%; height:100%; object-fit:contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span style="display:none; font-size:30px;">🍒</span>`;
-                flyEl.style.position = 'fixed'; flyEl.style.left = (clientX + (Math.random()*40-20)) + 'px'; flyEl.style.top = (clientY + (Math.random()*40-20)) + 'px'; flyEl.style.width = '40px'; flyEl.style.height = '40px'; flyEl.style.zIndex = '9999'; flyEl.style.transition = 'all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)'; flyEl.style.pointerEvents = 'none'; flyEl.style.filter = 'drop-shadow(0 6px 6px rgba(0,0,0,0.4))';
-                document.body.appendChild(flyEl);
-                
+                let flyEl = document.createElement('div'); flyEl.innerHTML = `<img src="img/cherry.png" style="width:100%; height:100%; object-fit:contain;" onerror="this.style.display='none';"><span style="display:none; font-size:30px;">🍒</span>`;
+                flyEl.style.position = 'fixed'; flyEl.style.left = (clientX + (Math.random()*40-20)) + 'px'; flyEl.style.top = (clientY + (Math.random()*40-20)) + 'px'; flyEl.style.width = '40px'; flyEl.style.height = '40px'; flyEl.style.zIndex = '9999'; flyEl.style.transition = 'all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)'; flyEl.style.pointerEvents = 'none'; flyEl.style.filter = 'drop-shadow(0 6px 6px rgba(0,0,0,0.4))'; document.body.appendChild(flyEl);
                 setTimeout(() => { let target = document.getElementById('storage-count').getBoundingClientRect(); flyEl.style.left = (target.left) + 'px'; flyEl.style.top = (target.top) + 'px'; flyEl.style.transform = 'scale(0.3)'; flyEl.style.opacity = '0'; }, 50);
                 setTimeout(() => flyEl.remove(), 600);
             }, i * 100);
         }
-        
         let flash = document.createElement('div'); flash.style.position = 'fixed'; flash.style.left = (clientX-30) + 'px'; flash.style.top = (clientY-30) + 'px'; flash.style.width = '60px'; flash.style.height = '60px'; flash.style.background = '#FFF'; flash.style.borderRadius = '50%'; flash.style.zIndex = '9998'; flash.style.animation = 'popAnim 0.3s forwards'; flash.style.pointerEvents = 'none'; document.body.appendChild(flash); setTimeout(() => flash.remove(), 300);
         renderFarmItems();
     }
 
-    setInterval(() => { if (document.getElementById('screen-farm').classList.contains('active')) renderFarmItems(); }, 1000);
+    setInterval(() => { 
+        if (document.getElementById('screen-farm').classList.contains('active')) {
+            renderFarmItems();
+            let mOpen = document.getElementById('modal-title')?.innerText === "🏪 РЫНОК"; if(mOpen) openMarket();
+            let fOpen = document.getElementById('modal-title')?.innerText.includes("Завод варенья"); if(fOpen && buildings.find(b=>b.type==='factory')) openFactoryInfo(buildings.find(b=>b.type==='factory').id);
+        } 
+    }, 1000);
 
     // --- СТАНДАРТНЫЕ ФУНКЦИИ (Сокращены) ---
     function showPreLevel(idx) { selectedLevelIndex = idx; let lvl = LEVELS_DATA[idx]; document.getElementById("prelevel-title").innerText = `Уровень ${lvl.id}`; document.getElementById("prelevel-icon").innerHTML = `<div style="width:100%;height:100%;">${getImgTag(lvl.targetItem)}</div>`; document.getElementById("prelevel-count").innerText = `${lvl.targetCount} шт.`; document.getElementById("prelevel-moves").innerText = `⏳ ${lvl.moves}`; selectedBoosters = { bomb: false, plane: false, moves: false }; updateBoosterUI(); document.getElementById("prelevel-modal").style.display = "flex"; }
