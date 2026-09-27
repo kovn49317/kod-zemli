@@ -29,25 +29,26 @@
 
         .coin-balance { background: #FFF8E1; border: 2px solid #FFECB3; padding: 6px 12px; border-radius: 14px; font-weight: 800; color: #F57F17; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 15px; }
         
-        /* --- ФЕРМА: ОТКРЫТЫЙ МИР + СЕТКА + ТРАВА --- */
+        /* ФЕРМА И КАМЕРА */
         .farm-viewport { flex: 1; overflow: hidden; position: relative; border-radius: 20px; border: 4px solid rgba(255,255,255,0.5); box-shadow: inset 0 0 20px rgba(0,0,0,0.2); background: #7CB342; touch-action: none; user-select: none; -webkit-user-select: none; margin-bottom: 10px; }
-        
-        /* Сетка строительства 80x80 поверх твоей травы bg_farm.jpg */
-        .farm-world { position: absolute; top: 0; left: 0; width: 2000px; height: 2000px; background-color: #8BC34A; background-image: linear-gradient(rgba(255,255,255,0.15) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.15) 2px, transparent 2px), url('img/bg_farm.jpg'); background-size: 80px 80px, 80px 80px, 400px 400px; transform-origin: 0 0; will-change: transform; }
+        .farm-world { position: absolute; top: 0; left: 0; width: 2000px; height: 2000px; background-color: #8BC34A; background-image: linear-gradient(rgba(255,255,255,0.15) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.15) 2px, transparent 2px), url('img/bg_farm.jpg'); background-size: 80px 80px, 80px 80px, 400px 400px; transform-origin: 0 0; will-change: transform; transition: transform 0.05s linear; }
         
         .farm-build-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 85%; z-index: 200; box-shadow: 0 4px 15px rgba(0,0,0,0.3); padding: 14px; font-size: 16px; border-radius: 14px;}
         .storage-badge { background: #E8F5E9; border: 2px solid #81C784; color: #2E7D32; font-weight: 800; padding: 6px 12px; border-radius: 14px; font-size: 14px; display: flex; align-items: center; gap: 4px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
-        /* АМБАР (Заготовка под barn.png) */
+        /* --- ОБНОВЛЕННЫЙ АМБАР СО ШКАЛОЙ --- */
         .main-barn { position: absolute; left: 880px; top: 880px; width: 240px; height: 240px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; z-index: 50; }
         .barn-shadow { background: rgba(0,0,0,0.25); width: 180px; height: 50px; border-radius: 50%; position: absolute; bottom: 10px; z-index: 1; filter: blur(4px); }
         .barn-img { width: 100%; height: 100%; object-fit: contain; z-index: 2; position: relative; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.3)); }
+        
+        .storage-bar-wrap { position: absolute; top: 0px; width: 140px; height: 22px; background: rgba(0,0,0,0.6); border: 2px solid #FFF; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .storage-bar-fill { position: absolute; top: 0; left: 0; bottom: 0; width: 0%; background: linear-gradient(90deg, #81C784, #4CAF50); transition: width 0.4s ease-out; z-index: 1; }
+        .storage-bar-text { position: relative; z-index: 2; color: #FFF; font-size: 12px; font-weight: 800; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
 
-        /* --- ОБЛАКА (Анимация полета) --- */
+        /* ОБЛАКА */
         .cloud-layer { position: absolute; pointer-events: none; z-index: 150; opacity: 0.85; animation: floatCloud linear infinite; }
         @keyframes floatCloud { 0% { transform: translateX(-400px); } 100% { transform: translateX(2400px); } }
 
-        /* Старые стили ... */
         .map-container { flex: 1; overflow-y: auto; position: relative; padding: 40px 0; display: flex; flex-direction: column-reverse; align-items: center; scroll-behavior: smooth; }
         .map-container::before { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: repeating-linear-gradient(to bottom, rgba(67,105,50,0.3) 0, rgba(67,105,50,0.3) 15px, transparent 15px, transparent 30px); transform: translateX(-50%); z-index: 0; }
         .level-node-wrap { position: relative; z-index: 1; width: 100%; display: flex; justify-content: center; margin: 20px 0; }
@@ -152,7 +153,6 @@
         <div id="farm-viewport" class="farm-viewport">
             <div id="farm-world" class="farm-world">
                 
-                <!-- Облака (будут летать на фоне) -->
                 <div class="cloud-layer" style="top: 150px; animation-duration: 80s;">
                     <img src="img/cloud1.png" style="width: 300px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     <span style="display:none; font-size: 80px; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));">☁️</span>
@@ -166,8 +166,12 @@
                     <span style="display:none; font-size: 70px; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));">☁️</span>
                 </div>
 
-                <!-- Главный Амбар -->
+                <!-- Амбар со Шкалой -->
                 <div class="main-barn">
+                    <div class="storage-bar-wrap">
+                        <div class="storage-bar-fill" id="barn-storage-fill"></div>
+                        <div class="storage-bar-text" id="barn-storage-text">0/50</div>
+                    </div>
                     <div class="barn-shadow"></div>
                     <img src="img/barn.png" class="barn-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     <span style="display:none; font-size: 120px; z-index: 2;">🏠</span>
@@ -257,12 +261,6 @@
 <script>
     try { if (typeof vkBridge !== 'undefined') vkBridge.send('VKWebAppInit'); } catch (e) {}
 
-    const MOCK_VK_POSTS = [ 
-        { text: "🛰️ <b>Точное земледелие:</b> Сегодня тракторы ездят сами благодаря GPS и ГЛОНАСС! Они не перекрывают ряды при посеве, экономят топливо и берегут почву от лишнего уплотнения.", date: "Сегодня" }, 
-        { text: "💧 <b>Системы полива:</b> Почему капельный полив лучше распылителей? Он доставляет воду и удобрения прямо к корням растения, снижая расход воды на 50% и не давая расти сорнякам между рядами.", date: "Вчера" }
-    ];
-    const QUIZ_LEVEL_FAIL = [ { q: "Как называется профессия человека, выращивающего урожай?", a: ["Агроном", "Ветеринар", "Зоотехник"], correct: 0 } ];
-
     const SIZE = 6;
     const TYPES = ["plum", "cherry", "strawberry", "bread", "tractor"];
     const ICON = { plum: "🍑", cherry: "🍒", strawberry: "🍓", bread: "🍞", tractor: "🚜" };
@@ -277,6 +275,8 @@
     let selectedLevelIndex = maxUnlockedLevel - 1; 
     let unlockedItems = localStorage.getItem('kz_unlocked') ? JSON.parse(localStorage.getItem('kz_unlocked')) : [];
     let coins = localStorage.getItem('kz_coins') ? parseInt(localStorage.getItem('kz_coins')) : 0;
+    
+    // --- ХРАНИЛИЩЕ ---
     let storage = JSON.parse(localStorage.getItem('kz_storage')) || { wheat: 0, milk: 0, capacity: 50 };
 
     let board = [], selected = null, busy = false, finished = false;
@@ -286,18 +286,29 @@
 
     function updateStorageUI() {
         let total = storage.wheat + storage.milk;
-        let el = document.getElementById('storage-count');
-        if (el) el.innerText = `${total}/${storage.capacity}`;
+        let percent = Math.min(100, (total / storage.capacity) * 100);
+        
+        // Бейдж наверху
+        let elTop = document.getElementById('storage-count');
+        if (elTop) elTop.innerText = `${total}/${storage.capacity}`;
+        
+        // Шкала над амбаром
+        let elFill = document.getElementById('barn-storage-fill');
+        let elText = document.getElementById('barn-storage-text');
+        if (elFill) elFill.style.width = percent + "%";
+        if (elText) elText.innerText = `${total} / ${storage.capacity}`;
     }
 
-    // ЛОГИКА КАМЕРЫ (Скролл и Зум)
+    // --- УМНАЯ КАМЕРА (ФОКУСНЫЙ ЗУМ + АНИМАЦИЯ) ---
     const fViewport = document.getElementById('farm-viewport');
     const fWorld = document.getElementById('farm-world');
     let fScale = 1;
     let fPanX = window.innerWidth < 400 ? -800 : -850; 
     let fPanY = -750;
+    
     let fIsDragging = false, fStartX, fStartY, fStartPanX, fStartPanY;
     let fInitialPinchDist = 0, fInitialScale = 1;
+    let fReqAnim = null;
 
     if (fViewport) {
         fViewport.addEventListener('touchstart', e => {
@@ -309,25 +320,50 @@
                 fIsDragging = false;
                 fInitialPinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
                 fInitialScale = fScale;
+                fStartPanX = fPanX; fStartPanY = fPanY;
             }
         }, {passive: false});
 
         fViewport.addEventListener('touchmove', e => {
             e.preventDefault();
             if (e.touches.length === 1 && fIsDragging) {
-                let dx = e.touches[0].clientX - fStartX; let dy = e.touches[0].clientY - fStartY;
-                fPanX = fStartPanX + dx; fPanY = fStartPanY + dy;
-                updateCamera();
+                fPanX = fStartPanX + (e.touches[0].clientX - fStartX); 
+                fPanY = fStartPanY + (e.touches[0].clientY - fStartY);
+                requestCameraUpdate();
             } else if (e.touches.length === 2) {
                 let dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-                let zoomDelta = dist / fInitialPinchDist;
-                fScale = Math.min(Math.max(0.4, fInitialScale * zoomDelta), 2.0);
-                updateCamera();
+                let newScale = Math.min(Math.max(0.4, fInitialScale * (dist / fInitialPinchDist)), 2.0);
+                
+                // Вычисляем центр между пальцами для идеального фокусного зума
+                let focalX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                let focalY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                
+                let rect = fViewport.getBoundingClientRect();
+                let viewFocalX = focalX - rect.left;
+                let viewFocalY = focalY - rect.top;
+                
+                let relX = (viewFocalX - fStartPanX) / fInitialScale;
+                let relY = (viewFocalY - fStartPanY) / fInitialScale;
+                
+                fScale = newScale;
+                fPanX = viewFocalX - relX * fScale;
+                fPanY = viewFocalY - relY * fScale;
+                
+                requestCameraUpdate();
             }
         }, {passive: false});
 
         fViewport.addEventListener('touchend', e => { fIsDragging = false; });
         fViewport.addEventListener('touchcancel', e => { fIsDragging = false; });
+    }
+
+    function requestCameraUpdate() {
+        if (!fReqAnim) {
+            fReqAnim = requestAnimationFrame(() => {
+                updateCamera();
+                fReqAnim = null;
+            });
+        }
     }
 
     function updateCamera() {
@@ -363,6 +399,13 @@
 
     function addCoins(amount) { coins += amount; localStorage.setItem('kz_coins', coins); updateCoinsUI(); }
     function updateCoinsUI() { document.querySelectorAll('.coin-val').forEach(el => el.innerText = coins); }
+    function checkDailyBonus() {
+        let today = new Date().toDateString();
+        if (localStorage.getItem('kz_last_login') !== today) {
+            localStorage.setItem('kz_last_login', today);
+            setTimeout(() => { addCoins(150); showModal("Ежедневный бонус 🎁", "Держи монеты для старта фермы:\n\n+150 🪙", "Забрать", closeModal); }, 500);
+        }
+    }
 
     function showScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
