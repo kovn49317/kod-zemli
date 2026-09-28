@@ -1,6 +1,5 @@
 try { if (typeof vkBridge !== 'undefined') vkBridge.send('VKWebAppInit'); } catch (e) {}
 
-// === ОБНОВЛЕННЫЕ ССЫЛКИ НА ВИДЕО ===
 const VIDEO_LINKS = { 
 plum: "https://vk.ru/clip_ext.php?oid=-222114060&id=456240781&autoplay=1", 
 cherry: "https://vk.ru/clip_ext.php?oid=-222114060&id=456240702&autoplay=1", 
@@ -69,7 +68,6 @@ let empty = true;
     }
 });
 if (empty) content += `<div style="color:#777; padding: 20px 0; text-align:center;">Амбар пуст. Собери урожай!</div>`;
-else content += `<p style="font-size:11px; color:#E58E26; text-align:center; margin-top:10px;">Продавать товары можно на Рынке 🏪</p>`;
 if (b.level < 5) content += `<button class="btn btn-secondary" style="margin-top:15px; width:100%; border:1px solid #CCC;" onclick="upgradeBuilding('${b.id}', ${upCost})">Улучшить до ур.${b.level+1} (${upCost} 🪙)</button>`;
 else content += `<p style="color:#E58E26; font-weight:bold; margin-top:15px; text-align:center;">Максимальный 5 уровень!</p>`;
 content += `</div>`; showModal(`📦 Амбар (Ур. ${b.level})`, "", "Закрыть", closeModal); document.getElementById('modal-text').innerHTML = content;
@@ -208,7 +206,7 @@ function requestCameraUpdate() { if (!fReqAnim) { fReqAnim = requestAnimationFra
 function updateCamera() { let minPanX = -(2000 * fScale - fViewport.clientWidth); let minPanY = -(2000 * fScale - fViewport.clientHeight); fPanX = Math.min(0, Math.max(minPanX, fPanX)); fPanY = Math.min(0, Math.max(minPanY, fPanY)); if (fWorld) fWorld.style.transform = `translate(${fPanX}px, ${fPanY}px) scale(${fScale})`; }
 setTimeout(updateCamera, 100);
 
-// === МАГАЗИН И ПОСАДКА ===
+// === МАГАЗИН ===
 let buildModeItem = null; let shopQty = 1;
 function changeShopQty(delta) { shopQty += delta; if (shopQty < 1) shopQty = 1; if (shopQty > 10) shopQty = 10; document.getElementById('shop-qty').innerText = shopQty; }
 
@@ -433,8 +431,27 @@ function closeBuildMenu() { document.getElementById('build-drawer').classList.re
 function renderLevelsMap() { const container = document.getElementById('levels-container'); container.innerHTML = ''; LEVELS_DATA.forEach((lvl, idx) => { const wrap = document.createElement('div'); const isCheckpoint = lvl.isCheckpoint || lvl.id % 10 === 0; wrap.className = `level-node-wrap ${isCheckpoint ? 'checkpoint' : ''}`; const isLocked = lvl.id > maxUnlockedLevel, isCompleted = lvl.id < maxUnlockedLevel, isCurrent = lvl.id === maxUnlockedLevel; let iconContent = isLocked ? '🔒' : lvl.id; if (isCheckpoint && !isLocked) iconContent = '▶️'; wrap.innerHTML = `<div class="level-node ${isLocked ? 'locked' : ''} ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}"><div>${iconContent}</div>${!isLocked && !isCheckpoint ? `<div class="level-badge">${getImgTag(lvl.targetItem)}${lvl.targetCount}</div>` : ''}</div>`; if (!isLocked) wrap.onclick = () => showPreLevel(idx); container.appendChild(wrap); }); }
 function getImgTag(name, special = null) { if (!name) return ""; let fallback = ICON[name] || SPECIAL_ICON[name] || "❓"; let html = `<img src="img/${name}.png" class="item-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span class="fallback-icon" style="display:none; width: 100%; height: 100%; align-items:center; justify-content:center;">${fallback}</span>`; if (special) { let specIcon = SPECIAL_ICON[special] || "✨"; html += `<div class="booster-badge" style="position:absolute; right:-4px; bottom:-4px; background:#FFF; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:14px; box-shadow:0 2px 4px rgba(0,0,0,0.4); z-index:10; border:1px solid #E0E0E0;">${specIcon}</div>`; } return html; }
 
+// === ТРИ В РЯД (С ANTI-DEADLOCK) ===
 function initLevel() { let lvl = LEVELS_DATA[selectedLevelIndex]; document.getElementById("game-level-indicator").innerText = `Уровень ${lvl.id}`; moves = lvl.moves; if (selectedBoosters.moves) moves += 5; collectedCount = 0; finished = false; busy = false; selected = null; quizUsed = false; document.getElementById("board").innerHTML = ""; createBoard(); updateUI(); }
-function createBoard() { do { board = []; for (let r = 0; r < SIZE; r++) { let row = []; for (let c = 0; c < SIZE; c++) { let type; do { type = TYPES[Math.floor(Math.random() * TYPES.length)]; } while ((c >= 2 && row[c-1].type === type && row[c-2].type === type) || (r >= 2 && board[r-1][c].type === type && board[r-2][c].type === type) || (r >= 1 && c >= 1 && board[r-1][c-1].type === type && board[r-1][c].type === type && row[c-1].type === type)); row.push({ type: type, special: null, counted: false, isNew: false }); } board.push(row); } } while (findAllMatches().length > 0); if (selectedBoosters.bomb) board[Math.floor(Math.random() * SIZE)][Math.floor(Math.random() * SIZE)].special = "bomb"; if (selectedBoosters.plane) board[Math.floor(Math.random() * SIZE)][Math.floor(Math.random() * SIZE)].special = "plane"; }
+function createBoard() { 
+let attempts = 0;
+do { 
+    board = []; 
+    for (let r = 0; r < SIZE; r++) { 
+        let row = []; 
+        for (let c = 0; c < SIZE; c++) { 
+            let type; 
+            do { type = TYPES[Math.floor(Math.random() * TYPES.length)]; } while ((c >= 2 && row[c-1].type === type && row[c-2].type === type) || (r >= 2 && board[r-1][c].type === type && board[r-2][c].type === type) || (r >= 1 && c >= 1 && board[r-1][c-1].type === type && board[r-1][c].type === type && row[c-1].type === type)); 
+            row.push({ type: type, special: null, counted: false, isNew: false }); 
+        } 
+        board.push(row); 
+    } 
+    attempts++;
+    if (attempts > 50) break;
+} while (findAllMatches().length > 0 || !hasPossibleMoves()); 
+if (selectedBoosters.bomb) board[Math.floor(Math.random() * SIZE)][Math.floor(Math.random() * SIZE)].special = "bomb"; 
+if (selectedBoosters.plane) board[Math.floor(Math.random() * SIZE)][Math.floor(Math.random() * SIZE)].special = "plane"; 
+}
 function renderBoard() { const boardEl = document.getElementById("board"); if (boardEl.children.length === 0) { for (let r = 0; r < SIZE; r++) { for (let c = 0; c < SIZE; c++) { const cell = document.createElement("div"); cell.className = "cell"; cell.id = `cell-${r}-${c}`; cell.innerHTML = `<div class="cell-inner" id="inner-${r}-${c}"></div>`; cell.addEventListener('touchstart', (e) => { if (busy || finished) return; swipeStartX = e.touches[0].clientX; swipeStartY = e.touches[0].clientY; swipeR = r; swipeC = c; isSwiping = false; }, {passive: true}); cell.addEventListener('touchmove', (e) => { isSwiping = true; }, {passive: true}); cell.addEventListener('touchend', (e) => { if (busy || finished || swipeR === -1) return; let dx = e.changedTouches[0].clientX - swipeStartX; let dy = e.changedTouches[0].clientY - swipeStartY; if (Math.max(Math.abs(dx), Math.abs(dy)) > 20) { isSwiping = true; let tr = swipeR, tc = swipeC; if (Math.abs(dx) > Math.abs(dy)) { dx > 0 ? tc++ : tc--; } else { dy > 0 ? tr++ : tr--; } if (tr >= 0 && tr < SIZE && tc >= 0 && tc < SIZE) { selected = null; renderBoard(); animateSwapAndCheck(swipeR, swipeC, tr, tc); } } setTimeout(() => isSwiping = false, 100); swipeR = -1; swipeC = -1; }); cell.onclick = (e) => { if (isSwiping) return; handleCellClick(r, c); }; boardEl.appendChild(cell); } } } for (let r = 0; r < SIZE; r++) { for (let c = 0; c < SIZE; c++) { const cell = document.getElementById(`cell-${r}-${c}`); const inner = document.getElementById(`inner-${r}-${c}`); if (selected && selected.r === r && selected.c === c) cell.classList.add("selected"); else cell.classList.remove("selected"); const item = board[r][c]; if (item) { let content = getImgTag(item.type, item.special); if (inner.innerHTML !== content) { inner.innerHTML = content; } inner.className = `cell-inner ${item.isNew ? 'drop-anim' : ''}`; inner.style.transform = ''; } else { inner.innerHTML = ''; inner.className = 'cell-inner'; } } } }
 function updateUI() { let lvl = LEVELS_DATA[selectedLevelIndex]; document.getElementById("target-icon").innerHTML = `<div style="width: 100%; height: 100%;">${getImgTag(lvl.targetItem)}</div>`; document.getElementById("target-count").innerText = `${collectedCount}/${lvl.targetCount}`; document.getElementById("moves-label").innerText = `Ходы: ${moves}`; renderBoard(); }
 function setMessage(text) { document.getElementById("message").innerText = text; }
@@ -448,13 +465,76 @@ setTimeout(() => { let temp = board[r1][c1]; board[r1][c1] = board[r2][c2]; boar
 
 function explodeCells(coordsSet, safeCoordStr) { let newlyAdded = true; let processedSpecials = new Set(); while (newlyAdded) { newlyAdded = false; let currentCoords = Array.from(coordsSet); for (let coord of currentCoords) { if (coord === safeCoordStr) continue; if (processedSpecials.has(coord)) continue; let parts = coord.split(','); let r = parseInt(parts[0]), c = parseInt(parts[1]); let item = board[r][c]; if (item && item.special) { processedSpecials.add(coord); let beforeSize = coordsSet.size; activateSpecial(r, c, coordsSet); if (coordsSet.size > beforeSize) newlyAdded = true; } } } }
 function processMatches(r1, c1, r2, c2, matches) { let toDestroy = new Set(); let specialCoords = null; if (r1 !== null) { specialCoords = checkAndCreateSpecial(r1, c1, matches); if (!specialCoords) specialCoords = checkAndCreateSpecial(r2, c2, matches); } let safeCoordStr = specialCoords ? `${specialCoords.r},${specialCoords.c}` : null; matches.forEach(m => { let coordStr = `${m.r},${m.c}`; if (coordStr === safeCoordStr) return; toDestroy.add(coordStr); }); explodeCells(toDestroy, safeCoordStr); toDestroy.forEach(coord => { let parts = coord.split(','); let r = parseInt(parts[0]), c = parseInt(parts[1]); let inner = document.getElementById(`inner-${r}-${c}`); if (inner) inner.classList.add('pop'); }); setTimeout(() => { toDestroy.forEach(coord => { let parts = coord.split(','); let r = parseInt(parts[0]), c = parseInt(parts[1]); if (board[r][c]) { collectItem(board[r][c]); board[r][c] = null; } }); renderBoard(); setTimeout(() => dropAndFill(), 50); }, 300); }
-function dropAndFill() { for (let c = 0; c < SIZE; c++) { let remaining = []; for (let r = SIZE - 1; r >= 0; r--) { if (board[r][c] !== null) remaining.push(board[r][c]); } let writeRow = SIZE - 1; for (let i = 0; i < remaining.length; i++) { board[writeRow][c] = remaining[i]; writeRow--; } while (writeRow >= 0) { board[writeRow][c] = { type: TYPES[Math.floor(Math.random() * TYPES.length)], special: null, counted: false, isNew: true }; writeRow--; } } renderBoard(); setTimeout(() => { for (let r = 0; r < SIZE; r++) { for (let c = 0; c < SIZE; c++) { if (board[r][c]) board[r][c].isNew = false; } } let cascadeMatches = findAllMatches(); if (cascadeMatches.length > 0) { processMatches(null, null, null, null, cascadeMatches); } else { checkGameEnd(); busy = false; } }, 350); }
+
+function dropAndFill() { 
+for (let c = 0; c < SIZE; c++) { let remaining = []; for (let r = SIZE - 1; r >= 0; r--) { if (board[r][c] !== null) remaining.push(board[r][c]); } let writeRow = SIZE - 1; for (let i = 0; i < remaining.length; i++) { board[writeRow][c] = remaining[i]; writeRow--; } while (writeRow >= 0) { board[writeRow][c] = { type: TYPES[Math.floor(Math.random() * TYPES.length)], special: null, counted: false, isNew: true }; writeRow--; } } 
+renderBoard(); 
+setTimeout(() => { 
+    for (let r = 0; r < SIZE; r++) { for (let c = 0; c < SIZE; c++) { if (board[r][c]) board[r][c].isNew = false; } } 
+    let cascadeMatches = findAllMatches(); 
+    if (cascadeMatches.length > 0) { 
+        processMatches(null, null, null, null, cascadeMatches); 
+    } else { 
+        checkGameEnd(); 
+        if (!finished) {
+            if (!hasPossibleMoves()) {
+                shuffleBoard();
+            } else {
+                busy = false; 
+            }
+        }
+    } 
+}, 350); 
+}
+
 function getCluster(r, c, matches) { let type = board[r][c]?.type; if (!type) return []; let cluster = []; let queue = [{r,c}]; let visited = new Set(); visited.add(`${r},${c}`); while(queue.length > 0) { let curr = queue.shift(); cluster.push(curr); let adj = matches.filter(m => board[m.r][m.c]?.type === type && !visited.has(`${m.r},${m.c}`) && (Math.abs(m.r - curr.r) + Math.abs(m.c - curr.c) === 1)); adj.forEach(a => { visited.add(`${a.r},${a.c}`); queue.push(a); }); } return cluster; }
 function checkAndCreateSpecial(r, c, matches) { if (r === null || c === null || matches.length < 4) return null; let type = board[r][c]?.type; if (!type) return null; let inMatch = matches.some(m => m.r === r && m.c === c); if (!inMatch) return null; let cluster = getCluster(r, c, matches); if (cluster.length < 4) return null; let rowCount = cluster.filter(m => m.r === r).length; let colCount = cluster.filter(m => m.c === c).length; if (rowCount >= 5 || colCount >= 5 || (rowCount >= 3 && colCount >= 3)) { board[r][c] = { type: type, special: "bomb", counted: false }; return { r, c }; } let minR = Math.min(...cluster.map(m=>m.r)), maxR = Math.max(...cluster.map(m=>m.r)); let minC = Math.min(...cluster.map(m=>m.c)), maxC = Math.max(...cluster.map(m=>m.c)); if (maxR - minR === 1 && maxC - minC === 1 && cluster.length === 4) { board[r][c] = { type: type, special: "plane", counted: false }; return { r, c }; } if (rowCount >= 4) { board[r][c] = { type: type, special: "arrowV", counted: false }; return { r, c }; } if (colCount >= 4) { board[r][c] = { type: type, special: "arrowH", counted: false }; return { r, c }; } return null; }
 function activateSpecial(r, c, toDestroy) { let item = board[r][c]; if (!item || !item.special) return; let spec = item.special; if (spec === "arrowH") { for (let col = 0; col < SIZE; col++) if (board[r][col]) toDestroy.add(`${r},${col}`); } else if (spec === "arrowV") { for (let row = 0; row < SIZE; row++) if (board[row][c]) toDestroy.add(`${row},${c}`); } else if (spec === "bomb") { for (let dr = -2; dr <= 2; dr++) { for (let dc = -2; dc <= 2; dc++) { let nr = r + dr, nc = c + dc; if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE && board[nr][nc]) { toDestroy.add(`${nr},${nc}`); } } } } else if (spec === "plane") { for(let dr=-1; dr<=1; dr++) { for(let dc=-1; dc<=1; dc++) { if(r+dr>=0 && r+dr<SIZE && c+dc>=0 && c+dc<SIZE && board[r+dr][c+dc]) toDestroy.add(`${r+dr},${c+dc}`); } } let targets = []; let lvl = LEVELS_DATA[selectedLevelIndex]; for(let rr=0; rr<SIZE; rr++){ for(let cc=0; cc<SIZE; cc++){ if (board[rr][cc] && board[rr][cc].type === lvl.targetItem && !toDestroy.has(`${rr},${cc}`)) targets.push(`${rr},${cc}`); } } if (targets.length > 0) toDestroy.add(targets[Math.floor(Math.random()*targets.length)]); else { let tr = Math.floor(Math.random() * SIZE), tc = Math.floor(Math.random() * SIZE); if (board[tr][tc]) toDestroy.add(`${tr},${tc}`); } } }
 function findAllMatches() { let matchedCoords = new Set(); for (let r = 0; r < SIZE; r++) { let count = 1; for (let c = 0; c < SIZE; c++) { let cur = board[r][c]?.type, next = (c + 1 < SIZE) ? board[r][c+1]?.type : null; if (cur && cur === next) count++; else { if (count >= 3) { for (let i = 0; i < count; i++) matchedCoords.add(`${r},${c - i}`); } count = 1; } } } for (let c = 0; c < SIZE; c++) { let count = 1; for (let r = 0; r < SIZE; r++) { let cur = board[r][c]?.type, next = (r + 1 < SIZE) ? board[r+1][c]?.type : null; if (cur && cur === next) count++; else { if (count >= 3) { for (let i = 0; i < count; i++) matchedCoords.add(`${r - i},${c}`); } count = 1; } } } for (let r = 0; r < SIZE - 1; r++) { for (let c = 0; c < SIZE - 1; c++) { let t = board[r][c]?.type; if (t && board[r+1][c]?.type === t && board[r][c+1]?.type === t && board[r+1][c+1]?.type === t) { matchedCoords.add(`${r},${c}`); matchedCoords.add(`${r+1},${c}`); matchedCoords.add(`${r},${c+1}`); matchedCoords.add(`${r+1},${c+1}`); } } } let res = []; matchedCoords.forEach(item => { let p = item.split(","); res.push({ r: parseInt(p[0]), c: parseInt(p[1]) }); }); return res; }
 
-// === ВИКТОРИНА ===
+// АНТИ-ДЕДЛОК (Проверка возможных ходов)
+function hasPossibleMoves() {
+for (let r = 0; r < SIZE; r++) {
+    for (let c = 0; c < SIZE; c++) {
+        if (board[r][c] && board[r][c].special) return true; // Спец-фишку можно сдвинуть всегда
+        if (c + 1 < SIZE) {
+            let t = board[r][c]; board[r][c] = board[r][c+1]; board[r][c+1] = t;
+            let m = findAllMatches();
+            t = board[r][c]; board[r][c] = board[r][c+1]; board[r][c+1] = t;
+            if (m.length > 0) return true;
+        }
+        if (r + 1 < SIZE) {
+            let t = board[r][c]; board[r][c] = board[r+1][c]; board[r+1][c] = t;
+            let m = findAllMatches();
+            t = board[r][c]; board[r][c] = board[r+1][c]; board[r+1][c] = t;
+            if (m.length > 0) return true;
+        }
+    }
+}
+return false;
+}
+
+function shuffleBoard() {
+setMessage("Нет ходов! Перемешивание...");
+busy = true;
+setTimeout(() => {
+    let attempts = 0;
+    let items = [];
+    for(let r=0; r<SIZE; r++) for(let c=0; c<SIZE; c++) items.push(board[r][c]);
+    do {
+        items.sort(() => Math.random() - 0.5);
+        let idx = 0;
+        for(let r=0; r<SIZE; r++) for(let c=0; c<SIZE; c++) board[r][c] = items[idx++];
+        attempts++;
+        if (attempts > 50) { createBoard(); break; } // fallback
+    } while(findAllMatches().length > 0 || !hasPossibleMoves());
+    
+    renderBoard();
+    setTimeout(() => { if(!finished) { busy = false; setMessage("Свайпни фрукты!"); } }, 500);
+}, 800);
+}
+
+// === ВИКТОРИНА И ОКОНЧАНИЕ ИГРЫ ===
 let currentQuizContext = null;
 const QUIZ_LEVEL_FAIL = [ 
 { q: "Как называется профессия человека, выращивающего урожай?", a: ["Агроном", "Ветеринар", "Зоотехник"], correct: 0 },
