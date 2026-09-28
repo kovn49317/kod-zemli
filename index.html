@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Код земли</title>
+    <!-- Предзагрузка тяжелых фонов для мгновенного старта -->
     <link rel="preload" href="img/cover.jpg" as="image">
+    <link rel="preload" href="img/bg_farm.jpg" as="image">
+    <link rel="preload" href="img/soil.png" as="image">
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
     <style>
         :root { --primary: #436932; --accent: #E58E26; --card-bg: rgba(255, 255, 255, 0.9); --cell-bg: rgba(255, 255, 255, 0.95); }
@@ -54,7 +57,7 @@
         .map-container { flex: 1; overflow-y: auto; position: relative; padding: 40px 0; display: flex; flex-direction: column-reverse; align-items: center; scroll-behavior: smooth; } .map-container::before { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; background: repeating-linear-gradient(to bottom, rgba(67,105,50,0.3) 0, rgba(67,105,50,0.3) 15px, transparent 15px, transparent 30px); transform: translateX(-50%); z-index: 0; } .level-node-wrap { position: relative; z-index: 1; width: 100%; display: flex; justify-content: center; margin: 20px 0; } .level-node-wrap:nth-child(even) { transform: translateX(40px); } .level-node-wrap:nth-child(odd) { transform: translateX(-40px); } .level-node-wrap.checkpoint { transform: translateX(0); margin: 30px 0; } .level-node { width: 60px; height: 60px; border-radius: 50%; border: 3px solid rgba(67,105,50,0.4); background: #FFF; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: all 0.2s; font-weight: 800; font-size: 20px; color: #263326; box-shadow: 0 4px 10px rgba(0,0,0,0.1); } .level-node.completed { background: #E8F5E9; border-color: #81C784; color: #2E7D32; } .level-node.current { border-color: var(--accent); background: #FFF3E0; color: var(--accent); transform: scale(1.15); box-shadow: 0 6px 16px rgba(229,142,38,0.3); } .level-node.locked { background: rgba(0,0,0,0.05); border-color: transparent; color: #9E9E9E; cursor: not-allowed; } .level-node-wrap.checkpoint .level-node { width: 76px; height: 76px; border-color: #FFC107; background: #FFF8E1; color: #FF8F00; box-shadow: 0 0 20px rgba(255,193,7,0.4); border-width: 4px; } .level-node-wrap.checkpoint .level-node.completed { background: #FFE082; } .level-node-wrap.checkpoint .level-node.locked { border-color: #E0E0E0; background: #F5F5F5; color: #BDBDBD; box-shadow: none; } .level-badge { position: absolute; top: -16px; right: -16px; background: #FFF; border-radius: 12px; padding: 2px 6px; font-size: 12px; font-weight: 700; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 2px; } .checkpoint-label { position: absolute; bottom: -20px; white-space: nowrap; font-size: 12px; font-weight: 800; color: #FF8F00; background: rgba(255,255,255,0.8); padding: 2px 8px; border-radius: 10px; }
         .status-card { background: rgba(0,0,0,0.04); padding: 10px 14px; border-radius: 14px; margin-bottom: 12px; display: flex; justify-content: space-around; font-size: 15px; font-weight: 800; align-items: center; border: 1px solid rgba(0,0,0,0.05); } .board { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; background: rgba(67,105,50,0.15); padding: 8px; border-radius: 18px; aspect-ratio: 1; margin-bottom: 12px; touch-action: none; user-select: none; -webkit-user-select: none; position: relative; } .cell { background: var(--cell-bg); border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; transition: 0.15s; aspect-ratio: 1; font-size: 32px; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.05); position: relative; overflow: visible; } .cell.selected { background: #d7ecd0; transform: scale(0.92); box-shadow: inset 0 0 0 3px var(--primary); } .cell-inner { width: 85%; height: 85%; position: absolute; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 5; } .item-img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.2)); user-select: none; -webkit-user-select: none; -webkit-user-drag: none; }
         @keyframes popAnim { 0% { transform: scale(1); opacity: 1; } 40% { transform: scale(1.25); opacity: 0.9; } 100% { transform: scale(0); opacity: 0; } } .pop { animation: popAnim 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important; } @keyframes dropDown { 0% { transform: translateY(-150%); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } } .drop-anim { animation: dropDown 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; } @keyframes pulseError { 0%, 100% { transform: translateX(0) scale(1); } 25% { transform: translateX(-4px) scale(1.05); } 75% { transform: translateX(4px) scale(1.05); } } .error-anim { animation: pulseError 0.3s; } .booster-badge { animation: pulseError 1.5s infinite; } .message { font-size: 13px; color: #555; min-height: 18px; margin-bottom: 10px; font-weight: 600; text-align: center; }
-        .collection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 10px 0; flex: 1; overflow-y: auto; } .collection-card { background: #FFF; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 1px solid rgba(0,0,0,0.08); opacity: 0.45; filter: grayscale(100%); transition: all 0.3s; } .collection-card.unlocked { opacity: 1; filter: grayscale(0%); cursor: pointer; border-color: var(--primary); box-shadow: 0 6px 16px rgba(67,105,50,0.15); } .collection-icon { font-size: 40px; margin-bottom: 6px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; } .collection-title { font-weight: 800; font-size: 14px; margin-bottom: 4px; } .collection-status { font-size: 11px; font-weight: 700; color: #777; } .collection-card.unlocked .collection-status { color: #2E7D32; }
+        .collection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 10px 0; flex: 1; overflow-y: auto; } .collection-card { background: #FFF; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 1px solid rgba(0,0,0,0.08); opacity: 0.45; filter: grayscale(100%); transition: all 0.3s; cursor: pointer; } .collection-card.unlocked { opacity: 1; filter: grayscale(0%); border-color: var(--primary); box-shadow: 0 6px 16px rgba(67,105,50,0.15); } .collection-icon { font-size: 40px; margin-bottom: 6px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; } .collection-title { font-weight: 800; font-size: 14px; margin-bottom: 4px; } .collection-status { font-size: 11px; font-weight: 700; color: #777; } .collection-card.unlocked .collection-status { color: #2E7D32; }
         .blog-feed { flex: 1; overflow-y: auto; padding-bottom: 20px; display: flex; flex-direction: column; gap: 16px; } .post-card { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.04); text-align: left; } .post-header { display: flex; align-items: center; margin-bottom: 12px; } .post-avatar { width: 44px; height: 44px; border-radius: 50%; background: #E8F5E9; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-right: 12px; border: 1px solid #C8E6C9; overflow: hidden; } .post-author { font-weight: 800; font-size: 15px; color: #1a1a1a; margin-bottom: 2px; } .post-date { font-size: 12px; color: #888; font-weight: 500; } .post-text { font-size: 14px; line-height: 1.45; color: #333; margin-bottom: 14px; }
         .booster-grid { display: flex; justify-content: center; gap: 12px; margin: 16px 0; } .booster-card { background: rgba(0,0,0,0.04); border: 2px solid rgba(0,0,0,0.1); border-radius: 14px; padding: 12px 8px; cursor: pointer; transition: 0.2s; position: relative; width: 75px; display: flex; flex-direction: column; align-items: center; } .booster-card.selected { background: #FFF8E1; border-color: #FFC107; box-shadow: 0 4px 12px rgba(255,193,7,0.3); transform: translateY(-3px); } .booster-icon { font-size: 28px; margin-bottom: 6px; } .booster-price { font-size: 12px; font-weight: 800; color: #F57F17; } .booster-check { position: absolute; top: -8px; right: -8px; background: #4CAF50; color: white; border-radius: 50%; width: 22px; height: 22px; font-size: 13px; display: none; align-items: center; justify-content: center; font-weight: bold; border: 2px solid #FFF;} .booster-card.selected .booster-check { display: flex; } .target-wrap { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 26px; font-weight: 900; background: rgba(67,105,50,0.1); border-radius: 16px; padding: 12px; margin-bottom: 20px; } .target-img-wrap { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
     </style>
@@ -107,6 +110,7 @@
                 <div class="cloud-layer" style="top: 150px; animation-duration: 80s;"><img src="img/cloud1.png" style="width: 300px;" onerror="this.style.display='none';"><span style="display:none; font-size: 80px;">☁️</span></div>
                 <div class="cloud-layer" style="top: 800px; animation-duration: 110s; animation-delay: -30s;"><img src="img/cloud2.png" style="width: 400px;" onerror="this.style.display='none';"><span style="display:none; font-size: 120px;">☁️</span></div>
                 
+                <!-- Контейнер для грядок (Без лагов) -->
                 <div id="farm-items-container" style="position: absolute; top:0; left:0; width:100%; height:100%;"></div>
             </div>
             <button class="btn btn-accent farm-build-btn" onclick="openBuildMenu()">🛒 МАГАЗИН И СТРОЙКА</button>
@@ -122,6 +126,7 @@
         </div>
     </div>
 
+    <!-- БЛОГ -->
     <div id="screen-blog" class="screen screen-padded" style="padding-bottom: 0;">
         <div class="nav-header">
             <button class="nav-back-btn" onclick="showScreen('screen-menu')">← Меню</button>
@@ -131,7 +136,7 @@
         <div class="blog-feed" id="blog-container"></div>
     </div>
 
-    <!-- ТРИ В РЯД + МАСКОТ КОРОВКА -->
+    <!-- ТРИ-В-РЯД И МАСКОТ -->
     <div id="screen-game" class="screen screen-padded">
         <div class="nav-header" style="margin-bottom: 8px;">
             <button class="nav-back-btn" onclick="showScreen('screen-levels')">← Карта</button>
@@ -149,12 +154,12 @@
         <div id="board" class="board"></div>
         <button class="btn btn-secondary" style="padding: 12px; font-size: 14px; margin-top: 10px;" onclick="showScreen('screen-levels')">Сдаться и выйти</button>
         
-        <!-- Место для маскота (Коровки) -->
         <div style="flex: 1; display: flex; justify-content: center; align-items: flex-end; margin-top: 15px; pointer-events: none;">
             <img src="img/cow.png" style="max-height: 140px; width: auto; object-fit: contain; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));" onerror="this.style.display='none';">
         </div>
     </div>
 
+    <!-- КОЛЛЕКЦИЯ -->
     <div id="screen-collection" class="screen screen-padded">
         <div class="nav-header">
             <button class="nav-back-btn" onclick="showScreen('screen-menu')">← Меню</button>
@@ -165,7 +170,7 @@
     </div>
 </div>
 
-<!-- Модалки -->
+<!-- МОДАЛКИ (Включая ВИДЕО) -->
 <div id="prelevel-modal" class="modal">
     <div class="modal-content" style="max-width: 340px;">
         <h2 id="prelevel-title" style="margin-top: 0; font-size: 26px; color: #263326; margin-bottom: 20px;">Уровень 1</h2>
@@ -193,15 +198,32 @@
     </div>
 </div>
 
+<!-- ВОССТАНОВЛЕННЫЙ ПЛЕЕР -->
+<div id="video-modal" class="modal">
+    <div class="modal-content" style="max-width: 95%; width: 400px; padding: 15px; background: #1a1a1a; color: #fff; border: 1px solid #333;">
+        <h3 id="video-title" style="margin-top: 0; font-size: 18px; margin-bottom: 12px;">Ролик</h3>
+        <div id="video-container" style="background: #000; height: 420px; border-radius: 8px; margin-bottom: 16px; overflow:hidden;"></div>
+        <button class="btn" style="background: #333; color: #FFF; box-shadow: none;" onclick="closeVideo()">Закрыть</button>
+    </div>
+</div>
+
 <script>
     try { if (typeof vkBridge !== 'undefined') vkBridge.send('VKWebAppInit'); } catch (e) {}
+
+    // --- ВИДЕО ДЛЯ КОЛЛЕКЦИИ ---
+    // СЮДА ВСТАВЬ ССЫЛКУ НА ВИДЕО ИЗ ВК ДЛЯ ЧЕРЕШНИ (Где написано 'cherry: "ССЫЛКА"')
+    const VIDEO_LINKS = { 
+        plum: "", 
+        cherry: "СЮДА_ВСТАВЬ_ССЫЛКУ_НА_ВИДЕО", 
+        strawberry: "https://vk.ru/clip_ext.php?oid=-241022619&id=456239018&autoplay=1", 
+        bread: "https://vk.ru/clip_ext.php?oid=-241022619&id=456239020&autoplay=1", 
+        tractor: "" 
+    };
 
     const MOCK_VK_POSTS = [ 
         { text: "🛰️ <b>Точное земледелие:</b> Сегодня тракторы ездят сами благодаря GPS и ГЛОНАСС! Они не перекрывают ряды при посеве, экономят топливо и берегут почву от лишнего уплотнения.", date: "Сегодня" }, 
         { text: "💧 <b>Системы полива:</b> Почему капельный полив лучше распылителей? Он доставляет воду и удобрения прямо к корням растения, снижая расход воды на 50% и не давая расти сорнякам между рядами.", date: "Вчера" },
-        { text: "🧬 <b>Селекция растений:</b> Многие боятся ГМО, но современная селекция позволяет создавать сорта пшеницы, устойчивые к засухе, без опасности для человека. Это спасает урожай в жару!", date: "3 дня назад" },
-        { text: "🌱 <b>Вертикальные фермы:</b> Представьте себе ферму прямо в городе, в небоскребе! Гидропоника позволяет выращивать клубнику без почвы круглый год, используя LED-лампы.", date: "Неделю назад" },
-        { text: "🚁 <b>Агродроны в деле:</b> Беспилотники с мультиспектральными камерами сканируют поля и вычисляют индекс NDVI. Они точно знают, какому ростку не хватает азота!", date: "Две недели назад" }
+        { text: "🧬 <b>Селекция растений:</b> Многие боятся ГМО, но современная селекция позволяет создавать сорта пшеницы, устойчивые к засухе, без опасности для человека. Это спасает урожай в жару!", date: "3 дня назад" }
     ];
 
     const SIZE = 6;
@@ -396,7 +418,7 @@
     function updateCamera() { let minPanX = -(2000 * fScale - fViewport.clientWidth); let minPanY = -(2000 * fScale - fViewport.clientHeight); fPanX = Math.min(0, Math.max(minPanX, fPanX)); fPanY = Math.min(0, Math.max(minPanY, fPanY)); if (fWorld) fWorld.style.transform = `translate(${fPanX}px, ${fPanY}px) scale(${fScale})`; }
     setTimeout(updateCamera, 100);
 
-    // --- МАГАЗИН ---
+    // --- МАГАЗИН И ПОСАДКА ---
     let buildModeItem = null; let shopQty = 1;
     function changeShopQty(delta) { shopQty += delta; if (shopQty < 1) shopQty = 1; if (shopQty > 10) shopQty = 10; document.getElementById('shop-qty').innerText = shopQty; }
 
@@ -534,24 +556,32 @@
             if (!el) {
                 el = document.createElement('div'); el.id = id;
                 el.style.position = 'absolute'; el.style.left = (bed.c * 80) + 'px'; el.style.top = (bed.r * 80) + 'px'; el.style.width = '80px'; el.style.height = '80px'; el.style.pointerEvents = 'none'; el.style.zIndex = bed.r * 10 - 5;
+                el.innerHTML = `<img src="img/soil.png" style="position:absolute; left:0; top:0; width:100%; height:100%; display:block;" onerror="this.style.background='#6D4C41';"><div class="item-wrap" style="position:absolute; left:-40px; top:-80px; width:160px; height:160px; display:flex; align-items:flex-end; justify-content:center; z-index:10;"></div>`;
                 container.appendChild(el);
             }
             
-            let html = `<img src="img/soil.png" style="position:absolute; left:0; top:0; width:100%; height:100%; display:block;" onerror="this.style.background='#6D4C41';">`;
+            let wrap = el.querySelector('.item-wrap');
             
             if (bed.item) {
-                let innerHTML = ''; let age = now - bed.item.plantedAt;
-                if (bed.item.state === 'dry') {
-                    innerHTML = `<img src="img/tree_dry.png" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 6px 6px rgba(0,0,0,0.4));" onerror="this.src='img/cherry.png'; this.style.filter='grayscale(100%) sepia(100%) hue-rotate(30deg) drop-shadow(0 6px 6px rgba(0,0,0,0.4))';">`;
-                } else if (age < 120000) { 
-                    let percent = Math.min(100, Math.floor((age / 120000) * 100));
-                    innerHTML = `<img src="img/sprout.png" style="width:30%; height:30%; object-fit:contain; margin-bottom:10px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));" onerror="this.style.display='none';"><div style="display:none; font-size:30px; margin-bottom:10px;">🌱</div><div style="position:absolute; bottom:15px; background:rgba(0,0,0,0.7); border: 1px solid #FFF; color:white; font-size:11px; font-weight:800; border-radius:8px; padding:2px 6px;">${percent}%</div>`;
-                } else { 
-                    innerHTML = `<div class="sway" style="width:100%; height:100%;"><img src="img/tree_cherry.png" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 8px 8px rgba(0,0,0,0.4));" onerror="this.src='img/cherry.png';"></div>`;
+                let age = now - bed.item.plantedAt;
+                let isDry = bed.item.state === 'dry';
+                let isGrowing = !isDry && age < 120000;
+                let stateKey = isDry ? 'dry' : (isGrowing ? 'growing' : 'ready');
+                
+                if (wrap.getAttribute('data-state') !== stateKey) {
+                    if (isDry) { wrap.innerHTML = `<img src="img/tree_dry.png" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 6px 6px rgba(0,0,0,0.4));" onerror="this.src='img/cherry.png'; this.style.filter='grayscale(100%) sepia(100%) hue-rotate(30deg) drop-shadow(0 6px 6px rgba(0,0,0,0.4))';">`; }
+                    else if (isGrowing) { wrap.innerHTML = `<img src="img/sprout.png" style="width:30%; height:30%; object-fit:contain; margin-bottom:10px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));" onerror="this.style.display='none';"><div style="display:none; font-size:30px; margin-bottom:10px;">🌱</div><div class="pct-lbl" style="position:absolute; bottom:15px; background:rgba(0,0,0,0.7); border: 1px solid #FFF; color:white; font-size:11px; font-weight:800; border-radius:8px; padding:2px 6px;">0%</div>`; }
+                    else { wrap.innerHTML = `<div class="sway" style="width:100%; height:100%;"><img src="img/tree_cherry.png" style="width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 8px 8px rgba(0,0,0,0.4));" onerror="this.src='img/cherry.png';"></div>`; }
+                    wrap.setAttribute('data-state', stateKey);
                 }
-                html += `<div style="position:absolute; left:-40px; top:-80px; width:160px; height:160px; display:flex; align-items:flex-end; justify-content:center; z-index:10;">${innerHTML}</div>`;
+                if (isGrowing) {
+                    let percent = Math.min(100, Math.floor((age / 120000) * 100));
+                    let lbl = wrap.querySelector('.pct-lbl');
+                    if (lbl && lbl.innerText !== percent + '%') lbl.innerText = percent + '%';
+                }
+            } else {
+                if (wrap.getAttribute('data-state') !== 'empty') { wrap.innerHTML = ''; wrap.setAttribute('data-state', 'empty'); }
             }
-            if (el.getAttribute('data-html') !== html) { el.innerHTML = html; el.setAttribute('data-html', html); }
         });
 
         Array.from(container.children).forEach(child => { if (!activeIds.has(child.id)) child.remove(); });
@@ -585,9 +615,24 @@
         } 
     }, 1000);
 
-    // --- СТАНДАРТНЫЕ ФУНКЦИИ И ТРИ-В-РЯД ---
-    function renderCollection() { const container = document.getElementById('collection-container'); container.innerHTML = ''; const metadata = { plum: { title: "Садовая слива", req: "2 ур." }, cherry: { title: "Спелая вишня", req: "4 ур." }, strawberry: { title: "Капельный полив", req: "3 ур." }, bread: { title: "Откуда берутся продукты", req: "6 ур." }, tractor: { title: "Агротехнологии", req: "5 ур." } }; TYPES.forEach(type => { const card = document.createElement('div'), isUnlocked = unlockedItems.includes(type); const info = metadata[type] || { title: type, req: "уровни" }; card.className = `collection-card ${isUnlocked ? 'unlocked' : ''}`; card.innerHTML = `<div class="collection-icon">${getImgTag(type)}</div><div class="collection-title">${info.title}</div><div class="collection-status">${isUnlocked ? '▶ Смотреть ролик' : '🔒 ' + info.req}</div>`; container.appendChild(card); }); }
+    // --- ВИДЕОПЛЕЕР (ВОССТАНОВЛЕНО) ---
+    function openVideo(type, title) { openVideoUrl(title, VIDEO_LINKS[type]); }
+    function openVideoUrl(title, url) { 
+        document.getElementById("video-modal").style.display = "flex"; 
+        document.getElementById("video-title").innerText = title; 
+        const container = document.getElementById("video-container"); 
+        if (url && url !== "" && url !== "СЮДА_ВСТАВЬ_ССЫЛКУ_НА_ВИДЕО") { 
+            container.innerHTML = `<iframe src="${url}" width="100%" height="100%" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen style="background-color:#000;"></iframe>`; 
+        } else { 
+            container.innerHTML = `<div style="padding:20px; text-align:center; color:#888;">Видео скоро появится!</div>`; 
+        } 
+    }
+    function closeVideo() { document.getElementById("video-modal").style.display = "none"; document.getElementById("video-container").innerHTML = ""; }
+
+    function renderCollection() { const container = document.getElementById('collection-container'); container.innerHTML = ''; const metadata = { plum: { title: "Садовая слива", req: "2 ур." }, cherry: { title: "Спелая вишня", req: "4 ур." }, strawberry: { title: "Капельный полив", req: "3 ур." }, bread: { title: "Откуда берутся продукты", req: "6 ур." }, tractor: { title: "Агротехнологии", req: "5 ур." } }; TYPES.forEach(type => { const card = document.createElement('div'), isUnlocked = unlockedItems.includes(type); const info = metadata[type] || { title: type, req: "уровни" }; card.className = `collection-card ${isUnlocked ? 'unlocked' : ''}`; card.innerHTML = `<div class="collection-icon">${getImgTag(type)}</div><div class="collection-title">${info.title}</div><div class="collection-status">${isUnlocked ? '▶ Смотреть ролик' : '🔒 ' + info.req}</div>`; if (isUnlocked) card.onclick = () => openVideo(type, info.title); container.appendChild(card); }); }
     function renderBlog() { const container = document.getElementById('blog-container'); container.innerHTML = ''; MOCK_VK_POSTS.forEach(post => { container.innerHTML += `<div class="post-card"><div class="post-header"><div class="post-avatar"><span style="font-size: 24px;">🌱</span></div><div><div class="post-author">Код Земли</div><div class="post-date">${post.date}</div></div></div><div class="post-text">${post.text}</div><div class="post-footer"><div class="post-action">🤍 Лайк</div><div class="post-action">💬 Коммент</div></div></div>`; }); }
+    
+    // --- СТАНДАРТНЫЕ ФУНКЦИИ И ТРИ-В-РЯД ---
     function showPreLevel(idx) { selectedLevelIndex = idx; let lvl = LEVELS_DATA[idx]; document.getElementById("prelevel-title").innerText = `Уровень ${lvl.id}`; document.getElementById("prelevel-icon").innerHTML = `<div style="width:100%;height:100%;">${getImgTag(lvl.targetItem)}</div>`; document.getElementById("prelevel-count").innerText = `${lvl.targetCount} шт.`; document.getElementById("prelevel-moves").innerText = `⏳ ${lvl.moves}`; selectedBoosters = { bomb: false, plane: false, moves: false }; updateBoosterUI(); document.getElementById("prelevel-modal").style.display = "flex"; }
     function closePreLevel() { document.getElementById("prelevel-modal").style.display = "none"; }
     function toggleBooster(type) { selectedBoosters[type] = !selectedBoosters[type]; updateBoosterUI(); }
@@ -651,10 +696,9 @@
         document.getElementById("modal").style.display = "flex"; 
     }
     
-    // ЗДЕСЬ БЫЛА ОШИБКА: Окно рынка закрывалось и сразу открывалось снова!
     function closeModal() { 
         document.getElementById("modal").style.display = "none"; 
-        document.getElementById("modal-title").innerText = "..."; // Очищаем заголовок, чтобы игра не думала, что Рынок все еще открыт!
+        document.getElementById("modal-title").innerText = "..."; 
     }
 
     updateCoinsUI(); checkDailyBonus();
