@@ -1,9 +1,8 @@
 try { if (typeof vkBridge !== 'undefined') vkBridge.send('VKWebAppInit'); } catch (e) {}
 
-// === КОНФИГ ИГРЫ ===
 const VIDEO_LINKS = { 
 plum: "", 
-cherry: "СЮДА_ВСТАВЬ_ССЫЛКУ_НА_ВИДЕО_ДЛЯ_ЧЕРЕШНИ", // Замени на нужную ссылку!
+cherry: "СЮДА_ВСТАВЬ_ССЫЛКУ_НА_ВИДЕО_ДЛЯ_ЧЕРЕШНИ", 
 strawberry: "https://vk.ru/clip_ext.php?oid=-241022619&id=456239018&autoplay=1", 
 bread: "https://vk.ru/clip_ext.php?oid=-241022619&id=456239020&autoplay=1", 
 tractor: "" 
@@ -35,7 +34,6 @@ const LEVELS_DATA = [
 { id: 12, targetItem: "plum", targetCount: 45, moves: 30, reward: null }
 ];
 
-// === ПЕРЕМЕННЫЕ ИГРОКА ===
 let maxUnlockedLevel = localStorage.getItem('kz_max_level') ? parseInt(localStorage.getItem('kz_max_level')) : 1;
 let selectedLevelIndex = maxUnlockedLevel - 1; 
 let unlockedItems = localStorage.getItem('kz_unlocked') ? JSON.parse(localStorage.getItem('kz_unlocked')) : [];
@@ -316,7 +314,7 @@ else if ((buildModeItem.type === 'barn' || buildModeItem.type === 'factory' || b
 }
 }
 
-// === УЛЬТРА-СКОРОСТНОЙ РЕНДЕР (БЕЗ ЛАГОВ И ЗАЗОРОВ) ===
+// === УЛЬТРА-СКОРОСТНОЙ РЕНДЕР ===
 function renderFarmItems() {
 let container = document.getElementById('farm-items-container'); if (!container) return;
 let now = Date.now(); let activeIds = new Set();
@@ -406,7 +404,7 @@ if (document.getElementById('screen-farm').classList.contains('active')) {
 } 
 }, 1000);
 
-// === КОЛЛЕКЦИЯ, БЛОГ, ТРИ-В-РЯД И МОДАЛКИ ===
+// === КОЛЛЕКЦИЯ, БЛОГ И МОДАЛКИ ===
 function openVideo(type, title) { openVideoUrl(title, VIDEO_LINKS[type]); }
 function openVideoUrl(title, url) { 
 document.getElementById("video-modal").style.display = "flex"; 
@@ -434,6 +432,7 @@ function closeBuildMenu() { document.getElementById('build-drawer').classList.re
 function renderLevelsMap() { const container = document.getElementById('levels-container'); container.innerHTML = ''; LEVELS_DATA.forEach((lvl, idx) => { const wrap = document.createElement('div'); const isCheckpoint = lvl.isCheckpoint || lvl.id % 10 === 0; wrap.className = `level-node-wrap ${isCheckpoint ? 'checkpoint' : ''}`; const isLocked = lvl.id > maxUnlockedLevel, isCompleted = lvl.id < maxUnlockedLevel, isCurrent = lvl.id === maxUnlockedLevel; let iconContent = isLocked ? '🔒' : lvl.id; if (isCheckpoint && !isLocked) iconContent = '▶️'; wrap.innerHTML = `<div class="level-node ${isLocked ? 'locked' : ''} ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}"><div>${iconContent}</div>${!isLocked && !isCheckpoint ? `<div class="level-badge">${getImgTag(lvl.targetItem)}${lvl.targetCount}</div>` : ''}</div>`; if (!isLocked) wrap.onclick = () => showPreLevel(idx); container.appendChild(wrap); }); }
 function getImgTag(name, special = null) { if (!name) return ""; let fallback = ICON[name] || SPECIAL_ICON[name] || "❓"; let html = `<img src="img/${name}.png" class="item-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><span class="fallback-icon" style="display:none; width: 100%; height: 100%; align-items:center; justify-content:center;">${fallback}</span>`; if (special) { let specIcon = SPECIAL_ICON[special] || "✨"; html += `<div class="booster-badge" style="position:absolute; right:-4px; bottom:-4px; background:#FFF; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:14px; box-shadow:0 2px 4px rgba(0,0,0,0.4); z-index:10; border:1px solid #E0E0E0;">${specIcon}</div>`; } return html; }
 
+// === ТРИ В РЯД ===
 function initLevel() { let lvl = LEVELS_DATA[selectedLevelIndex]; document.getElementById("game-level-indicator").innerText = `Уровень ${lvl.id}`; moves = lvl.moves; if (selectedBoosters.moves) moves += 5; collectedCount = 0; finished = false; busy = false; selected = null; quizUsed = false; document.getElementById("board").innerHTML = ""; createBoard(); updateUI(); }
 function createBoard() { do { board = []; for (let r = 0; r < SIZE; r++) { let row = []; for (let c = 0; c < SIZE; c++) { let type; do { type = TYPES[Math.floor(Math.random() * TYPES.length)]; } while ((c >= 2 && row[c-1].type === type && row[c-2].type === type) || (r >= 2 && board[r-1][c].type === type && board[r-2][c].type === type) || (r >= 1 && c >= 1 && board[r-1][c-1].type === type && board[r-1][c].type === type && row[c-1].type === type)); row.push({ type: type, special: null, counted: false, isNew: false }); } board.push(row); } } while (findAllMatches().length > 0); if (selectedBoosters.bomb) board[Math.floor(Math.random() * SIZE)][Math.floor(Math.random() * SIZE)].special = "bomb"; if (selectedBoosters.plane) board[Math.floor(Math.random() * SIZE)][Math.floor(Math.random() * SIZE)].special = "plane"; }
 function renderBoard() { const boardEl = document.getElementById("board"); if (boardEl.children.length === 0) { for (let r = 0; r < SIZE; r++) { for (let c = 0; c < SIZE; c++) { const cell = document.createElement("div"); cell.className = "cell"; cell.id = `cell-${r}-${c}`; cell.innerHTML = `<div class="cell-inner" id="inner-${r}-${c}"></div>`; cell.addEventListener('touchstart', (e) => { if (busy || finished) return; swipeStartX = e.touches[0].clientX; swipeStartY = e.touches[0].clientY; swipeR = r; swipeC = c; isSwiping = false; }, {passive: true}); cell.addEventListener('touchmove', (e) => { isSwiping = true; }, {passive: true}); cell.addEventListener('touchend', (e) => { if (busy || finished || swipeR === -1) return; let dx = e.changedTouches[0].clientX - swipeStartX; let dy = e.changedTouches[0].clientY - swipeStartY; if (Math.max(Math.abs(dx), Math.abs(dy)) > 20) { isSwiping = true; let tr = swipeR, tc = swipeC; if (Math.abs(dx) > Math.abs(dy)) { dx > 0 ? tc++ : tc--; } else { dy > 0 ? tr++ : tr--; } if (tr >= 0 && tr < SIZE && tc >= 0 && tc < SIZE) { selected = null; renderBoard(); animateSwapAndCheck(swipeR, swipeC, tr, tc); } } setTimeout(() => isSwiping = false, 100); swipeR = -1; swipeC = -1; }); cell.onclick = (e) => { if (isSwiping) return; handleCellClick(r, c); }; boardEl.appendChild(cell); } } } for (let r = 0; r < SIZE; r++) { for (let c = 0; c < SIZE; c++) { const cell = document.getElementById(`cell-${r}-${c}`); const inner = document.getElementById(`inner-${r}-${c}`); if (selected && selected.r === r && selected.c === c) cell.classList.add("selected"); else cell.classList.remove("selected"); const item = board[r][c]; if (item) { let content = getImgTag(item.type, item.special); if (inner.innerHTML !== content) { inner.innerHTML = content; } inner.className = `cell-inner ${item.isNew ? 'drop-anim' : ''}`; inner.style.transform = ''; } else { inner.innerHTML = ''; inner.className = 'cell-inner'; } } } }
@@ -455,6 +454,14 @@ function checkAndCreateSpecial(r, c, matches) { if (r === null || c === null || 
 function activateSpecial(r, c, toDestroy) { let item = board[r][c]; if (!item || !item.special) return; let spec = item.special; if (spec === "arrowH") { for (let col = 0; col < SIZE; col++) if (board[r][col]) toDestroy.add(`${r},${col}`); } else if (spec === "arrowV") { for (let row = 0; row < SIZE; row++) if (board[row][c]) toDestroy.add(`${row},${c}`); } else if (spec === "bomb") { for (let dr = -2; dr <= 2; dr++) { for (let dc = -2; dc <= 2; dc++) { let nr = r + dr, nc = c + dc; if (nr >= 0 && nr < SIZE && nc >= 0 && nc < SIZE && board[nr][nc]) { toDestroy.add(`${nr},${nc}`); } } } } else if (spec === "plane") { for(let dr=-1; dr<=1; dr++) { for(let dc=-1; dc<=1; dc++) { if(r+dr>=0 && r+dr<SIZE && c+dc>=0 && c+dc<SIZE && board[r+dr][c+dc]) toDestroy.add(`${r+dr},${c+dc}`); } } let targets = []; let lvl = LEVELS_DATA[selectedLevelIndex]; for(let rr=0; rr<SIZE; rr++){ for(let cc=0; cc<SIZE; cc++){ if (board[rr][cc] && board[rr][cc].type === lvl.targetItem && !toDestroy.has(`${rr},${cc}`)) targets.push(`${rr},${cc}`); } } if (targets.length > 0) toDestroy.add(targets[Math.floor(Math.random()*targets.length)]); else { let tr = Math.floor(Math.random() * SIZE), tc = Math.floor(Math.random() * SIZE); if (board[tr][tc]) toDestroy.add(`${tr},${tc}`); } } }
 function findAllMatches() { let matchedCoords = new Set(); for (let r = 0; r < SIZE; r++) { let count = 1; for (let c = 0; c < SIZE; c++) { let cur = board[r][c]?.type, next = (c + 1 < SIZE) ? board[r][c+1]?.type : null; if (cur && cur === next) count++; else { if (count >= 3) { for (let i = 0; i < count; i++) matchedCoords.add(`${r},${c - i}`); } count = 1; } } } for (let c = 0; c < SIZE; c++) { let count = 1; for (let r = 0; r < SIZE; r++) { let cur = board[r][c]?.type, next = (r + 1 < SIZE) ? board[r+1][c]?.type : null; if (cur && cur === next) count++; else { if (count >= 3) { for (let i = 0; i < count; i++) matchedCoords.add(`${r - i},${c}`); } count = 1; } } } for (let r = 0; r < SIZE - 1; r++) { for (let c = 0; c < SIZE - 1; c++) { let t = board[r][c]?.type; if (t && board[r+1][c]?.type === t && board[r][c+1]?.type === t && board[r+1][c+1]?.type === t) { matchedCoords.add(`${r},${c}`); matchedCoords.add(`${r+1},${c}`); matchedCoords.add(`${r},${c+1}`); matchedCoords.add(`${r+1},${c+1}`); } } } let res = []; matchedCoords.forEach(item => { let p = item.split(","); res.push({ r: parseInt(p[0]), c: parseInt(p[1]) }); }); return res; }
 
+// === ВОССТАНОВЛЕННАЯ ЛОГИКА ВИКТОРИНЫ ===
+let currentQuizContext = null;
+
+const QUIZ_LEVEL_FAIL = [ 
+{ q: "Как называется профессия человека, выращивающего урожай?", a: ["Агроном", "Ветеринар", "Зоотехник"], correct: 0 },
+{ q: "Для чего нужен капельный полив?", a: ["Охлаждать растения", "Экономить воду", "Смывать вредителей"], correct: 1 } 
+];
+
 function checkGameEnd() { 
 updateUI(); let lvl = LEVELS_DATA[selectedLevelIndex]; 
 if (collectedCount >= lvl.targetCount) { 
@@ -469,11 +476,55 @@ if (collectedCount >= lvl.targetCount) {
     if (isCheckpoint) { showModal("Сюжетный чекпоинт!", "Ты дошел до важного этапа.\n" + rewardText, "Смотреть видео", () => { closeModal(); showScreen('screen-levels'); }); } else { showModal("Уровень пройден!", `Отличная работа!\n${rewardText}`, "К уровню", () => { closeModal(); showScreen('screen-levels'); }); } 
 } else if (moves <= 0) { 
     finished = true; document.getElementById("reward-box").style.display = "none"; 
-    showModal("Ходы закончились", "Попробуй еще раз!", "Заново", () => { closeModal(); initLevel(); }); 
+    if (!quizUsed) {
+        showLevelFailQuiz();
+    } else {
+        showModal("Ходы закончились", "Попробуй еще раз!", "Заново", () => { closeModal(); initLevel(); }); 
+    }
 } 
 }
 
+function showLevelFailQuiz() {
+currentQuizContext = 'level_fail'; 
+const q = QUIZ_LEVEL_FAIL[Math.floor(Math.random() * QUIZ_LEVEL_FAIL.length)];
+document.getElementById("quiz-modal-title").innerText = "Второй шанс! 🌱";
+document.getElementById("quiz-modal-desc").innerHTML = "У тебя кончились ходы. Ответь на вопрос правильно, чтобы получить <b style='color:#436932;'>+3 хода</b> бесплатно!";
+document.getElementById("quiz-close-btn").innerText = "Сдаться"; 
+document.getElementById("quiz-q").innerText = q.q;
+
+const opts = document.getElementById("quiz-options"); 
+opts.innerHTML = "";
+
+q.a.forEach((ans, i) => { 
+    let b = document.createElement("button"); 
+    b.className = "btn"; 
+    b.style.marginBottom = "8px"; 
+    b.style.backgroundColor = "#F5F5F5"; 
+    b.style.color = "#333"; 
+    b.style.boxShadow = "none"; 
+    b.style.border = "1px solid #CCC"; 
+    b.innerText = ans; 
+    b.onclick = () => handleQuizAnswer(i === q.correct); 
+    opts.appendChild(b); 
+});
+document.getElementById("quiz-modal").style.display = "flex";
+}
+
+function handleQuizAnswer(isCorrect) {
+document.getElementById("quiz-modal").style.display = "none";
+if (currentQuizContext === 'level_fail') {
+    quizUsed = true;
+    if (isCorrect) { 
+        finished = false; busy = false; moves += 3; 
+        updateUI(); setMessage("Правильно! +3 хода"); 
+    } else { 
+        showModal("Неверно 😔", "Правильный ответ был другой. Ходы закончились.", "Заново", () => { closeModal(); initLevel(); }); 
+    }
+}
+}
+
 function failQuiz() { document.getElementById("quiz-modal").style.display = "none"; showModal("Сдался?", "Ходы закончились. Попробуй еще раз!", "Заново", () => { closeModal(); initLevel(); }); }
+
 function showModal(title, text, btnText, callback, secondaryBtnText = null, secondaryCallback = null) { 
 document.getElementById("modal-title").innerText = title; 
 document.getElementById("modal-text").innerHTML = text; 
